@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Botanical HD</title>
+    <title>FancyPantry Obsidian Garden</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,67 +15,76 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         body { 
-            background-color: #121110; 
+            background-color: #0c0a09; 
             min-height: 100vh; 
             color: #E7E5E4; 
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at center, transparent 0%, #121110 90%),
-                url('https://images.unsplash.com/photo-1525498128493-380d1990a112?auto=format&fit=crop&q=20&w=1000');
+            /* Layered backgrounds for depth */
+            background: 
+                radial-gradient(circle at center, rgba(12,10,9,0.7) 0%, #0c0a09 90%),
+                url('https://images.unsplash.com/photo-1536147116438-62679a5e01f2?auto=format&fit=crop&q=40&w=1200');
             background-attachment: fixed;
             background-size: cover;
+            background-position: center;
         }
 
-        /* The Corner Vines */
-        .vines-top {
+        /* Top-Left Overgrowth */
+        .vines-tl {
             position: fixed;
-            top: -50px;
-            left: -50px;
-            width: 400px;
-            height: 400px;
-            background-image: url('https://images.unsplash.com/photo-1533038590840-1cde6e668a91?auto=format&fit=crop&q=60&w=500');
+            top: -10%;
+            left: -5%;
+            width: 60vw;
+            height: 60vh;
+            background-image: url('https://images.unsplash.com/photo-1530903045075-e84081ad7d29?auto=format&fit=crop&q=60&w=800');
             background-size: contain;
-            background-no-repeat: no-repeat;
-            opacity: 0.25;
-            filter: grayscale(40%) contrast(120%);
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            filter: brightness(0.6) contrast(1.2) saturate(0.5);
             pointer-events: none;
             z-index: 0;
-            transform: rotate(-15deg);
+            transform: rotate(-10deg);
         }
 
-        .vines-bottom {
+        /* Bottom-Right Overgrowth */
+        .vines-br {
             position: fixed;
-            bottom: -80px;
-            right: -80px;
-            width: 500px;
-            height: 500px;
-            background-image: url('https://images.unsplash.com/photo-1501004318641-729e75164754?auto=format&fit=crop&q=60&w=500');
+            bottom: -15%;
+            right: -10%;
+            width: 70vw;
+            height: 70vh;
+            background-image: url('https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&q=60&w=800');
             background-size: contain;
-            background-no-repeat: no-repeat;
-            opacity: 0.2;
-            filter: grayscale(30%) brightness(0.7);
+            background-repeat: no-repeat;
+            background-position: bottom right;
+            opacity: 0.25;
+            filter: brightness(0.5) contrast(1.3) grayscale(20%);
             pointer-events: none;
             z-index: 0;
         }
 
         .glass-card {
-            background: rgba(28, 25, 23, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(23, 21, 20, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
 
         .glass-dock {
-            background: rgba(28, 25, 23, 0.8);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(12, 10, 9, 0.85);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        h1 {
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
     </style>
 </head>
 <body class="antialiased font-light">
-    <div class="vines-top"></div>
-    <div class="vines-bottom"></div>
+    <div class="vines-tl"></div>
+    <div class="vines-br"></div>
     
     <div id="root" class="relative z-10"></div>
 
@@ -134,47 +143,47 @@
             const filteredItems = items.filter(item => item.room === activeRoom);
 
             return (
-                <div className="max-w-5xl mx-auto min-h-screen pb-48 px-6 pt-16">
-                    <header className="flex justify-between items-end mb-12">
+                <div className="max-w-6xl mx-auto min-h-screen pb-48 px-6 pt-16">
+                    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-16 gap-4">
                         <div>
-                            <h1 className="text-5xl font-extralight tracking-tighter text-stone-100 uppercase italic leading-none">FancyPantry</h1>
-                            <p className="text-stone-500 text-[10px] tracking-[0.5em] font-bold mt-3 uppercase">Managed Atmosphere</p>
+                            <h1 className="text-6xl font-extralight tracking-tighter text-white uppercase italic leading-none">FancyPantry</h1>
+                            <p className="text-stone-500 text-[11px] tracking-[0.6em] font-bold mt-4 uppercase ml-1">Deep Forest Inventory</p>
                         </div>
-                        <div className="text-stone-700 font-serif italic text-2xl hidden sm:block">
-                            {items.length} items in stock
+                        <div className="bg-stone-100 text-stone-900 px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-2xl">
+                            {items.length} Units Cloud-Synced
                         </div>
                     </header>
                     
-                    <nav className="flex gap-4 overflow-x-auto pb-6 mb-10 no-scrollbar border-b border-stone-800/30">
+                    <nav className="flex gap-4 overflow-x-auto pb-8 mb-12 no-scrollbar border-b border-white/5">
                         {rooms.map(room => (
                             <button 
                                 key={room.name} 
                                 onClick={() => {setActiveRoom(room.name); setEditingId(null);}}
-                                className={`flex items-center gap-3 px-8 py-3 rounded-2xl border transition-all whitespace-nowrap ${
+                                className={`flex items-center gap-3 px-8 py-3.5 rounded-3xl border transition-all whitespace-nowrap ${
                                     activeRoom === room.name 
-                                    ? "bg-stone-100 text-stone-900 border-stone-100 shadow-[0_0_30px_rgba(255,255,255,0.1)] scale-105" 
-                                    : "bg-stone-900/20 text-stone-500 border-stone-800 hover:border-stone-600 hover:text-stone-300"
+                                    ? "bg-white text-stone-950 border-white shadow-[0_0_40px_rgba(255,255,255,0.15)] scale-105" 
+                                    : "bg-black/20 text-stone-500 border-white/10 hover:border-white/20 hover:text-stone-300"
                                 }`}
                             >
                                 <i data-lucide={room.icon} className="w-4 h-4"></i>
-                                <span className="text-[11px] font-bold uppercase tracking-widest">{room.name}</span>
+                                <span className="text-[11px] font-bold uppercase tracking-[0.2em]">{room.name}</span>
                             </button>
                         ))}
                     </nav>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredItems.map(item => (
-                            <div key={item.id} className="glass-card px-7 py-6 rounded-[2.5rem] flex justify-between items-center group hover:border-stone-700 transition-all duration-500">
+                            <div key={item.id} className="glass-card px-8 py-7 rounded-[2.8rem] flex justify-between items-center group transition-all duration-500 hover:scale-[1.02]">
                                 <div className="flex-1 mr-4">
                                     {editingId === item.id ? (
                                         <div className="flex flex-col gap-2">
-                                            <input autoFocus className="text-sm font-medium text-stone-100 bg-stone-800/50 rounded-lg px-2 py-1 outline-none border-b border-stone-500"
+                                            <input autoFocus className="text-sm font-medium text-white bg-white/5 rounded-lg px-2 py-1 outline-none border-b border-white/30"
                                                 value={item.name}
                                                 onChange={(e) => updateItem(item.id, 'name', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
                                                 onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                                             />
-                                            <input className="text-[10px] font-bold text-stone-400 bg-stone-800/50 rounded-lg px-2 outline-none w-16"
+                                            <input className="text-[10px] font-bold text-stone-400 bg-white/5 rounded-lg px-2 outline-none w-16"
                                                 value={item.qty}
                                                 onChange={(e) => updateItem(item.id, 'qty', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
@@ -183,12 +192,12 @@
                                         </div>
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
-                                            <p className="text-base font-medium text-stone-200 group-hover:text-white transition-colors uppercase tracking-tight">{item.name}</p>
-                                            <p className="text-[11px] text-stone-500 font-bold mt-2 uppercase tracking-[0.2em]">Stocked: {item.qty}</p>
+                                            <p className="text-lg font-medium text-stone-100 group-hover:text-white transition-colors tracking-tight uppercase">{item.name}</p>
+                                            <p className="text-[10px] text-stone-500 font-bold mt-2 uppercase tracking-[0.3em]">Qty: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
-                                <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-red-900/50 p-2 transition-all opacity-40 group-hover:opacity-100">
+                                <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-red-500/60 p-2 transition-all opacity-20 group-hover:opacity-100">
                                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -196,18 +205,18 @@
                     </div>
 
                     <div className="fixed bottom-12 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="glass-dock shadow-2xl rounded-[3rem] p-2.5 w-full max-w-2xl pointer-events-auto">
-                            <form onSubmit={handleAddItem} className="flex items-center gap-3">
-                                <input type="text" placeholder={`Replenish ${activeRoom.toLowerCase()}...`} 
+                        <div className="glass-dock shadow-[0_30px_100px_rgba(0,0,0,0.8)] rounded-[3.5rem] p-3 w-full max-w-3xl pointer-events-auto">
+                            <form onSubmit={handleAddItem} className="flex items-center gap-4">
+                                <input type="text" placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
                                     value={newName} onChange={(e) => setNewName(e.target.value)}
-                                    className="flex-1 bg-transparent border-none px-8 py-4 outline-none text-[17px] text-stone-100 placeholder:text-stone-800"
+                                    className="flex-1 bg-transparent border-none px-8 py-4 outline-none text-[18px] text-white placeholder:text-stone-800"
                                 />
                                 <input type="text" placeholder="Vol" 
                                     value={newQty} onChange={(e) => setNewQty(e.target.value)}
-                                    className="w-24 bg-stone-100/5 border border-stone-800 rounded-[1.8rem] py-4 text-center outline-none text-[14px] font-bold text-stone-600"
+                                    className="w-24 bg-white/5 border border-white/10 rounded-[2rem] py-4 text-center outline-none text-[14px] font-bold text-stone-400"
                                 />
-                                <button type="submit" className="bg-stone-100 text-stone-900 w-14 h-14 rounded-[2rem] flex items-center justify-center shadow-xl active:scale-90 transition-all">
-                                    <i data-lucide="plus" className="w-7 h-7"></i>
+                                <button type="submit" className="bg-white text-stone-950 w-16 h-16 rounded-[2.2rem] flex items-center justify-center shadow-2xl active:scale-90 transition-all hover:bg-stone-200">
+                                    <i data-lucide="plus" className="w-8 h-8"></i>
                                 </button>
                             </form>
                         </div>
