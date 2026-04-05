@@ -43,20 +43,19 @@
             async function fetchItems() {
                 const { data, error } = await supabase.from('FancyPantry').select('*').order('name');
                 if (data) setItems(data);
-                if (error) console.error("Fetch Error:", error);
             }
 
             const handleAddItem = async (e) => {
                 e.preventDefault();
                 if (!newName) return;
 
-                const nameToAdd = newName.trim();
+                const nameToAdd = newName.trim().toLowerCase();
                 const qtyToAdd = parseFloat(newQty) || 1;
                 
-                // Find existing item in CURRENT room (case insensitive)
+                // Find existing item in current room (very thorough search)
                 const existing = items.find(i => 
                     i && i.room === activeRoom && 
-                    i.name && i.name.toLowerCase().trim() === nameToAdd.toLowerCase().trim()
+                    i.name && i.name.toLowerCase().trim() === nameToAdd
                 );
 
                 if (existing) {
@@ -68,21 +67,15 @@
                         .update({ qty: combined })
                         .eq('id', existing.id);
                     
-                    if (error) {
-                        alert("Update failed: " + error.message);
-                    } else {
-                        await fetchItems();
-                    }
+                    // Force refresh after update
+                    await fetchItems();
                 } else {
                     const { error } = await supabase
                         .from('FancyPantry')
-                        .insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom }]);
+                        .insert([{ name: newName.trim(), qty: qtyToAdd.toString(), room: activeRoom }]);
                     
-                    if (error) {
-                        alert("Insert failed: " + error.message);
-                    } else {
-                        await fetchItems();
-                    }
+                    // Force refresh after insert
+                    await fetchItems();
                 }
                 setNewName(""); setNewQty("");
             };
