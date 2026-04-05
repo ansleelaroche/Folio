@@ -8,32 +8,37 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-[#F9F8F6] text-stone-800">
+<body class="bg-[#FDFCFB] text-stone-800 antialiased">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
         function PantryApp() {
-            const rooms = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
+            const rooms = [
+                { name: "Fridge", icon: "refrigerator" },
+                { name: "Freezer", icon: "snowflake" },
+                { name: "Pantry", icon: "box" },
+                { name: "Counter", icon: "utensils" },
+                { name: "Cabinets", icon: "archive" }
+            ];
+
             const [activeRoom, setActiveRoom] = useState("Fridge");
-            
-            // NEW: Load items from LocalStorage when the app starts
             const [items, setItems] = useState(() => {
                 const saved = localStorage.getItem("pantry_data");
-                return saved ? JSON.parse(saved) : [
-                    { id: 1, name: "Organic Milk", qty: "1", room: "Fridge" }
-                ];
+                return saved ? JSON.parse(saved) : [];
             });
 
             const [newName, setNewName] = useState("");
-            const [newQty, setNewQty] = useState(""); // State for Quantity
+            const [newQty, setNewQty] = useState("");
 
-            // NEW: Save items to LocalStorage whenever the list changes
             useEffect(() => {
-                localStorage.setItem("pantry_data", JSON.stringify(items));
-            }, [items]);
+                const saved = localStorage.getItem("pantry_data");
+                // This renders the icons after React finishes building the page
+                lucide.createIcons();
+            }, [items, activeRoom]);
 
             const handleAddItem = (e) => {
                 e.preventDefault();
@@ -56,56 +61,81 @@
             const filteredItems = items.filter(item => item.room === activeRoom);
 
             return (
-                <div class="max-w-md mx-auto min-h-screen pb-40 p-6">
-                    <header class="mb-8 pt-6">
-                        <h1 class="text-3xl font-extralight tracking-tight text-stone-900 italic">Kitchen Inventory</h1>
-                        <p class="text-stone-400 text-sm mt-1 uppercase tracking-widest">{activeRoom}</p>
+                <div class="max-w-2xl mx-auto min-h-screen pb-48 p-6 lg:p-12">
+                    <header class="mb-12 flex justify-between items-end">
+                        <div>
+                            <h1 class="text-4xl font-light tracking-tight text-stone-900">Inventory</h1>
+                            <p class="text-stone-400 text-sm mt-1 font-medium uppercase tracking-[0.2em]">Kitchen Management</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-3xl font-extralight text-stone-300">{items.length}</span>
+                            <p class="text-[10px] text-stone-400 uppercase font-bold">Total Items</p>
+                        </div>
                     </header>
                     
-                    <div class="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
+                    {/* Category Navigation */}
+                    <nav class="flex gap-4 overflow-x-auto pb-8 mb-4 no-scrollbar border-b border-stone-100">
                         {rooms.map(room => (
-                            <button key={room} onClick={() => setActiveRoom(room)}
-                                class={`px-5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
-                                    activeRoom === room ? "bg-stone-900 text-white border-stone-900" : "bg-white text-stone-400 border-stone-200"
-                                }`}>
-                                {room.toUpperCase()}
+                            <button 
+                                key={room.name} 
+                                onClick={() => setActiveRoom(room.name)}
+                                class={`flex flex-col items-center gap-2 min-w-[80px] transition-all ${
+                                    activeRoom === room.name ? "text-stone-900 scale-110" : "text-stone-300 hover:text-stone-500"
+                                }`}
+                            >
+                                <i data-lucide={room.icon} class="w-6 h-6 stroke-[1.5px]"></i>
+                                <span class="text-[10px] font-bold uppercase tracking-widest">{room.name}</span>
+                                {activeRoom === room.name && <div class="w-1 h-1 bg-stone-900 rounded-full mt-1"></div>}
                             </button>
                         ))}
-                    </div>
+                    </nav>
 
-                    <div class="space-y-2">
+                    {/* Inventory Grid */}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {filteredItems.length > 0 ? (
                             filteredItems.map(item => (
-                                <div key={item.id} class="bg-white p-4 rounded-xl border border-stone-100 flex justify-between items-center shadow-sm">
-                                    <div class="flex flex-col">
-                                        <span class="font-medium text-stone-800">{item.name}</span>
-                                        <span class="text-[10px] text-stone-400 uppercase font-bold tracking-tighter">Qty: {item.qty}</span>
+                                <div key={item.id} class="bg-white p-5 rounded-3xl border border-stone-100 flex flex-col justify-between h-32 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-transform active:scale-95">
+                                    <div class="flex justify-between items-start">
+                                        <div class="w-8 h-8 bg-stone-50 rounded-full flex items-center justify-center">
+                                            <i data-lucide="shopping-bag" class="w-4 h-4 text-stone-400 stroke-[1.5px]"></i>
+                                        </div>
+                                        <button onClick={() => removeItem(item.id)} class="text-stone-200 hover:text-red-400 transition-colors">
+                                            <i data-lucide="x" class="w-4 h-4"></i>
+                                        </button>
                                     </div>
-                                    <button onClick={() => removeItem(item.id)} class="text-stone-300 hover:text-red-400 text-xl">×</button>
+                                    <div>
+                                        <h3 class="font-medium text-stone-800 leading-tight">{item.name}</h3>
+                                        <p class="text-xs text-stone-400 mt-1 font-bold">QTY: {item.qty}</p>
+                                    </div>
                                 </div>
                             ))
                         ) : (
-                            <div class="py-20 text-center border border-dashed border-stone-200 rounded-2xl">
-                                <p class="text-stone-300 text-sm italic">Nothing in {activeRoom}</p>
+                            <div class="col-span-full py-24 text-center border-2 border-dashed border-stone-100 rounded-[2rem]">
+                                <i data-lucide="utensils-crosses" class="w-8 h-8 mx-auto text-stone-200 mb-4 stroke-[1px]"></i>
+                                <p class="text-stone-300 text-sm font-light italic">Your {activeRoom} is currently empty</p>
                             </div>
                         )}
                     </div>
 
-                    {/* UPDATED: Dual Input Bar */}
-                    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-100 p-6">
-                        <form onSubmit={handleAddItem} class="max-w-md mx-auto flex flex-col gap-3">
-                            <div class="flex gap-2">
-                                <input type="text" placeholder="Item name..." value={newName}
-                                    onChange={(e) => setNewName(e.target.value)}
-                                    class="flex-1 bg-stone-50 border border-stone-100 rounded-xl p-3 outline-none focus:bg-white focus:border-stone-300 transition-all"
-                                />
-                                <input type="text" placeholder="Qty" value={newQty}
-                                    onChange={(e) => setNewQty(e.target.value)}
-                                    class="w-16 bg-stone-50 border border-stone-100 rounded-xl p-3 text-center outline-none"
-                                />
-                            </div>
-                            <button type="submit" class="bg-stone-900 text-white py-3 rounded-xl font-bold active:scale-95 transition-all">
-                                ADD TO {activeRoom.toUpperCase()}
+                    {/* Floating Input Dock */}
+                    <div class="fixed bottom-8 left-6 right-6 lg:left-auto lg:right-auto lg:w-[600px] bg-white/70 backdrop-blur-2xl border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2.5rem] p-4 mx-auto">
+                        <form onSubmit={handleAddItem} class="flex gap-3">
+                            <input 
+                                type="text" 
+                                placeholder={`Add to ${activeRoom}...`} 
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                class="flex-1 bg-transparent border-none px-4 py-2 outline-none text-stone-800 placeholder:text-stone-300 font-medium"
+                            />
+                            <input 
+                                type="text" 
+                                placeholder="Qty" 
+                                value={newQty}
+                                onChange={(e) => setNewQty(e.target.value)}
+                                class="w-16 bg-stone-100/50 border-none rounded-2xl px-2 text-center outline-none text-xs font-bold"
+                            />
+                            <button type="submit" class="bg-stone-900 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-stone-700 active:scale-90 transition-all shadow-lg">
+                                <i data-lucide="plus" class="w-6 h-6"></i>
                             </button>
                         </form>
                     </div>
