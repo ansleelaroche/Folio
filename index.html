@@ -50,46 +50,43 @@
                 if (!newName) return;
 
                 const nameToAdd = newName.trim();
-                const qtyToAdd = Number(newQty) || 1;
+                const qtyToAdd = parseFloat(newQty) || 1;
                 
-                // Safe search for existing items
                 const existing = items.find(i => 
                     i && i.room === activeRoom && 
                     i.name && i.name.toLowerCase() === nameToAdd.toLowerCase()
                 );
 
                 if (existing) {
-                    const currentQty = Number(existing.qty) || 0;
+                    const currentQty = parseFloat(existing.qty) || 0;
                     const combined = (currentQty + qtyToAdd).toString();
                     
-                    const { data } = await supabase
+                    const { error } = await supabase
                         .from('FancyPantry')
                         .update({ qty: combined })
-                        .eq('id', existing.id)
-                        .select();
+                        .eq('id', existing.id);
                     
-                    if (data) setItems(items.map(i => i && i.id === existing.id ? data[0] : i));
+                    if (!error) await fetchItems();
                 } else {
-                    const { data } = await supabase
+                    const { error } = await supabase
                         .from('FancyPantry')
-                        .insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom }])
-                        .select();
-                    if (data) setItems([...items, data[0]]);
+                        .insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom }]);
+                    
+                    if (!error) await fetchItems();
                 }
                 setNewName(""); setNewQty("");
             };
 
             const updateItem = async (id, field, value) => {
-                setItems(items.map(i => i && i.id === id ? { ...i, [field]: value } : i));
+                setItems(prev => prev.map(i => i.id === id ? { ...i, [field]: value } : i));
                 await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
             };
 
             const removeItem = async (id) => {
-                setItems(items.filter(i => i && i.id !== id));
+                setItems(prev => prev.filter(i => i.id !== id));
                 await supabase.from('FancyPantry').delete().eq('id', id);
             };
 
-            // SAFE FILTER: This prevents the 'undefined' error
             const filteredItems = items.filter(item => item && item.room === activeRoom);
 
             return (
@@ -119,8 +116,8 @@
                                         />
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
-                                            <p className="text-[11px] font-medium text-stone-200 truncate">{item.name || "Unnamed"}</p>
-                                            <p className="text-[9px] text-stone-500 font-bold uppercase">QTY: {item.qty || "0"}</p>
+                                            <p className="text-[11px] font-medium text-stone-200 truncate">{item.name}</p>
+                                            <p className="text-[9px] text-stone- stone-500 font-bold">QTY: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
