@@ -39,14 +39,18 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const CATEGORIES = {
-            "Produce": { bar: "bg-emerald-600", text: "text-emerald-500", icon: "leaf", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
-            "Dairy": { bar: "bg-stone-300", text: "text-stone-300", icon: "milk", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
-            "Protein": { bar: "bg-orange-700", text: "text-orange-600", icon: "bone", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
-            "Drinks": { bar: "bg-teal-800", text: "text-teal-600", icon: "droplets", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
-            "Pantry": { bar: "bg-yellow-600", text: "text-yellow-600", icon: "container", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice", "sauce"] },
-            "Frozen": { bar: "bg-blue-500", text: "text-blue-400", icon: "snowflake", keywords: ["ice", "frozen", "pizza", "nugget"] },
-            "Misc": { bar: "bg-stone-500", text: "text-stone-500", icon: "more-horizontal", keywords: [] }
-        };
+    "Produce": { bar: "bg-emerald-600", text: "text-emerald-500", icon: "leaf", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
+    "Dairy": { bar: "bg-stone-300", text: "text-stone-300", icon: "milk", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
+    "Protein": { bar: "bg-orange-700", text: "text-orange-600", icon: "bone", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+    "Drinks": { bar: "bg-teal-800", text: "text-teal-600", icon: "droplets", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
+    
+    /* NEW CATEGORY */
+    "Condiments": { bar: "bg-amber-600", text: "text-amber-500", icon: "utensils", keywords: ["mayo", "ranch", "ketchup", "mustard", "sauce", "dressing", "aioli", "dip", "salsa", "jam", "syrup"] },
+    
+    "Pantry": { bar: "bg-yellow-600", text: "text-yellow-600", icon: "container", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice"] },
+    "Frozen": { bar: "bg-blue-500", text: "text-blue-400", icon: "snowflake", keywords: ["ice", "frozen", "pizza", "nugget"] },
+    "Misc": { bar: "bg-stone-500", text: "text-stone-500", icon: "more-horizontal", keywords: [] }
+};
 
         function PantryApp() {
             const [activeRoom, setActiveRoom] = useState("Fridge");
