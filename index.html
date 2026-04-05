@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Smart</title>
+    <title>FancyPantry Professional</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,8 +14,9 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         body { background-color: #1c1917; color: #E7E5E4; min-height: 100vh; overflow-x: hidden; }
         .vines-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; opacity: 0.15; }
-        .glass-card { background: rgba(41, 37, 36, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .shelf-divider { border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 0.75rem; padding-bottom: 0.25rem; }
+        .glass-card { background: rgba(41, 37, 36, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.03); }
+        .shelf-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 1rem; padding-bottom: 0.5rem; }
+        .accent-bar { width: 3px; height: 100%; position: absolute; left: 0; top: 0; border-radius: 4px 0 0 4px; }
     </style>
 </head>
 <body class="antialiased font-light tracking-tight uppercase">
@@ -31,13 +32,13 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const CATEGORIES = {
-            "Produce": { color: "text-green-400", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
-            "Dairy": { color: "text-blue-300", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
-            "Protein": { color: "text-red-400", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
-            "Drinks": { color: "text-purple-300", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop"] },
-            "Pantry": { color: "text-orange-300", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "coffee", "tea", "spice", "sauce"] },
-            "Frozen": { color: "text-cyan-200", keywords: ["ice", "frozen", "pizza", "nugget"] },
-            "Misc": { color: "text-stone-500", keywords: [] }
+            "Produce": { color: "bg-green-500", text: "text-green-400", icon: "apple", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
+            "Dairy": { color: "bg-blue-400", text: "text-blue-300", icon: "milky-way", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
+            "Protein": { color: "bg-red-500", text: "text-red-400", icon: "beef", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+            "Drinks": { color: "bg-purple-400", text: "text-purple-300", icon: "cup-soda", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
+            "Pantry": { color: "bg-orange-400", text: "text-orange-300", icon: "package", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice", "sauce"] },
+            "Frozen": { color: "bg-cyan-400", text: "text-cyan-200", icon: "snowflake", keywords: ["ice", "frozen", "pizza", "nugget"] },
+            "Misc": { color: "bg-stone-500", text: "text-stone-500", icon: "archive", keywords: [] }
         };
 
         function PantryApp() {
@@ -49,9 +50,8 @@
             const [isSyncing, setIsSyncing] = useState(false);
 
             useEffect(() => { fetchItems(); }, []);
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom]);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, isSyncing]);
 
-            // Auto-categorize based on typing
             useEffect(() => {
                 const name = newName.toLowerCase();
                 for (const [cat, data] of Object.entries(CATEGORIES)) {
@@ -70,10 +70,8 @@
             const groupedItems = useMemo(() => {
                 const filtered = items.filter(i => i.room === activeRoom);
                 return filtered.reduce((acc, item) => {
-                    // Match category case-insensitively
                     const dbCat = (item.category || "Misc").toLowerCase();
                     const matchedCat = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
-                    
                     if (!acc[matchedCat]) acc[matchedCat] = [];
                     acc[matchedCat].push(item);
                     return acc;
@@ -84,7 +82,6 @@
                 e.preventDefault();
                 if (!newName || isSyncing) return;
                 setIsSyncing(true);
-
                 const nameToAdd = newName.trim();
                 const qtyToAdd = parseFloat(newQty) || 1;
                 const existing = items.find(i => i.room === activeRoom && i.name?.toLowerCase() === nameToAdd.toLowerCase());
@@ -94,12 +91,7 @@
                         const newTotal = (parseFloat(existing.qty || 0) + qtyToAdd).toString();
                         await supabase.from('FancyPantry').update({ qty: newTotal }).eq('id', existing.id);
                     } else {
-                        await supabase.from('FancyPantry').insert([{ 
-                            name: nameToAdd, 
-                            qty: qtyToAdd.toString(), 
-                            room: activeRoom, 
-                            category: selectedCat 
-                        }]);
+                        await supabase.from('FancyPantry').insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom, category: selectedCat }]);
                     }
                     await fetchItems();
                 } finally {
@@ -115,34 +107,36 @@
 
             return (
                 <div className="max-w-4xl mx-auto pb-48 px-6 pt-12">
-                    <header className="mb-8">
-                        <h1 className="text-xl font-extralight italic tracking-[0.2em] text-stone-500">{activeRoom} <span className="text-white">Inventory</span></h1>
+                    <header className="mb-10 flex justify-between items-center">
+                        <h1 className="text-xl font-extralight italic tracking-[0.3em] text-stone-500 uppercase">{activeRoom}</h1>
+                        <span className="text-[9px] font-bold text-stone-700 tracking-widest">{items.filter(i => i.room === activeRoom).length} ITEMS</span>
                     </header>
 
-                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-6 no-scrollbar border-b border-white/5">
+                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-8 no-scrollbar">
                         {["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"].map(room => (
                             <button key={room} onClick={() => setActiveRoom(room)}
-                                className={`px-4 py-2 rounded-lg text-[9px] font-bold transition-all ${
-                                    activeRoom === room ? "bg-white text-stone-900" : "bg-stone-900/40 text-stone-600"
+                                className={`px-5 py-2 rounded-xl text-[10px] font-bold transition-all ${
+                                    activeRoom === room ? "bg-white text-stone-900 shadow-xl" : "bg-stone-900/40 text-stone-600"
                                 }`}>
                                 {room}
                             </button>
                         ))}
                     </nav>
 
-                    <div className="space-y-8">
+                    <div className="space-y-12">
                         {Object.keys(CATEGORIES).map(cat => groupedItems[cat] && (
-                            <section key={cat} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                <div className="shelf-divider flex justify-between items-baseline">
-                                    <h2 className={`text-[9px] font-black tracking-[0.3em] ${CATEGORIES[cat].color}`}>{cat}</h2>
-                                    <span className="text-[8px] text-stone-700">{groupedItems[cat].length}</span>
+                            <section key={cat} className="animate-in fade-in duration-700">
+                                <div className="shelf-header">
+                                    <i data-lucide={CATEGORIES[cat].icon} className={`w-4 h-4 ${CATEGORIES[cat].text}`}></i>
+                                    <h2 className={`text-[10px] font-black tracking-[0.4em] uppercase ${CATEGORIES[cat].text}`}>{cat}</h2>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {groupedItems[cat].map(item => (
-                                        <div key={item.id} className="glass-card p-3 rounded-xl flex justify-between items-center group">
+                                        <div key={item.id} className="glass-card relative p-3 pl-5 rounded-xl flex justify-between items-center group overflow-hidden">
+                                            <div className={`accent-bar ${CATEGORIES[cat].color}`}></div>
                                             <div className="min-w-0">
-                                                <p className="text-[10px] font-medium text-stone-200 truncate">{item.name}</p>
-                                                <p className="text-[8px] text-stone-600 font-bold">QTY: {item.qty}</p>
+                                                <p className="text-[11px] font-semibold text-stone-100 truncate uppercase">{item.name}</p>
+                                                <p className="text-[9px] text-stone-600 font-bold tracking-tighter uppercase">QTY: {item.qty}</p>
                                             </div>
                                             <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-red-500 transition-colors">
                                                 <i data-lucide="x" className="w-3 h-3"></i>
@@ -154,25 +148,26 @@
                         ))}
                     </div>
 
-                    <div className="fixed bottom-6 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="bg-[#1c1917]/95 backdrop-blur-2xl p-4 w-full max-w-lg pointer-events-auto rounded-[2rem] border border-white/5 shadow-2xl">
-                            <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
+                    <div className="fixed bottom-8 left-6 right-6 flex justify-center pointer-events-none">
+                        <div className="bg-[#1c1917]/95 backdrop-blur-3xl p-4 w-full max-w-lg pointer-events-auto rounded-[2.5rem] border border-white/5 shadow-2xl">
+                            <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
                                 {Object.keys(CATEGORIES).map(cat => (
                                     <button key={cat} onClick={() => setSelectedCat(cat)}
-                                        className={`px-3 py-1 rounded-full text-[8px] font-bold transition-all border ${
+                                        className={`px-3 py-1 rounded-full text-[8px] font-bold transition-all flex items-center gap-1 border ${
                                             selectedCat === cat ? "bg-white text-black border-white" : "bg-stone-900/50 text-stone-600 border-transparent"
                                         }`}>
+                                        <i data-lucide={CATEGORIES[cat].icon} className="w-2.5 h-2.5"></i>
                                         {cat}
                                     </button>
                                 ))}
                             </div>
                             <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input type="text" placeholder="Add Item..." value={newName} onChange={(e) => setNewName(e.target.value)} 
-                                    className="flex-1 bg-transparent px-2 py-1 outline-none text-sm text-white placeholder:text-stone-800" />
+                                <input type="text" placeholder="Scan or Type Item..." value={newName} onChange={(e) => setNewName(e.target.value)} 
+                                    className="flex-1 bg-transparent px-2 py-1 outline-none text-sm text-white placeholder:text-stone-800 uppercase" />
                                 <input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} 
-                                    className="w-10 bg-white/5 rounded-lg py-2 text-center outline-none text-xs text-stone-400" />
-                                <button type="submit" disabled={isSyncing} className="bg-white text-stone-900 w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-transform">
-                                    <i data-lucide="plus" className="w-5 h-5"></i>
+                                    className="w-10 bg-white/10 rounded-lg py-2 text-center outline-none text-xs text-stone-400" />
+                                <button type="submit" disabled={isSyncing} className="bg-white text-stone-900 w-12 h-12 rounded-2xl flex items-center justify-center active:scale-95 transition-all">
+                                    <i data-lucide={isSyncing ? "refresh-cw" : "plus"} className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`}></i>
                                 </button>
                             </form>
                         </div>
