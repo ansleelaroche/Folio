@@ -31,11 +31,12 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const CATEGORIES = {
-            "Produce": { color: "text-green-400", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime"] },
-            "Dairy": { color: "text-blue-300", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm"] },
-            "Protein": { color: "text-red-400", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham"] },
-            "Pantry": { color: "text-orange-300", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "coffee", "tea", "spice"] },
-            "Frozen": { color: "text-cyan-200", keywords: ["ice", "frozen", "pizza", "nugget", "berry", "peas"] },
+            "Produce": { color: "text-green-400", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
+            "Dairy": { color: "text-blue-300", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
+            "Protein": { color: "text-red-400", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+            "Drinks": { color: "text-purple-300", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop"] },
+            "Pantry": { color: "text-orange-300", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "coffee", "tea", "spice", "sauce"] },
+            "Frozen": { color: "text-cyan-200", keywords: ["ice", "frozen", "pizza", "nugget"] },
             "Misc": { color: "text-stone-500", keywords: [] }
         };
 
@@ -69,9 +70,12 @@
             const groupedItems = useMemo(() => {
                 const filtered = items.filter(i => i.room === activeRoom);
                 return filtered.reduce((acc, item) => {
-                    const cat = item.category || "Misc";
-                    if (!acc[cat]) acc[cat] = [];
-                    acc[cat].push(item);
+                    // Match category case-insensitively
+                    const dbCat = (item.category || "Misc").toLowerCase();
+                    const matchedCat = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
+                    
+                    if (!acc[matchedCat]) acc[matchedCat] = [];
+                    acc[matchedCat].push(item);
                     return acc;
                 }, {});
             }, [items, activeRoom]);
@@ -90,7 +94,12 @@
                         const newTotal = (parseFloat(existing.qty || 0) + qtyToAdd).toString();
                         await supabase.from('FancyPantry').update({ qty: newTotal }).eq('id', existing.id);
                     } else {
-                        await supabase.from('FancyPantry').insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom, category: selectedCat }]);
+                        await supabase.from('FancyPantry').insert([{ 
+                            name: nameToAdd, 
+                            qty: qtyToAdd.toString(), 
+                            room: activeRoom, 
+                            category: selectedCat 
+                        }]);
                     }
                     await fetchItems();
                 } finally {
@@ -110,7 +119,7 @@
                         <h1 className="text-xl font-extralight italic tracking-[0.2em] text-stone-500">{activeRoom} <span className="text-white">Inventory</span></h1>
                     </header>
 
-                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-6 no-scrollbar">
+                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-6 no-scrollbar border-b border-white/5">
                         {["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"].map(room => (
                             <button key={room} onClick={() => setActiveRoom(room)}
                                 className={`px-4 py-2 rounded-lg text-[9px] font-bold transition-all ${
@@ -123,7 +132,7 @@
 
                     <div className="space-y-8">
                         {Object.keys(CATEGORIES).map(cat => groupedItems[cat] && (
-                            <section key={cat}>
+                            <section key={cat} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                                 <div className="shelf-divider flex justify-between items-baseline">
                                     <h2 className={`text-[9px] font-black tracking-[0.3em] ${CATEGORIES[cat].color}`}>{cat}</h2>
                                     <span className="text-[8px] text-stone-700">{groupedItems[cat].length}</span>
@@ -146,12 +155,12 @@
                     </div>
 
                     <div className="fixed bottom-6 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="bg-[#1c1917] p-4 w-full max-w-lg pointer-events-auto rounded-3xl border border-white/5 shadow-2xl">
+                        <div className="bg-[#1c1917]/95 backdrop-blur-2xl p-4 w-full max-w-lg pointer-events-auto rounded-[2rem] border border-white/5 shadow-2xl">
                             <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
                                 {Object.keys(CATEGORIES).map(cat => (
                                     <button key={cat} onClick={() => setSelectedCat(cat)}
-                                        className={`px-3 py-1 rounded-full text-[8px] font-bold transition-all ${
-                                            selectedCat === cat ? "bg-white text-black" : "bg-stone-900 text-stone-600"
+                                        className={`px-3 py-1 rounded-full text-[8px] font-bold transition-all border ${
+                                            selectedCat === cat ? "bg-white text-black border-white" : "bg-stone-900/50 text-stone-600 border-transparent"
                                         }`}>
                                         {cat}
                                     </button>
@@ -162,7 +171,7 @@
                                     className="flex-1 bg-transparent px-2 py-1 outline-none text-sm text-white placeholder:text-stone-800" />
                                 <input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} 
                                     className="w-10 bg-white/5 rounded-lg py-2 text-center outline-none text-xs text-stone-400" />
-                                <button type="submit" disabled={isSyncing} className="bg-white text-stone-900 w-10 h-10 rounded-xl flex items-center justify-center">
+                                <button type="submit" disabled={isSyncing} className="bg-white text-stone-900 w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-transform">
                                     <i data-lucide="plus" className="w-5 h-5"></i>
                                 </button>
                             </form>
