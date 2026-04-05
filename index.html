@@ -13,9 +13,9 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         body { background-color: #1c1917; color: #E7E5E4; min-height: 100vh; overflow-x: hidden; }
-        .vines-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; opacity: 0.15; }
+        .vines-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; opacity: 0.12; }
         .glass-card { background: rgba(41, 37, 36, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.03); }
-        .shelf-header { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 1rem; padding-bottom: 0.5rem; }
+        .shelf-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 1.25rem; padding-bottom: 0.5rem; }
         .accent-bar { width: 3px; height: 100%; position: absolute; left: 0; top: 0; border-radius: 4px 0 0 4px; }
     </style>
 </head>
@@ -32,13 +32,13 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const CATEGORIES = {
-            "Produce": { color: "bg-green-500", text: "text-green-400", icon: "apple", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
-            "Dairy": { color: "bg-blue-400", text: "text-blue-300", icon: "milky-way", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
-            "Protein": { color: "bg-red-500", text: "text-red-400", icon: "beef", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
-            "Drinks": { color: "bg-purple-400", text: "text-purple-300", icon: "cup-soda", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
-            "Pantry": { color: "bg-orange-400", text: "text-orange-300", icon: "package", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice", "sauce"] },
-            "Frozen": { color: "bg-cyan-400", text: "text-cyan-200", icon: "snowflake", keywords: ["ice", "frozen", "pizza", "nugget"] },
-            "Misc": { color: "bg-stone-500", text: "text-stone-500", icon: "archive", keywords: [] }
+            "Produce": { color: "bg-emerald-700", text: "text-emerald-500", icon: "leaf", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
+            "Dairy": { color: "bg-stone-200", text: "text-stone-300", icon: "milk", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
+            "Protein": { color: "bg-orange-800", text: "text-orange-700/80", icon: "bone", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+            "Drinks": { color: "bg-emerald-900", text: "text-emerald-800", icon: "droplets", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
+            "Pantry": { color: "bg-yellow-700", text: "text-yellow-600/70", icon: "container", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice", "sauce"] },
+            "Frozen": { color: "bg-slate-500", text: "text-slate-400", icon: "snowflake", keywords: ["ice", "frozen", "pizza", "nugget"] },
+            "Misc": { color: "bg-stone-700", text: "text-stone-600", icon: "more-horizontal", keywords: [] }
         };
 
         function PantryApp() {
@@ -67,17 +67,6 @@
                 if (data) setItems(data);
             }
 
-            const groupedItems = useMemo(() => {
-                const filtered = items.filter(i => i.room === activeRoom);
-                return filtered.reduce((acc, item) => {
-                    const dbCat = (item.category || "Misc").toLowerCase();
-                    const matchedCat = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
-                    if (!acc[matchedCat]) acc[matchedCat] = [];
-                    acc[matchedCat].push(item);
-                    return acc;
-                }, {});
-            }, [items, activeRoom]);
-
             const handleAddItem = async (e) => {
                 e.preventDefault();
                 if (!newName || isSyncing) return;
@@ -105,18 +94,30 @@
                 setItems(prev => prev.filter(i => i.id !== id));
             };
 
+            const groupedItems = useMemo(() => {
+                const filtered = items.filter(i => i.room === activeRoom);
+                return filtered.reduce((acc, item) => {
+                    const dbCat = (item.category || "Misc").toLowerCase();
+                    const matchedCat = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
+                    if (!acc[matchedCat]) acc[matchedCat] = [];
+                    acc[matchedCat].push(item);
+                    return acc;
+                }, {});
+            }, [items, activeRoom]);
+
             return (
                 <div className="max-w-4xl mx-auto pb-48 px-6 pt-12">
                     <header className="mb-10 flex justify-between items-center">
-                        <h1 className="text-xl font-extralight italic tracking-[0.3em] text-stone-500 uppercase">{activeRoom}</h1>
-                        <span className="text-[9px] font-bold text-stone-700 tracking-widest">{items.filter(i => i.room === activeRoom).length} ITEMS</span>
+                        <h1 className="text-sm font-bold tracking-[0.4em] text-stone-600 uppercase">{activeRoom}</h1>
+                        <div className="h-px bg-white/5 flex-1 mx-6"></div>
+                        <span className="text-[9px] font-black text-stone-500 tracking-widest">{items.filter(i => i.room === activeRoom).length} UNIT</span>
                     </header>
 
-                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-8 no-scrollbar">
+                    <nav className="flex gap-2 overflow-x-auto pb-6 mb-10 no-scrollbar">
                         {["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"].map(room => (
                             <button key={room} onClick={() => setActiveRoom(room)}
-                                className={`px-5 py-2 rounded-xl text-[10px] font-bold transition-all ${
-                                    activeRoom === room ? "bg-white text-stone-900 shadow-xl" : "bg-stone-900/40 text-stone-600"
+                                className={`px-5 py-2 rounded-lg text-[10px] font-bold transition-all border ${
+                                    activeRoom === room ? "bg-stone-100 text-stone-900 border-stone-100" : "bg-transparent text-stone-600 border-white/5"
                                 }`}>
                                 {room}
                             </button>
@@ -125,20 +126,20 @@
 
                     <div className="space-y-12">
                         {Object.keys(CATEGORIES).map(cat => groupedItems[cat] && (
-                            <section key={cat} className="animate-in fade-in duration-700">
+                            <section key={cat} className="animate-in fade-in duration-500">
                                 <div className="shelf-header">
-                                    <i data-lucide={CATEGORIES[cat].icon} className={`w-4 h-4 ${CATEGORIES[cat].text}`}></i>
-                                    <h2 className={`text-[10px] font-black tracking-[0.4em] uppercase ${CATEGORIES[cat].text}`}>{cat}</h2>
+                                    <i data-lucide={CATEGORIES[cat].icon} className={`w-3.5 h-3.5 ${CATEGORIES[cat].text} opacity-70`}></i>
+                                    <h2 className={`text-[9px] font-black tracking-[0.5em] uppercase ${CATEGORIES[cat].text}`}>{cat}</h2>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {groupedItems[cat].map(item => (
-                                        <div key={item.id} className="glass-card relative p-3 pl-5 rounded-xl flex justify-between items-center group overflow-hidden">
-                                            <div className={`accent-bar ${CATEGORIES[cat].color}`}></div>
+                                        <div key={item.id} className="glass-card relative p-4 pl-6 rounded-lg flex justify-between items-center group overflow-hidden border-white/[0.02]">
+                                            <div className={`accent-bar ${CATEGORIES[cat].color} opacity-40`}></div>
                                             <div className="min-w-0">
-                                                <p className="text-[11px] font-semibold text-stone-100 truncate uppercase">{item.name}</p>
-                                                <p className="text-[9px] text-stone-600 font-bold tracking-tighter uppercase">QTY: {item.qty}</p>
+                                                <p className="text-[11px] font-medium text-stone-300 truncate tracking-tight lowercase first-letter:uppercase">{item.name}</p>
+                                                <p className="text-[8px] text-stone-600 font-black mt-1">x {item.qty}</p>
                                             </div>
-                                            <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-red-500 transition-colors">
+                                            <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-stone-400 transition-colors">
                                                 <i data-lucide="x" className="w-3 h-3"></i>
                                             </button>
                                         </div>
@@ -149,26 +150,28 @@
                     </div>
 
                     <div className="fixed bottom-8 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="bg-[#1c1917]/95 backdrop-blur-3xl p-4 w-full max-w-lg pointer-events-auto rounded-[2.5rem] border border-white/5 shadow-2xl">
-                            <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+                        <div className="bg-[#1c1917]/98 p-4 w-full max-w-lg pointer-events-auto rounded-3xl border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                            <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar justify-center">
                                 {Object.keys(CATEGORIES).map(cat => (
                                     <button key={cat} onClick={() => setSelectedCat(cat)}
-                                        className={`px-3 py-1 rounded-full text-[8px] font-bold transition-all flex items-center gap-1 border ${
-                                            selectedCat === cat ? "bg-white text-black border-white" : "bg-stone-900/50 text-stone-600 border-transparent"
+                                        className={`px-3 py-1.5 rounded-full text-[8px] font-black transition-all flex items-center gap-1.5 border ${
+                                            selectedCat === cat ? "bg-stone-200 text-stone-900 border-stone-200" : "bg-stone-900/50 text-stone-600 border-transparent opacity-50"
                                         }`}>
                                         <i data-lucide={CATEGORIES[cat].icon} className="w-2.5 h-2.5"></i>
                                         {cat}
                                     </button>
                                 ))}
                             </div>
-                            <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input type="text" placeholder="Scan or Type Item..." value={newName} onChange={(e) => setNewName(e.target.value)} 
-                                    className="flex-1 bg-transparent px-2 py-1 outline-none text-sm text-white placeholder:text-stone-800 uppercase" />
-                                <input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} 
-                                    className="w-10 bg-white/10 rounded-lg py-2 text-center outline-none text-xs text-stone-400" />
-                                <button type="submit" disabled={isSyncing} className="bg-white text-stone-900 w-12 h-12 rounded-2xl flex items-center justify-center active:scale-95 transition-all">
-                                    <i data-lucide={isSyncing ? "refresh-cw" : "plus"} className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`}></i>
-                                </button>
+                            <form onSubmit={handleAddItem} className="flex items-center gap-3 px-2">
+                                <input type="text" placeholder="Add to list..." value={newName} onChange={(e) => setNewName(e.target.value)} 
+                                    className="flex-1 bg-transparent py-1 outline-none text-sm text-stone-200 placeholder:text-stone-800 tracking-wide" />
+                                <div className="flex items-center bg-stone-900/50 rounded-xl border border-white/5 pr-1">
+                                    <input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} 
+                                        className="w-10 bg-transparent py-2 text-center outline-none text-xs text-stone-400 font-bold" />
+                                    <button type="submit" disabled={isSyncing} className="bg-stone-200 text-stone-900 w-9 h-9 rounded-lg flex items-center justify-center hover:bg-white transition-all">
+                                        <i data-lucide={isSyncing ? "refresh-cw" : "plus"} className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`}></i>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
