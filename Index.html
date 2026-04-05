@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Cloud</title>
+    <title>FancyPantry Dark</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,22 +13,23 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        body { background-color: #FAF9F6; min-height: 100vh; }
-        /* Smooth transitions for the glass dock */
+        body { background-color: #1C1917; min-height: 100vh; color: #E7E5E4; }
+        /* Smoked Glass Dock */
         .glass-dock {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(41, 37, 36, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
         }
+        /* Custom selection color */
+        ::selection { background: #44403C; color: #F5F5F4; }
     </style>
 </head>
-<body class="text-stone-800 antialiased font-light">
+<body class="antialiased font-light">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- DATABASE CONNECTION ---
         const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -48,17 +49,11 @@
             const [newQty, setNewQty] = useState("");
             const [editingId, setEditingId] = useState(null);
 
-            // Fetch initial data
             useEffect(() => { fetchItems(); }, []);
-
-            // Refresh icons whenever the view changes
             useEffect(() => { lucide.createIcons(); }, [items, activeRoom, editingId]);
 
             async function fetchItems() {
-                const { data } = await supabase
-                    .from('FancyPantry')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                const { data } = await supabase.from('FancyPantry').select('*').order('created_at', { ascending: false });
                 if (data) setItems(data);
             }
 
@@ -75,9 +70,7 @@
             };
 
             const updateItem = async (id, field, value) => {
-                // Instant UI update
                 setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
-                // Background cloud sync
                 await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
             };
 
@@ -92,25 +85,24 @@
                 <div className="max-w-5xl mx-auto min-h-screen pb-48 px-6 pt-12">
                     <header className="flex justify-between items-end mb-10">
                         <div>
-                            <h1 className="text-4xl font-extralight tracking-tighter text-stone-900 uppercase italic">FancyPantry</h1>
-                            <p className="text-stone-400 text-[10px] tracking-[0.3em] font-bold mt-1 uppercase">Cloud Inventory</p>
+                            <h1 className="text-4xl font-extralight tracking-tighter text-stone-100 uppercase italic">FancyPantry</h1>
+                            <p className="text-stone-500 text-[10px] tracking-[0.4em] font-bold mt-1 uppercase">Ambient Inventory</p>
                         </div>
                         <div className="text-right hidden sm:block">
-                            <span className="text-4xl font-extralight text-stone-200">{items.length}</span>
-                            <p className="text-[9px] font-bold text-stone-400 tracking-widest uppercase">Stock Count</p>
+                            <span className="text-4xl font-extralight text-stone-700">{items.length}</span>
+                            <p className="text-[9px] font-bold text-stone-600 tracking-widest uppercase">Stock</p>
                         </div>
                     </header>
                     
-                    {/* Responsive Room Tabs */}
-                    <nav className="flex gap-3 overflow-x-auto pb-6 mb-8 no-scrollbar border-b border-stone-100">
+                    <nav className="flex gap-3 overflow-x-auto pb-6 mb-8 no-scrollbar border-b border-stone-800">
                         {rooms.map(room => (
                             <button 
                                 key={room.name} 
                                 onClick={() => {setActiveRoom(room.name); setEditingId(null);}}
                                 className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl border transition-all whitespace-nowrap ${
                                     activeRoom === room.name 
-                                    ? "bg-stone-900 text-white border-stone-900 shadow-md scale-105" 
-                                    : "bg-white text-stone-400 border-stone-100 hover:border-stone-200"
+                                    ? "bg-stone-100 text-stone-900 border-stone-100 shadow-xl scale-105" 
+                                    : "bg-transparent text-stone-500 border-stone-800 hover:border-stone-700 hover:text-stone-300"
                                 }`}
                             >
                                 <i data-lucide={room.icon} className="w-4 h-4 stroke-[1.5px]"></i>
@@ -119,23 +111,19 @@
                         ))}
                     </nav>
 
-                    {/* Dynamic Grid: 1 col mobile, 2 tablet, 3 desktop */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredItems.map(item => (
-                            <div key={item.id} className="bg-white px-5 py-4 rounded-3xl border border-stone-50 flex justify-between items-center shadow-sm hover:shadow-md transition-all">
+                            <div key={item.id} className="bg-[#292524] px-6 py-5 rounded-[2rem] border border-stone-800 flex justify-between items-center shadow-2xl transition-all">
                                 <div className="flex-1 mr-4">
                                     {editingId === item.id ? (
                                         <div className="flex flex-col gap-1">
-                                            <input 
-                                                autoFocus 
-                                                className="text-sm font-medium text-stone-800 bg-stone-50 rounded px-2 py-1 outline-none border-b border-stone-200"
+                                            <input autoFocus className="text-sm font-medium text-stone-100 bg-stone-800 rounded-lg px-2 py-1 outline-none border-b border-stone-600"
                                                 value={item.name}
                                                 onChange={(e) => updateItem(item.id, 'name', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
                                                 onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                                             />
-                                            <input 
-                                                className="text-[10px] font-bold text-stone-500 bg-stone-50 rounded px-2 outline-none w-20"
+                                            <input className="text-[10px] font-bold text-stone-400 bg-stone-800 rounded-lg px-2 outline-none w-20"
                                                 value={item.qty}
                                                 onChange={(e) => updateItem(item.id, 'qty', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
@@ -144,47 +132,37 @@
                                         </div>
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer group">
-                                            <p className="text-sm font-medium text-stone-700 leading-none group-hover:text-stone-900 transition-colors">{item.name}</p>
-                                            <p className="text-[10px] text-stone-400 font-bold mt-2 uppercase tracking-tight">Quantity: {item.qty}</p>
+                                            <p className="text-sm font-medium text-stone-200 leading-none group-hover:text-white transition-colors">{item.name}</p>
+                                            <p className="text-[10px] text-stone-500 font-bold mt-2 uppercase tracking-widest">Qty: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
-                                <button onClick={() => removeItem(item.id)} className="text-stone-200 hover:text-red-400 p-2 transition-colors">
+                                <button onClick={() => removeItem(item.id)} className="text-stone-600 hover:text-red-400 p-2 transition-colors">
                                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                                 </button>
                             </div>
                         ))}
                         
                         {filteredItems.length === 0 && (
-                            <div className="col-span-full py-24 text-center border-2 border-dashed border-stone-100 rounded-[2.5rem]">
-                                <i data-lucide="package-open" className="w-8 h-8 mx-auto text-stone-100 mb-4 stroke-[1px]"></i>
-                                <p className="text-stone-300 text-xs font-bold tracking-[0.3em] uppercase italic">Empty {activeRoom}</p>
+                            <div className="col-span-full py-24 text-center border-2 border-dashed border-stone-800 rounded-[3rem]">
+                                <i data-lucide="package-open" className="w-8 h-8 mx-auto text-stone-800 mb-4 stroke-[1px]"></i>
+                                <p className="text-stone-600 text-xs font-bold tracking-[0.4em] uppercase italic">{activeRoom} Empty</p>
                             </div>
                         )}
                     </div>
 
-                    {/* Centered Glass Input Dock */}
                     <div className="fixed bottom-10 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="glass-dock border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2.2rem] p-2 w-full max-w-xl pointer-events-auto">
+                        <div className="glass-dock border border-stone-700/50 shadow-2xl rounded-[2.5rem] p-2 w-full max-w-xl pointer-events-auto">
                             <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input 
-                                    type="text" 
-                                    placeholder={`New in ${activeRoom.toLowerCase()}...`} 
-                                    value={newName} 
-                                    onChange={(e) => setNewName(e.target.value)}
-                                    className="flex-1 bg-transparent border-none px-6 py-3 outline-none text-[16px] text-stone-800 placeholder:text-stone-300"
+                                <input type="text" placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
+                                    value={newName} onChange={(e) => setNewName(e.target.value)}
+                                    className="flex-1 bg-transparent border-none px-6 py-3 outline-none text-[16px] text-stone-100 placeholder:text-stone-600"
                                 />
-                                <input 
-                                    type="text" 
-                                    placeholder="Qty" 
-                                    value={newQty} 
-                                    onChange={(e) => setNewQty(e.target.value)}
-                                    className="w-20 bg-stone-900/5 border-none rounded-2xl py-3 text-center outline-none text-[16px] font-bold text-stone-500"
+                                <input type="text" placeholder="Qty" 
+                                    value={newQty} onChange={(e) => setNewQty(e.target.value)}
+                                    className="w-20 bg-stone-800/50 border border-stone-700 rounded-2xl py-3 text-center outline-none text-[16px] font-bold text-stone-400"
                                 />
-                                <button 
-                                    type="submit" 
-                                    className="bg-stone-900 text-white w-12 h-12 rounded-[1.2rem] flex items-center justify-center hover:bg-stone-800 active:scale-90 transition-all shadow-lg"
-                                >
+                                <button type="submit" className="bg-stone-100 text-stone-900 w-12 h-12 rounded-[1.4rem] flex items-center justify-center hover:bg-white active:scale-90 transition-all shadow-xl">
                                     <i data-lucide="plus" className="w-6 h-6"></i>
                                 </button>
                             </form>
