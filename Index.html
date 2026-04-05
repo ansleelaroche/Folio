@@ -3,77 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Sleek Pantry</title>
+    <title>Kitchen Inventory</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-[#F9F8F6] font-sans text-stone-800">
+<body class="bg-[#F9F8F6] text-stone-800">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         function PantryApp() {
+            // 1. State: What room are we in?
+            const [activeRoom, setActiveRoom] = useState("Fridge");
+            
+            // 2. State: Our Inventory
             const [items, setItems] = useState([
-                { id: 1, name: "Organic Milk", qty: "1 Gallon" },
-                { id: 2, name: "Free-range Eggs", qty: "12" }
+                { id: 1, name: "Milk", qty: "1", room: "Fridge" },
+                { id: 2, name: "Ice Cream", qty: "2", room: "Freezer" },
+                { id: 3, name: "Pasta", qty: "3", room: "Pantry" }
             ]);
+
             const [newName, setNewName] = useState("");
-            const [newQty, setNewQty] = useState("");
+
+            // Rooms configuration
+            const rooms = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
 
             const handleAddItem = (e) => {
                 e.preventDefault();
                 if (!newName) return;
-                
                 const newItem = {
                     id: Date.now(),
                     name: newName,
-                    qty: newQty || "1"
+                    qty: "1",
+                    room: activeRoom // Automatically sorts it into the room you're viewing!
                 };
-                
                 setItems([newItem, ...items]);
                 setNewName("");
-                setNewQty("");
             };
+
+            const removeItem = (id) => {
+                setItems(items.filter(item => item.id !== id));
+            };
+
+            // Filter items based on the active room
+            const filteredItems = items.filter(item => item.room === activeRoom);
 
             return (
                 <div class="max-w-md mx-auto min-h-screen pb-32 p-6">
-                    <header class="mb-10 pt-8">
-                        <h1 class="text-4xl font-extralight tracking-tight text-stone-900">My Pantry</h1>
-                        <p class="text-stone-400 text-sm mt-2">{items.length} items tracked</p>
+                    <header class="mb-8 pt-6">
+                        <h1 class="text-3xl font-extralight tracking-tight text-stone-900">My Kitchen</h1>
+                        <p class="text-stone-400 text-sm mt-1">Organizing {activeRoom}</p>
                     </header>
                     
-                    {/* The List */}
-                    <div class="space-y-3">
-                        {items.map(item => (
-                            <div key={item.id} class="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex justify-between items-center transition-all">
-                                <span class="font-medium text-stone-700">{item.name}</span>
-                                <span class="text-stone-400 text-sm bg-stone-50 px-3 py-1 rounded-full">{item.qty}</span>
-                            </div>
+                    {/* Horizontal Room Selector */}
+                    <div class="flex gap-3 overflow-x-auto pb-4 mb-6 no-scrollbar">
+                        {rooms.map(room => (
+                            <button 
+                                key={room}
+                                onClick={() => setActiveRoom(room)}
+                                class={`px-5 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                                    activeRoom === room 
+                                    ? "bg-stone-900 text-white shadow-md" 
+                                    : "bg-white text-stone-400 border border-stone-100"
+                                }`}
+                            >
+                                {room}
+                            </button>
                         ))}
                     </div>
 
-                    {/* Simple Add Form - Positioned at bottom for thumb access */}
-                    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-stone-100 p-6 pb-8">
+                    {/* The Inventory List for the Active Room */}
+                    <div class="space-y-3">
+                        {filteredItems.length > 0 ? (
+                            filteredItems.map(item => (
+                                <div key={item.id} class="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex justify-between items-center group">
+                                    <div>
+                                        <p class="font-medium text-stone-700">{item.name}</p>
+                                        <p class="text-xs text-stone-400">Qty: {item.qty}</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => removeItem(item.id)}
+                                        class="text-stone-300 hover:text-red-400 p-2"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div class="py-20 text-center border-2 border-dashed border-stone-200 rounded-3xl">
+                                <p class="text-stone-300 italic">This {activeRoom} is empty</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Bottom Input Bar */}
+                    <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-stone-100 p-6 pb-10">
                         <form onSubmit={handleAddItem} class="max-w-md mx-auto flex gap-2">
                             <input 
                                 type="text" 
-                                placeholder="Item name..." 
+                                placeholder={`Add to ${activeRoom}...`} 
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
-                                class="flex-1 bg-stone-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-stone-300 outline-none"
+                                class="flex-1 bg-stone-100 border-none rounded-2xl p-4 focus:ring-2 focus:ring-stone-200 outline-none"
                             />
-                            <input 
-                                type="text" 
-                                placeholder="Qty" 
-                                value={newQty}
-                                onChange={(e) => setNewQty(e.target.value)}
-                                class="w-20 bg-stone-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-stone-300 outline-none text-center"
-                            />
-                            <button type="submit" class="bg-stone-900 text-white px-5 rounded-xl font-bold hover:bg-stone-700 active:scale-95 transition-all">
-                                +
+                            <button type="submit" class="bg-stone-900 text-white px-8 rounded-2xl font-bold active:scale-95 transition-all">
+                                Add
                             </button>
                         </form>
                     </div>
