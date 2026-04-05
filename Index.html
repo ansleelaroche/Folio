@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Botanical</title>
+    <title>FancyPantry Botanical HD</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,37 +13,70 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        body { background-color: #1C1917; min-height: 100vh; color: #E7E5E4; overflow-x: hidden; }
-        .glass-dock {
-            background: rgba(41, 37, 36, 0.85);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+        
+        body { 
+            background-color: #121110; 
+            min-height: 100vh; 
+            color: #E7E5E4; 
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at center, transparent 0%, #121110 90%),
+                url('https://images.unsplash.com/photo-1525498128493-380d1990a112?auto=format&fit=crop&q=20&w=1000');
+            background-attachment: fixed;
+            background-size: cover;
         }
-        .foliage {
+
+        /* The Corner Vines */
+        .vines-top {
             position: fixed;
+            top: -50px;
+            left: -50px;
+            width: 400px;
+            height: 400px;
+            background-image: url('https://images.unsplash.com/photo-1533038590840-1cde6e668a91?auto=format&fit=crop&q=60&w=500');
+            background-size: contain;
+            background-no-repeat: no-repeat;
+            opacity: 0.25;
+            filter: grayscale(40%) contrast(120%);
             pointer-events: none;
             z-index: 0;
-            opacity: 0.4;
+            transform: rotate(-15deg);
+        }
+
+        .vines-bottom {
+            position: fixed;
+            bottom: -80px;
+            right: -80px;
+            width: 500px;
+            height: 500px;
+            background-image: url('https://images.unsplash.com/photo-1501004318641-729e75164754?auto=format&fit=crop&q=60&w=500');
+            background-size: contain;
+            background-no-repeat: no-repeat;
+            opacity: 0.2;
+            filter: grayscale(30%) brightness(0.7);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glass-card {
+            background: rgba(28, 25, 23, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-dock {
+            background: rgba(28, 25, 23, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 <body class="antialiased font-light">
-    <svg class="foliage top-0 left-0 w-48 h-48 sm:w-64 sm:h-64" viewBox="0 0 100 100" fill="none">
-        <path d="M0 0C10 20 30 25 50 20C70 15 80 30 75 50M0 10C15 35 45 35 60 55" stroke="#444B3C" stroke-width="0.5"/>
-        <ellipse cx="20" cy="15" rx="3" ry="1.5" fill="#3D4435" transform="rotate(-20 20 15)"/>
-        <ellipse cx="45" cy="22" rx="4" ry="2" fill="#4A5241" transform="rotate(10 45 22)"/>
-        <ellipse cx="65" cy="35" rx="3.5" ry="1.8" fill="#3D4435" transform="rotate(45 65 35)"/>
-        <ellipse cx="10" cy="30" rx="3" ry="1.5" fill="#4A5241" transform="rotate(-60 10 30)"/>
-    </svg>
-
-    <svg class="foliage bottom-0 right-0 w-64 h-64 sm:w-96 sm:h-96" viewBox="0 0 100 100" fill="none">
-        <path d="M100 100C80 90 75 70 80 50C85 30 70 20 50 25M90 100C65 85 65 55 45 40" stroke="#444B3C" stroke-width="0.5"/>
-        <ellipse cx="85" cy="80" rx="4" ry="2" fill="#3D4435" transform="rotate(20 85 80)"/>
-        <ellipse cx="78" cy="55" rx="5" ry="2.5" fill="#4A5241" transform="rotate(-10 78 55)"/>
-        <ellipse cx="60" cy="30" rx="4" ry="2" fill="#3D4435" transform="rotate(-45 60 30)"/>
-        <ellipse cx="80" cy="20" rx="3" ry="1.5" fill="#4A5241" transform="rotate(30 80 20)"/>
-    </svg>
-
+    <div class="vines-top"></div>
+    <div class="vines-bottom"></div>
+    
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
@@ -101,47 +134,47 @@
             const filteredItems = items.filter(item => item.room === activeRoom);
 
             return (
-                <div className="max-w-5xl mx-auto min-h-screen pb-48 px-6 pt-12">
-                    <header className="flex justify-between items-end mb-10">
+                <div className="max-w-5xl mx-auto min-h-screen pb-48 px-6 pt-16">
+                    <header className="flex justify-between items-end mb-12">
                         <div>
-                            <h1 className="text-4xl font-extralight tracking-tighter text-stone-100 uppercase italic">FancyPantry</h1>
-                            <p className="text-stone-500 text-[10px] tracking-[0.4em] font-bold mt-1 uppercase">Cloud Kitchen</p>
+                            <h1 className="text-5xl font-extralight tracking-tighter text-stone-100 uppercase italic leading-none">FancyPantry</h1>
+                            <p className="text-stone-500 text-[10px] tracking-[0.5em] font-bold mt-3 uppercase">Managed Atmosphere</p>
                         </div>
-                        <div className="text-right hidden sm:block">
-                            <span className="text-4xl font-extralight text-stone-800">{items.length}</span>
+                        <div className="text-stone-700 font-serif italic text-2xl hidden sm:block">
+                            {items.length} items in stock
                         </div>
                     </header>
                     
-                    <nav className="flex gap-3 overflow-x-auto pb-6 mb-8 no-scrollbar border-b border-stone-800/50">
+                    <nav className="flex gap-4 overflow-x-auto pb-6 mb-10 no-scrollbar border-b border-stone-800/30">
                         {rooms.map(room => (
                             <button 
                                 key={room.name} 
                                 onClick={() => {setActiveRoom(room.name); setEditingId(null);}}
-                                className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl border transition-all whitespace-nowrap ${
+                                className={`flex items-center gap-3 px-8 py-3 rounded-2xl border transition-all whitespace-nowrap ${
                                     activeRoom === room.name 
-                                    ? "bg-stone-100 text-stone-900 border-stone-100 shadow-xl scale-105" 
-                                    : "bg-stone-900/30 text-stone-500 border-stone-800 hover:border-stone-700"
+                                    ? "bg-stone-100 text-stone-900 border-stone-100 shadow-[0_0_30px_rgba(255,255,255,0.1)] scale-105" 
+                                    : "bg-stone-900/20 text-stone-500 border-stone-800 hover:border-stone-600 hover:text-stone-300"
                                 }`}
                             >
-                                <i data-lucide={room.icon} className="w-4 h-4 stroke-[1.5px]"></i>
-                                <span className="text-xs font-bold uppercase tracking-widest">{room.name}</span>
+                                <i data-lucide={room.icon} className="w-4 h-4"></i>
+                                <span className="text-[11px] font-bold uppercase tracking-widest">{room.name}</span>
                             </button>
                         ))}
                     </nav>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {filteredItems.map(item => (
-                            <div key={item.id} className="bg-[#292524]/60 backdrop-blur-sm px-6 py-5 rounded-[2rem] border border-stone-800/50 flex justify-between items-center transition-all">
+                            <div key={item.id} className="glass-card px-7 py-6 rounded-[2.5rem] flex justify-between items-center group hover:border-stone-700 transition-all duration-500">
                                 <div className="flex-1 mr-4">
                                     {editingId === item.id ? (
-                                        <div className="flex flex-col gap-1">
-                                            <input autoFocus className="text-sm font-medium text-stone-100 bg-stone-800 rounded-lg px-2 py-1 outline-none border-b border-stone-600"
+                                        <div className="flex flex-col gap-2">
+                                            <input autoFocus className="text-sm font-medium text-stone-100 bg-stone-800/50 rounded-lg px-2 py-1 outline-none border-b border-stone-500"
                                                 value={item.name}
                                                 onChange={(e) => updateItem(item.id, 'name', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
                                                 onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                                             />
-                                            <input className="text-[10px] font-bold text-stone-400 bg-stone-800 rounded-lg px-2 outline-none w-20"
+                                            <input className="text-[10px] font-bold text-stone-400 bg-stone-800/50 rounded-lg px-2 outline-none w-16"
                                                 value={item.qty}
                                                 onChange={(e) => updateItem(item.id, 'qty', e.target.value)}
                                                 onBlur={() => setEditingId(null)}
@@ -149,32 +182,32 @@
                                             />
                                         </div>
                                     ) : (
-                                        <div onClick={() => setEditingId(item.id)} className="cursor-pointer group">
-                                            <p className="text-sm font-medium text-stone-200 group-hover:text-white">{item.name}</p>
-                                            <p className="text-[10px] text-stone-500 font-bold mt-2 uppercase tracking-widest">Qty: {item.qty}</p>
+                                        <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
+                                            <p className="text-base font-medium text-stone-200 group-hover:text-white transition-colors uppercase tracking-tight">{item.name}</p>
+                                            <p className="text-[11px] text-stone-500 font-bold mt-2 uppercase tracking-[0.2em]">Stocked: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
-                                <button onClick={() => removeItem(item.id)} className="text-stone-700 hover:text-red-400 p-2 transition-colors">
+                                <button onClick={() => removeItem(item.id)} className="text-stone-800 hover:text-red-900/50 p-2 transition-all opacity-40 group-hover:opacity-100">
                                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                                 </button>
                             </div>
                         ))}
                     </div>
 
-                    <div className="fixed bottom-10 left-6 right-6 flex justify-center pointer-events-none">
-                        <div className="glass-dock border border-stone-700/50 shadow-2xl rounded-[2.5rem] p-2 w-full max-w-xl pointer-events-auto">
-                            <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input type="text" placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
+                    <div className="fixed bottom-12 left-6 right-6 flex justify-center pointer-events-none">
+                        <div className="glass-dock shadow-2xl rounded-[3rem] p-2.5 w-full max-w-2xl pointer-events-auto">
+                            <form onSubmit={handleAddItem} className="flex items-center gap-3">
+                                <input type="text" placeholder={`Replenish ${activeRoom.toLowerCase()}...`} 
                                     value={newName} onChange={(e) => setNewName(e.target.value)}
-                                    className="flex-1 bg-transparent border-none px-6 py-3 outline-none text-[16px] text-stone-100 placeholder:text-stone-700"
+                                    className="flex-1 bg-transparent border-none px-8 py-4 outline-none text-[17px] text-stone-100 placeholder:text-stone-800"
                                 />
-                                <input type="text" placeholder="Qty" 
+                                <input type="text" placeholder="Vol" 
                                     value={newQty} onChange={(e) => setNewQty(e.target.value)}
-                                    className="w-20 bg-stone-800/40 border border-stone-700/50 rounded-2xl py-3 text-center outline-none text-[16px] font-bold text-stone-500"
+                                    className="w-24 bg-stone-100/5 border border-stone-800 rounded-[1.8rem] py-4 text-center outline-none text-[14px] font-bold text-stone-600"
                                 />
-                                <button type="submit" className="bg-stone-100 text-stone-900 w-12 h-12 rounded-[1.4rem] flex items-center justify-center shadow-xl active:scale-95 transition-transform">
-                                    <i data-lucide="plus" className="w-6 h-6"></i>
+                                <button type="submit" className="bg-stone-100 text-stone-900 w-14 h-14 rounded-[2rem] flex items-center justify-center shadow-xl active:scale-90 transition-all">
+                                    <i data-lucide="plus" className="w-7 h-7"></i>
                                 </button>
                             </form>
                         </div>
