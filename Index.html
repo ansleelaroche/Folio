@@ -25,13 +25,13 @@
         // Initialize Supabase using the "Secret Keys" from Netlify
         // Note: These variables will be 'undefined' until deployed on Netlify
         const supabaseUrl = window.location.hostname === 'localhost' ? '' : 'https://jqvuqfqedzlegxuvudag.supabase.co';
-        const supabaseKey = window.location.hostname === 'localhost' ? '' : 'jqvuqfqedzlegxuvudag';
+        const supabaseKey = window.location.hostname === 'localhost' ? '' : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw';
         
         // FOR NOW: To make it work instantly without complex build steps, 
         // paste your actual URL and KEY into the strings below.
         const supabase = window.supabase.createClient(
             'https://jqvuqfqedzlegxuvudag.supabase.co', 
-            'jqvuqfqedzlegxuvudag'
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'
         );
 
         function PantryApp() {
