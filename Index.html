@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Smart Cloud</title>
+    <title>FancyPantry Smart</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -42,7 +42,14 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function PantryApp() {
-            const rooms = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
+            const rooms = [
+                { name: "Fridge", icon: "refrigerator" },
+                { name: "Freezer", icon: "snowflake" },
+                { name: "Pantry", icon: "box" },
+                { name: "Counter", icon: "utensils" },
+                { name: "Cabinets", icon: "archive" }
+            ];
+            
             const [activeRoom, setActiveRoom] = useState("Fridge");
             const [items, setItems] = useState([]);
             const [newName, setNewName] = useState("");
@@ -64,14 +71,12 @@
                 const cleanName = newName.trim();
                 const cleanQty = newQty || "1";
                 
-                // 1. Check for existing item in the SAME room (Case Insensitive)
                 const existingItem = items.find(i => 
                     i.room === activeRoom && 
                     i.name.toLowerCase() === cleanName.toLowerCase()
                 );
 
                 if (existingItem) {
-                    // 2. Logic to merge Quantities
                     const oldVal = parseFloat(existingItem.qty) || 0;
                     const newVal = parseFloat(cleanQty) || 0;
                     const combinedQty = (oldVal + newVal).toString();
@@ -86,7 +91,6 @@
                         setItems(items.map(i => i.id === existingItem.id ? data[0] : i));
                     }
                 } else {
-                    // 3. Brand new item
                     const { data } = await supabase
                         .from('FancyPantry')
                         .insert([{ name: cleanName, qty: cleanQty, room: activeRoom }])
@@ -119,11 +123,12 @@
                     
                     <nav className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar border-b border-white/5">
                         {rooms.map(room => (
-                            <button key={room} onClick={() => setActiveRoom(room)}
-                                className={`px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all ${
-                                    activeRoom === room ? "bg-white text-stone-900" : "bg-stone-900/40 text-stone-500"
+                            <button key={room.name} onClick={() => setActiveRoom(room.name)}
+                                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
+                                    activeRoom === room.name ? "bg-white text-stone-900" : "bg-stone-900/40 text-stone-500"
                                 }`}>
-                                {room}
+                                <i data-lucide={room.icon} className="w-3 h-3"></i>
+                                {room.name}
                             </button>
                         ))}
                     </nav>
@@ -156,7 +161,7 @@
                     <div className="fixed bottom-8 left-4 right-4 flex justify-center pointer-events-none">
                         <div className="glass-dock p-1.5 w-full max-w-lg pointer-events-auto rounded-2xl shadow-2xl">
                             <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input type="text" placeholder={`Add to ${activeRoom}...`} 
+                                <input type="text" placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
                                     value={newName} onChange={(e) => setNewName(e.target.value)}
                                     className="flex-1 bg-transparent px-4 py-3 outline-none text-sm text-white placeholder:text-stone-700"
                                 />
