@@ -41,8 +41,9 @@
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom]);
 
             async function fetchItems() {
-                const { data } = await supabase.from('FancyPantry').select('*').order('name');
+                const { data, error } = await supabase.from('FancyPantry').select('*').order('name');
                 if (data) setItems(data);
+                if (error) console.error("Fetch Error:", error);
             }
 
             const handleAddItem = async (e) => {
@@ -52,9 +53,10 @@
                 const nameToAdd = newName.trim();
                 const qtyToAdd = parseFloat(newQty) || 1;
                 
+                // Find existing item in CURRENT room (case insensitive)
                 const existing = items.find(i => 
                     i && i.room === activeRoom && 
-                    i.name && i.name.toLowerCase() === nameToAdd.toLowerCase()
+                    i.name && i.name.toLowerCase().trim() === nameToAdd.toLowerCase().trim()
                 );
 
                 if (existing) {
@@ -66,25 +68,33 @@
                         .update({ qty: combined })
                         .eq('id', existing.id);
                     
-                    if (!error) await fetchItems();
+                    if (error) {
+                        alert("Update failed: " + error.message);
+                    } else {
+                        await fetchItems();
+                    }
                 } else {
                     const { error } = await supabase
                         .from('FancyPantry')
                         .insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom }]);
                     
-                    if (!error) await fetchItems();
+                    if (error) {
+                        alert("Insert failed: " + error.message);
+                    } else {
+                        await fetchItems();
+                    }
                 }
                 setNewName(""); setNewQty("");
             };
 
             const updateItem = async (id, field, value) => {
-                setItems(prev => prev.map(i => i.id === id ? { ...i, [field]: value } : i));
-                await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
+                const { error } = await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
+                if (!error) setItems(prev => prev.map(i => i.id === id ? { ...i, [field]: value } : i));
             };
 
             const removeItem = async (id) => {
-                setItems(prev => prev.filter(i => i.id !== id));
-                await supabase.from('FancyPantry').delete().eq('id', id);
+                const { error } = await supabase.from('FancyPantry').delete().eq('id', id);
+                if (!error) setItems(prev => prev.filter(i => i.id !== id));
             };
 
             const filteredItems = items.filter(item => item && item.room === activeRoom);
@@ -117,7 +127,7 @@
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
                                             <p className="text-[11px] font-medium text-stone-200 truncate">{item.name}</p>
-                                            <p className="text-[9px] text-stone- stone-500 font-bold">QTY: {item.qty}</p>
+                                            <p className="text-[9px] text-stone-500 font-bold uppercase">QTY: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
