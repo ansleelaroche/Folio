@@ -59,7 +59,7 @@
             }, [items, activeRoom, editingId]);
 
             async function fetchItems() {
-                const { data } = await supabase.from('pantry_items').select('*').order('created_at', { ascending: false });
+                const { data } = await supabase.from('FancyPantry').select('*').order('created_at', { ascending: false });
                 if (data) setItems(data);
             }
 
@@ -68,7 +68,7 @@
                 if (!newName) return;
                 
                 const newItem = { name: newName, qty: newQty || "1", room: activeRoom };
-                const { data, error } = await supabase.from('pantry_items').insert([newItem]).select();
+                const { data, error } = await supabase.from('FancyPantry').insert([newItem]).select();
                 
                 if (data) {
                     setItems([data[0], ...items]);
@@ -79,12 +79,12 @@
 
             const updateItem = async (id, field, value) => {
                 setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
-                await supabase.from('pantry_items').update({ [field]: value }).eq('id', id);
+                await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
             };
 
             const removeItem = async (id) => {
                 setItems(items.filter(item => item.id !== id));
-                await supabase.from('pantry_items').delete().eq('id', id);
+                await supabase.from('FancyPantry').delete().eq('id', id);
             };
 
             const filteredItems = items.filter(item => item.room === activeRoom);
