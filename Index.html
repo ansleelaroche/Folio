@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Kitchen</title>
+    <title>Kitchen Cloud</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Custom scrollbar hide */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Stop the rubber-band bounce on some mobile browsers */
         body { overflow-x: hidden; position: fixed; width: 100%; height: 100%; }
         #root { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     </style>
@@ -24,6 +21,18 @@
 
     <script type="text/babel">
         const { useState, useEffect } = React;
+
+        // Initialize Supabase using the "Secret Keys" from Netlify
+        // Note: These variables will be 'undefined' until deployed on Netlify
+        const supabaseUrl = window.location.hostname === 'localhost' ? '' : 'YOUR_SUPABASE_URL_HERE';
+        const supabaseKey = window.location.hostname === 'localhost' ? '' : 'YOUR_SUPABASE_ANON_KEY_HERE';
+        
+        // FOR NOW: To make it work instantly without complex build steps, 
+        // paste your actual URL and KEY into the strings below.
+        const supabase = supabase.createClient(
+            'https://YOUR-URL.supabase.co', 
+            'YOUR-ANON-KEY'
+        );
 
         function PantryApp() {
             const rooms = [
@@ -35,102 +44,101 @@
             ];
 
             const [activeRoom, setActiveRoom] = useState("Fridge");
-            const [items, setItems] = useState(() => {
-                const saved = localStorage.getItem("pantry_data");
-                return saved ? JSON.parse(saved) : [];
-            });
-
+            const [items, setItems] = useState([]);
             const [newName, setNewName] = useState("");
             const [newQty, setNewQty] = useState("");
+            const [editingId, setEditingId] = useState(null);
+
+            // FETCH DATA FROM DATABASE
+            useEffect(() => {
+                fetchItems();
+            }, []);
 
             useEffect(() => {
-                localStorage.setItem("pantry_data", JSON.stringify(items));
                 lucide.createIcons();
-            }, [items, activeRoom]);
+            }, [items, activeRoom, editingId]);
 
-            const handleAddItem = (e) => {
+            async function fetchItems() {
+                const { data } = await supabase.from('pantry_items').select('*').order('created_at', { ascending: false });
+                if (data) setItems(data);
+            }
+
+            const handleAddItem = async (e) => {
                 e.preventDefault();
                 if (!newName) return;
-                const newItem = { id: Date.now(), name: newName, qty: newQty || "1", room: activeRoom };
-                setItems([newItem, ...items]);
-                setNewName("");
-                setNewQty("");
+                
+                const newItem = { name: newName, qty: newQty || "1", room: activeRoom };
+                const { data, error } = await supabase.from('pantry_items').insert([newItem]).select();
+                
+                if (data) {
+                    setItems([data[0], ...items]);
+                    setNewName("");
+                    setNewQty("");
+                }
             };
 
-            const removeItem = (id) => {
+            const updateItem = async (id, field, value) => {
+                setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+                await supabase.from('pantry_items').update({ [field]: value }).eq('id', id);
+            };
+
+            const removeItem = async (id) => {
                 setItems(items.filter(item => item.id !== id));
+                await supabase.from('pantry_items').delete().eq('id', id);
             };
 
             const filteredItems = items.filter(item => item.room === activeRoom);
 
             return (
-                <div class="max-w-md mx-auto min-h-screen pb-32 px-5 pt-8">
+                <div class="max-w-md mx-auto min-h-screen pb-40 px-5 pt-8">
                     <header class="flex justify-between items-center mb-6">
-                        <h1 class="text-2xl font-extralight tracking-tight text-stone-900 uppercase">Kitchen</h1>
-                        <span class="text-xs font-bold text-stone-300 tracking-widest">{items.length} TOTAL</span>
+                        <h1 class="text-2xl font-extralight tracking-tighter text-stone-900 uppercase italic">Cloud Pantry</h1>
+                        <span class="text-[10px] font-bold text-stone-300 tracking-widest">{items.length} ITEMS</span>
                     </header>
                     
-                    {/* Compact Navigation */}
                     <nav class="flex gap-2 overflow-x-auto pb-4 mb-4 no-scrollbar border-b border-stone-100">
                         {rooms.map(room => (
-                            <button 
-                                key={room.name} 
-                                onClick={() => setActiveRoom(room.name)}
-                                class={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all border ${
-                                    activeRoom === room.name ? "bg-stone-900 text-white border-stone-900" : "bg-white text-stone-400 border-stone-100 shadow-sm"
-                                }`}
-                            >
+                            <button key={room.name} onClick={() => {setActiveRoom(room.name); setEditingId(null);}}
+                                class={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
+                                    activeRoom === room.name ? "bg-stone-900 text-white border-stone-900" : "bg-white text-stone-400 border-stone-100"
+                                }`}>
                                 <i data-lucide={room.icon} class="w-3.5 h-3.5 stroke-[1.5px]"></i>
                                 <span class="text-[10px] font-bold uppercase tracking-wider">{room.name}</span>
                             </button>
                         ))}
                     </nav>
 
-                    {/* Slim Item List */}
                     <div class="space-y-1.5">
-                        {filteredItems.length > 0 ? (
-                            filteredItems.map(item => (
-                                <div key={item.id} class="bg-white px-4 py-2.5 rounded-xl border border-stone-100 flex justify-between items-center shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-6 h-6 bg-stone-50 rounded-full flex items-center justify-center">
-                                            <i data-lucide="circle" class="w-2.5 h-2.5 text-stone-200"></i>
-                                        </div>
-                                        <div>
+                        {filteredItems.map(item => (
+                            <div key={item.id} class="bg-white px-4 py-3 rounded-2xl border border-stone-50 flex justify-between items-center shadow-sm">
+                                <div class="flex-1 mr-4">
+                                    {editingId === item.id ? (
+                                        <input autoFocus class="text-sm font-medium text-stone-800 bg-stone-50 rounded px-1 outline-none w-full"
+                                            value={item.name}
+                                            onChange={(e) => updateItem(item.id, 'name', e.target.value)}
+                                            onBlur={() => setEditingId(null)}
+                                        />
+                                    ) : (
+                                        <div onClick={() => setEditingId(item.id)}>
                                             <p class="text-sm font-medium text-stone-700 leading-none">{item.name}</p>
-                                            <p class="text-[9px] text-stone-400 font-bold mt-0.5">QTY: {item.qty}</p>
+                                            <p class="text-[9px] text-stone-400 font-bold mt-1 uppercase">Qty: {item.qty}</p>
                                         </div>
-                                    </div>
-                                    <button onClick={() => removeItem(item.id)} class="text-stone-200 hover:text-red-300 p-1">
-                                        <i data-lucide="minus" class="w-3.5 h-3.5"></i>
-                                    </button>
+                                    )}
                                 </div>
-                            ))
-                        ) : (
-                            <div class="py-12 text-center border border-dashed border-stone-200 rounded-2xl">
-                                <p class="text-stone-300 text-[11px] uppercase tracking-widest italic">{activeRoom} Empty</p>
+                                <button onClick={() => removeItem(item.id)} class="text-stone-200 hover:text-red-300 p-1">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
                             </div>
-                        )}
+                        ))}
                     </div>
 
-                    {/* Ultra-Slim Dock */}
-                    <div class="fixed bottom-6 left-5 right-5 bg-white/80 backdrop-blur-xl border border-stone-100 shadow-xl rounded-2xl p-2 max-w-md mx-auto">
+                    <div class="fixed bottom-8 left-5 right-5 bg-white/90 backdrop-blur-2xl border border-white shadow-xl rounded-3xl p-2 max-w-md mx-auto">
                         <form onSubmit={handleAddItem} class="flex items-center gap-1">
-                            <input 
-                                type="text" 
-                                placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                /* The font-size below prevents the iOS Zoom */
-                                class="flex-1 bg-transparent border-none px-3 py-2 outline-none text-[16px] sm:text-sm text-stone-800 placeholder:text-stone-300"
+                            <input type="text" placeholder={`Add to ${activeRoom.toLowerCase()}...`} 
+                                value={newName} onChange={(e) => setNewName(e.target.value)}
+                                class="flex-1 bg-transparent border-none px-4 py-2 outline-none text-[16px]"
                             />
-                            <input 
-                                type="text" 
-                                placeholder="Qty" 
-                                value={newQty}
-                                onChange={(e) => setNewQty(e.target.value)}
-                                class="w-12 bg-stone-50 border-none rounded-lg py-2 text-center outline-none text-[16px] sm:text-[10px] font-bold text-stone-500"
-                            />
-                            <button type="submit" class="bg-stone-900 text-white w-9 h-9 rounded-xl flex items-center justify-center active:scale-90 transition-all">
+                            <button type="submit" class="bg-stone-900 text-white w-10 h-10 rounded-2xl flex items-center justify-center">
                                 <i data-lucide="plus" class="w-5 h-5"></i>
                             </button>
                         </form>
