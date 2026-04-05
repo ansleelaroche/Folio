@@ -12,41 +12,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        body { background-color: #1c1917; color: #E7E5E4; min-height: 100vh; }
-        .vines-svg { position: fixed; pointer-events: none; z-index: 0; opacity: 0.15; }
+        body { background-color: #1c1917; color: #E7E5E4; min-height: 100vh; overflow-x: hidden; }
         .glass-card { background: rgba(41, 37, 36, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.03); }
         .glass-dock { background: rgba(28, 25, 23, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .vines-svg { position: fixed; pointer-events: none; z-index: 0; opacity: 0.15; }
     </style>
 </head>
-<body class="antialiased font-light uppercase tracking-tight">
+<body class="antialiased font-light tracking-tight uppercase">
     <svg class="vines-svg top-0 left-0 w-[300px] h-[300px]" viewBox="0 0 200 200">
         <path d="M0,0 Q50,20 80,80 T150,120" stroke="#4d7c0f" stroke-width="1.5" fill="none"/>
     </svg>
-    
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
-
         const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         function PantryApp() {
-            const rooms = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
             const [activeRoom, setActiveRoom] = useState("Fridge");
             const [items, setItems] = useState([]);
             const [newName, setNewName] = useState("");
             const [newQty, setNewQty] = useState("");
             const [editingId, setEditingId] = useState(null);
 
-            useEffect(() => { 
-                fetchItems(); 
-            }, []);
-
-            useEffect(() => { 
-                if (window.lucide) window.lucide.createIcons(); 
-            }, [items, activeRoom, editingId]);
+            useEffect(() => { fetchItems(); }, []);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom]);
 
             async function fetchItems() {
                 const { data } = await supabase.from('FancyPantry').select('*').order('name');
@@ -57,19 +49,31 @@
                 e.preventDefault();
                 if (!newName) return;
 
-                const name = newName.trim();
-                const qtyStr = newQty || "1";
+                const nameToAdd = newName.trim();
+                const qtyToAdd = Number(newQty) || 1;
                 
                 const existing = items.find(i => 
-                    i.room === activeRoom && i.name.toLowerCase() === name.toLowerCase()
+                    i.room === activeRoom && 
+                    i.name && 
+                    i.name.toLowerCase() === nameToAdd.toLowerCase()
                 );
 
                 if (existing) {
-                    const combined = (parseFloat(existing.qty || 0) + parseFloat(qtyStr || 0)).toString();
-                    const { data } = await supabase.from('FancyPantry').update({ qty: combined }).eq('id', existing.id).select();
+                    const currentQty = Number(existing.qty) || 0;
+                    const combined = (currentQty + qtyToAdd).toString();
+                    
+                    const { data } = await supabase
+                        .from('FancyPantry')
+                        .update({ qty: combined })
+                        .eq('id', existing.id)
+                        .select();
+                    
                     if (data) setItems(items.map(i => i.id === existing.id ? data[0] : i));
                 } else {
-                    const { data } = await supabase.from('FancyPantry').insert([{ name, qty: qtyStr, room: activeRoom }]).select();
+                    const { data } = await supabase
+                        .from('FancyPantry')
+                        .insert([{ name: nameToAdd, qty: qtyToAdd.toString(), room: activeRoom }])
+                        .select();
                     if (data) setItems([...items, data[0]]);
                 }
                 setNewName(""); setNewQty("");
@@ -85,28 +89,24 @@
                 await supabase.from('FancyPantry').delete().eq('id', id);
             };
 
-            const filtered = items.filter(i => i.room === activeRoom);
+            const filteredItems = items.filter(i => i.room === activeRoom);
 
             return (
                 <div className="max-w-4xl mx-auto pb-40 px-4 pt-10">
                     <header className="flex justify-between items-center mb-8 px-2">
                         <h1 className="text-3xl font-extralight italic">FancyPantry</h1>
-                        <span className="text-stone-600 text-[10px] font-bold tracking-widest">{filtered.length} ITEMS</span>
+                        <span className="text-stone-600 text-[10px] font-bold tracking-widest">{filteredItems.length} ITEMS</span>
                     </header>
-                    
                     <nav className="flex gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar border-b border-white/5">
-                        {rooms.map(room => (
-                            <button key={room} onClick={() => setActiveRoom(room)}
-                                className={`px-5 py-2 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${
-                                    activeRoom === room ? "bg-white text-stone-900" : "bg-stone-900/40 text-stone-500"
-                                }`}>
+                        {["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"].map(room => (
+                            <button key={room} onClick={() => {setActiveRoom(room); setEditingId(null);}}
+                                className={`px-5 py-2 rounded-xl text-[10px] font-bold transition-all whitespace-nowrap ${activeRoom === room ? "bg-white text-stone-900" : "bg-stone-900/40 text-stone-500"}`}>
                                 {room}
                             </button>
                         ))}
                     </nav>
-
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                        {filtered.map(item => (
+                        {filteredItems.map(item => (
                             <div key={item.id} className="glass-card px-4 py-3 rounded-2xl flex justify-between items-center group">
                                 <div className="flex-1 min-w-0 mr-2">
                                     {editingId === item.id ? (
@@ -114,35 +114,25 @@
                                             value={item.name}
                                             onChange={(e) => updateItem(item.id, 'name', e.target.value)}
                                             onBlur={() => setEditingId(null)}
+                                            onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                                         />
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
                                             <p className="text-[11px] font-medium text-stone-200 truncate">{item.name}</p>
-                                            <p className="text-[9px] text-stone-500 font-bold">QTY: {item.qty}</p>
+                                            <p className="text-[9px] text-stone-500 font-bold uppercase">QTY: {item.qty}</p>
                                         </div>
                                     )}
                                 </div>
-                                <button onClick={() => removeItem(item.id)} className="text-stone-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i data-lucide="x" className="w-3 h-3"></i>
-                                </button>
+                                <button onClick={() => removeItem(item.id)} className="text-stone-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="x" className="w-3 h-3"></i></button>
                             </div>
                         ))}
                     </div>
-
                     <div className="fixed bottom-8 left-4 right-4 flex justify-center pointer-events-none">
                         <div className="glass-dock p-2 w-full max-w-lg pointer-events-auto rounded-2xl shadow-2xl">
                             <form onSubmit={handleAddItem} className="flex items-center gap-2">
-                                <input type="text" placeholder={`${activeRoom}...`} 
-                                    value={newName} onChange={(e) => setNewName(e.target.value)}
-                                    className="flex-1 bg-transparent px-4 py-3 outline-none text-sm text-white placeholder:text-stone-700"
-                                />
-                                <input type="text" placeholder="Qty" 
-                                    value={newQty} onChange={(e) => setNewQty(e.target.value)}
-                                    className="w-16 bg-white/5 rounded-xl py-3 text-center outline-none text-xs font-bold text-stone-400"
-                                />
-                                <button type="submit" className="bg-white text-stone-900 w-10 h-10 rounded-xl flex items-center justify-center">
-                                    <i data-lucide="plus" className="w-5 h-5"></i>
-                                </button>
+                                <input type="text" placeholder={activeRoom} value={newName} onChange={(e) => setNewName(e.target.value)} className="flex-1 bg-transparent px-4 py-3 outline-none text-sm text-white placeholder:text-stone-700" />
+                                <input type="text" inputMode="decimal" placeholder="QTY" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-16 bg-white/5 rounded-xl py-3 text-center outline-none text-xs font-bold text-stone-400" />
+                                <button type="submit" className="bg-white text-stone-900 w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-transform"><i data-lucide="plus" className="w-5 h-5"></i></button>
                             </form>
                         </div>
                     </div>
