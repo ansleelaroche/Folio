@@ -1,50 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Sleek Pantry</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script> </head>
-<body class="bg-stone-100 font-sans">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#F9F8F6] font-sans text-stone-800">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState } = React;
 
         function PantryApp() {
-            // This is our "Chalkboard" (The State)
             const [items, setItems] = useState([
-                { id: 1, name: "Organic Milk", qty: 1 },
-                { id: 2, name: "Eggs", qty: 12 }
+                { id: 1, name: "Organic Milk", qty: "1 Gallon" },
+                { id: 2, name: "Free-range Eggs", qty: "12" }
             ]);
+            const [newName, setNewName] = useState("");
+            const [newQty, setNewQty] = useState("");
 
-            const addItem = () => {
-                const newItem = { id: Date.now(), name: "New Item", qty: 1 };
-                setItems([...items, newItem]); // This tells React: "Update your thoughts!"
+            const handleAddItem = (e) => {
+                e.preventDefault();
+                if (!newName) return;
+                
+                const newItem = {
+                    id: Date.now(),
+                    name: newName,
+                    qty: newQty || "1"
+                };
+                
+                setItems([newItem, ...items]);
+                setNewName("");
+                setNewQty("");
             };
 
             return (
-                <div class="max-w-md mx-auto p-6">
-                    <h1 class="text-3xl font-light mb-8 text-stone-800">My Kitchen</h1>
+                <div class="max-w-md mx-auto min-h-screen pb-32 p-6">
+                    <header class="mb-10 pt-8">
+                        <h1 class="text-4xl font-extralight tracking-tight text-stone-900">My Pantry</h1>
+                        <p class="text-stone-400 text-sm mt-2">{items.length} items tracked</p>
+                    </header>
                     
-                    {/* The Inventory List */}
-                    <div class="space-y-4">
+                    {/* The List */}
+                    <div class="space-y-3">
                         {items.map(item => (
-                            <div key={item.id} class="bg-white p-4 rounded-xl shadow-sm border border-stone-200 flex justify-between items-center">
-                                <span class="text-lg text-stone-700">{item.name}</span>
-                                <span class="bg-stone-100 px-3 py-1 rounded-full text-sm font-medium">{item.qty}</span>
+                            <div key={item.id} class="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex justify-between items-center transition-all">
+                                <span class="font-medium text-stone-700">{item.name}</span>
+                                <span class="text-stone-400 text-sm bg-stone-50 px-3 py-1 rounded-full">{item.qty}</span>
                             </div>
                         ))}
                     </div>
 
-                    {/* The "Quick Add" Button */}
-                    <button 
-                        onClick={addItem}
-                        class="fixed bottom-8 right-8 bg-stone-800 text-white w-14 h-14 rounded-full shadow-lg text-2xl flex items-center justify-center hover:bg-stone-700 transition-all"
-                    >
-                        +
-                    </button>
+                    {/* Simple Add Form - Positioned at bottom for thumb access */}
+                    <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-stone-100 p-6 pb-8">
+                        <form onSubmit={handleAddItem} class="max-w-md mx-auto flex gap-2">
+                            <input 
+                                type="text" 
+                                placeholder="Item name..." 
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                class="flex-1 bg-stone-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-stone-300 outline-none"
+                            />
+                            <input 
+                                type="text" 
+                                placeholder="Qty" 
+                                value={newQty}
+                                onChange={(e) => setNewQty(e.target.value)}
+                                class="w-20 bg-stone-100 border-none rounded-xl p-3 focus:ring-2 focus:ring-stone-300 outline-none text-center"
+                            />
+                            <button type="submit" class="bg-stone-900 text-white px-5 rounded-xl font-bold hover:bg-stone-700 active:scale-95 transition-all">
+                                +
+                            </button>
+                        </form>
+                    </div>
                 </div>
             );
         }
