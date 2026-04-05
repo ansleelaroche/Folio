@@ -52,10 +52,10 @@
                 const nameToAdd = newName.trim();
                 const qtyToAdd = Number(newQty) || 1;
                 
+                // Safe search for existing items
                 const existing = items.find(i => 
-                    i.room === activeRoom && 
-                    i.name && 
-                    i.name.toLowerCase() === nameToAdd.toLowerCase()
+                    i && i.room === activeRoom && 
+                    i.name && i.name.toLowerCase() === nameToAdd.toLowerCase()
                 );
 
                 if (existing) {
@@ -68,7 +68,7 @@
                         .eq('id', existing.id)
                         .select();
                     
-                    if (data) setItems(items.map(i => i.id === existing.id ? data[0] : i));
+                    if (data) setItems(items.map(i => i && i.id === existing.id ? data[0] : i));
                 } else {
                     const { data } = await supabase
                         .from('FancyPantry')
@@ -80,16 +80,17 @@
             };
 
             const updateItem = async (id, field, value) => {
-                setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
+                setItems(items.map(i => i && i.id === id ? { ...i, [field]: value } : i));
                 await supabase.from('FancyPantry').update({ [field]: value }).eq('id', id);
             };
 
             const removeItem = async (id) => {
-                setItems(items.filter(i => i.id !== id));
+                setItems(items.filter(i => i && i.id !== id));
                 await supabase.from('FancyPantry').delete().eq('id', id);
             };
 
-            const filteredItems = items.filter(i => i.room === activeRoom);
+            // SAFE FILTER: This prevents the 'undefined' error
+            const filteredItems = items.filter(item => item && item.room === activeRoom);
 
             return (
                 <div className="max-w-4xl mx-auto pb-40 px-4 pt-10">
@@ -118,8 +119,8 @@
                                         />
                                     ) : (
                                         <div onClick={() => setEditingId(item.id)} className="cursor-pointer">
-                                            <p className="text-[11px] font-medium text-stone-200 truncate">{item.name}</p>
-                                            <p className="text-[9px] text-stone-500 font-bold uppercase">QTY: {item.qty}</p>
+                                            <p className="text-[11px] font-medium text-stone-200 truncate">{item.name || "Unnamed"}</p>
+                                            <p className="text-[9px] text-stone-500 font-bold uppercase">QTY: {item.qty || "0"}</p>
                                         </div>
                                     )}
                                 </div>
