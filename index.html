@@ -20,8 +20,8 @@
         .handwritten-header { font-family: 'Covered By Your Grace', cursive; font-size: 1.35rem; letter-spacing: 0.1em; color: #525252; text-transform: uppercase; }
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
         .room-btn.active { color: #fff; border-bottom: 2px solid #71717a; }
-        .out-of-stock { color: #8a4d5e !important; } /* Dark Rose Pink */
-        input.inline-edit { background: transparent; border-bottom: 1px dashed #444; outline: none; width: 100%; color: inherit; font-family: inherit; }
+        .out-of-stock { color: #8a4d5e !important; }
+        input.inline-edit { background: rgba(255,255,255,0.05); border-bottom: 1px dashed #555; outline: none; color: inherit; font-family: inherit; padding: 2px 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -30,7 +30,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
         const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -61,10 +61,10 @@
             const [newName, setNewName] = useState("");
             const [newQty, setNewQty] = useState("");
             
-            // Inline Edit State
             const [editingId, setEditingId] = useState(null);
             const [editValue, setEditValue] = useState("");
             const [editQty, setEditQty] = useState("");
+            const editRowRef = useRef(null);
 
             useEffect(() => { fetchItems(); }, []);
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen]);
@@ -103,9 +103,7 @@
 
             const grouped = useMemo(() => {
                 const roomItems = items.filter(i => i.room === activeRoom);
-                // Sort so 0 qty is at the bottom
                 const sorted = [...roomItems].sort((a, b) => (parseFloat(a.qty) === 0 ? 1 : -1));
-                
                 return sorted.reduce((acc, i) => {
                     const c = i.category || "Misc";
                     if (!acc[c]) acc[c] = [];
@@ -115,7 +113,7 @@
             }, [items, activeRoom]);
 
             return (
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-5xl mx-auto pb-24">
                     <nav className="flex justify-center gap-6 md:gap-12 mb-10 py-2">
                         {Object.keys(ROOM_ICONS).map(r => (
                             <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase ${activeRoom === r ? 'active bg-white/5' : 'text-stone-800'}`}>
@@ -131,13 +129,17 @@
                                     <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
                                     <h3 className="handwritten-header">{cat}</h3>
                                 </div>
-                                <ul className="space-y-2">
+                                <ul className="space-y-3">
                                     {grouped[cat].map(item => (
-                                        <li key={item.id} className={`flex justify-between items-center group ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
+                                        <li key={item.id} className={`flex justify-between items-center group min-h-[24px] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
                                             {editingId === item.id ? (
-                                                <div className="flex gap-2 w-full">
-                                                    <input className="inline-edit handwritten" value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={() => saveInlineEdit(item.id)} autoFocus />
-                                                    <input className="w-10 inline-edit text-[9px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} onBlur={() => saveInlineEdit(item.id)} />
+                                                <div className="flex items-center gap-2 w-full animate-pulse" ref={editRowRef}>
+                                                    <input className="inline-edit handwritten flex-1" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[8px] text-stone-700">QTY:</span>
+                                                        <input className="w-10 inline-edit text-[9px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
+                                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-stone-200 text-black rounded p-0.5 ml-1"><i data-lucide="check" className="w-3 h-3"></i></button>
+                                                    </div>
                                                 </div>
                                             ) : (
                                                 <>
