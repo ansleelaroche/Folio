@@ -163,15 +163,31 @@
         }, [items, activeRoom]);
 
         const columnedCategories = useMemo(() => {
+            // We want 3 columns
             const cols = [[], [], []];
-            // Get keys of categories that actually have items in this room
-            const currentCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
-            currentCats.forEach((cat, index) => {
-                cols[index % 3].push(cat);
+            // Track the "height" (number of items) in each column
+            const colHeights = [0, 0, 0];
+
+            // Get categories that actually have items
+            const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
+
+            // Sort activeCats by length (longest first) to distribute the big ones first
+            const sortedByLength = activeCats.sort((a, b) => grouped[b].length - grouped[a].length);
+
+            sortedByLength.forEach(cat => {
+                // Find the index of the column that is currently the shortest
+                const shortestColIndex = colHeights.indexOf(Math.min(...colHeights));
+                
+                // Add the category to that column
+                cols[shortestColIndex].push(cat);
+                
+                // Update the height of that column (item count + 5 for the header/padding)
+                colHeights[shortestColIndex] += (grouped[cat].length + 5);
             });
+
             return cols;
         }, [grouped]);
-
+        
         const renderBox = (cat) => (
             <div key={cat} className="note-box">
                 <div className="flex items-center gap-2 mb-4 opacity-80">
