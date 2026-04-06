@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Art Edition</title>
+    <title>FancyPantry Mini</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,56 +11,51 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&display=swap');
         
         body { 
-            background-color: #0f0f0f; 
-            color: #E7E5E4; 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow: hidden;
+            background-color: #0f0e0d; 
+            color: #d4d4d8; 
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Large Artistic Vines */
-        .art-bg {
+        .botanical-overlay {
             position: fixed;
             inset: 0;
             pointer-events: none;
             z-index: 0;
-            opacity: 0.12;
-            filter: grayscale(100%) invert(1);
+            opacity: 0.05;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
         }
 
-        .sidebar-art {
-            background: rgba(15, 15, 15, 0.7);
-            backdrop-filter: blur(30px);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        .sidebar {
+            background: #161616;
+            border-right: 1px solid #262626;
         }
 
-        .masonry-card {
-            background: rgba(30, 30, 30, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.2s ease;
+        .mini-card {
+            background: #1c1c1c;
+            border: 1px solid #2d2d2d;
+            transition: all 0.15s ease;
         }
         
-        .masonry-card:hover {
-            transform: translateY(-2px);
-            background: rgba(40, 40, 40, 0.6);
+        .mini-card:hover {
+            border-color: #444;
+            background: #222;
+        }
+
+        .active-tab {
+            background: #262626;
+            color: #fff;
+            border-left: 2px solid #525252;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="antialiased tracking-tight">
-    <div class="art-bg">
-        <svg width="100%" height="100%" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M-50,800 Q150,600 100,300 T400,100 T800,-50" stroke="white" stroke-width="0.5" />
-            <path d="M850,800 Q650,400 700,200 T400,50 T0,0" stroke="white" stroke-width="0.5" />
-            <circle cx="100" cy="300" r="2" fill="white" opacity="0.5"/>
-            <circle cx="400" cy="100" r="3" fill="white" opacity="0.3"/>
-        </svg>
-    </div>
-
+<body class="antialiased tracking-tighter uppercase text-[10px] font-bold">
+    <div class="botanical-overlay"></div>
     <div id="root" class="relative z-10"></div>
 
     <script type="text/babel">
@@ -69,39 +64,11 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Icon Brain: Maps specific foods to Lucide Icons
-        const getFoodIcon = (name) => {
-            const low = name.toLowerCase();
-            if (low.includes('milk') || low.includes('dairy')) return 'milky-way';
-            if (low.includes('apple') || low.includes('fruit')) return 'apple';
-            if (low.includes('carrot') || low.includes('veg')) return 'carrot';
-            if (low.includes('meat') || low.includes('beef') || low.includes('protein')) return 'beef';
-            if (low.includes('fish')) return 'fish';
-            if (low.includes('bread') || low.includes('wheat')) return 'wheat';
-            if (low.includes('pizza') || low.includes('frozen')) return 'pizza';
-            if (low.includes('wine') || low.includes('drink')) return 'glass-water';
-            if (low.includes('coffee')) return 'coffee';
-            if (low.includes('cheese')) return 'proportions';
-            return 'dot'; // Fallback
-        };
-
         const ROOMS = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
-        const CATEGORIES = {
-            "Produce": { icon: "leaf", rooms: ["Fridge", "Counter"] },
-            "Dairy": { icon: "milk", rooms: ["Fridge"] },
-            "Protein": { icon: "bone", rooms: ["Fridge", "Freezer"] },
-            "Drinks": { icon: "droplets", rooms: ["Fridge", "Pantry"] },
-            "Condiments": { icon: "utensils", rooms: ["Fridge", "Pantry"] },
-            "Meats & Seafood": { icon: "anchor", rooms: ["Freezer"] },
-            "Prepared Meals": { icon: "box", rooms: ["Freezer"] },
-            "Frozen Veg & Fruit": { icon: "leaf", rooms: ["Freezer"] },
-            "Bakery & Breads": { icon: "wheat", rooms: ["Counter", "Pantry"] },
-            "Quick Snacks": { icon: "zap", rooms: ["Counter", "Pantry"] },
-            "Baking Essentials": { icon: "cookie", rooms: ["Cabinets", "Pantry"] },
-            "Seasonings & Oils": { icon: "flask-conical", rooms: ["Cabinets", "Pantry"] },
-            "Spreads & Jars": { icon: "container", rooms: ["Cabinets", "Pantry"] },
-            "Dishware": { icon: "utensils-2", rooms: ["Cabinets"] },
-            "Misc": { icon: "archive", rooms: ROOMS }
+        const CAT_CONFIG = {
+            "Produce": "leaf", "Dairy": "milk", "Protein": "bone", "Drinks": "droplets",
+            "Condiments": "utensils", "Meats & Seafood": "anchor", "Prepared Meals": "box",
+            "Bakery": "wheat", "Baking": "cookie", "Spreads": "container", "Dishware": "utensils-2", "Misc": "archive"
         };
 
         function PantryApp() {
@@ -115,7 +82,7 @@
             const [isSyncing, setIsSyncing] = useState(false);
 
             useEffect(() => { fetchItems(); }, []);
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, isModalOpen, modalRoom, modalCat]);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, isModalOpen]);
 
             async function fetchItems() {
                 const { data } = await supabase.from('FancyPantry').select('*').order('name');
@@ -126,8 +93,8 @@
                 e.preventDefault();
                 if (!newName || isSyncing) return;
                 setIsSyncing(true);
+                const existing = items.find(i => i.room === modalRoom && i.name?.toLowerCase() === newName.trim().toLowerCase());
                 try {
-                    const existing = items.find(i => i.room === modalRoom && i.name?.toLowerCase() === newName.trim().toLowerCase());
                     if (existing) {
                         const nextQty = (parseFloat(existing.qty || 0) + (parseFloat(newQty) || 1)).toString();
                         await supabase.from('FancyPantry').update({ qty: nextQty }).eq('id', existing.id);
@@ -139,83 +106,57 @@
                 } finally { setIsSyncing(false); }
             };
 
-            const removeItem = async (id) => {
-                await supabase.from('FancyPantry').delete().eq('id', id);
-                setItems(prev => prev.filter(i => i.id !== id));
-            };
-
-            const groupedItems = useMemo(() => {
+            const grouped = useMemo(() => {
                 const roomItems = items.filter(i => i.room === activeRoom);
-                return roomItems.reduce((acc, item) => {
-                    const dbCat = (item.category || "Misc").toLowerCase();
-                    const matchedCat = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
-                    if (!acc[matchedCat]) acc[matchedCat] = [];
-                    acc[matchedCat].push(item);
+                return roomItems.reduce((acc, i) => {
+                    const c = i.category || "Misc";
+                    if (!acc[c]) acc[c] = [];
+                    acc[c].push(i);
                     return acc;
                 }, {});
             }, [items, activeRoom]);
 
             return (
-                <div className="flex h-screen w-full overflow-hidden">
-                    {/* Artistic Sidebar */}
-                    <aside className="hidden lg:flex flex-col w-72 sidebar-art z-20">
-                        <div className="p-10">
-                            <h1 className="text-xl font-extralight tracking-[0.4em] uppercase mb-1">FancyPantry</h1>
-                            <p className="text-[8px] font-black text-stone-600 tracking-[0.3em]">PROFESSIONAL GRADE</p>
+                <div className="flex h-screen w-full">
+                    {/* SLIM SIDEBAR */}
+                    <aside className="w-16 md:w-48 sidebar flex flex-col pt-8">
+                        <div className="px-4 mb-8 hidden md:block">
+                            <h1 className="tracking-[0.3em] text-stone-500">PANTRY</h1>
                         </div>
-                        
-                        <nav className="flex-1 px-6 space-y-2 overflow-y-auto no-scrollbar">
-                            <p className="px-4 text-[9px] font-black text-stone-700 tracking-widest mb-4 uppercase">System Rooms</p>
+                        <nav className="flex-1 space-y-1">
                             {ROOMS.map(r => (
-                                <button key={r} onClick={() => setActiveRoom(r)} className={`w-full text-left px-4 py-3 rounded-xl text-xs transition-all ${activeRoom === r ? 'bg-white/5 text-white shadow-inner' : 'text-stone-500 hover:text-stone-300'}`}>
-                                    {r}
+                                <button key={r} onClick={() => setActiveRoom(r)} className={`w-full py-3 px-4 text-left transition-all ${activeRoom === r ? 'active-tab' : 'text-stone-600'}`}>
+                                    <span className="hidden md:inline">{r}</span>
+                                    <span className="md:hidden text-[8px]">{r[0]}</span>
                                 </button>
                             ))}
                         </nav>
-
-                        <div className="p-8">
-                            <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="w-full bg-white text-black py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase hover:invert transition-all">
-                                + Add Stock
-                            </button>
-                        </div>
+                        <button onClick={() => {setModalRoom(activeRoom); setIsModalOpen(true)}} className="p-4 bg-stone-100 text-black m-2 rounded hover:bg-white">+</button>
                     </aside>
 
-                    {/* Main Canvas */}
-                    <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-20 no-scrollbar">
-                        <div className="max-w-5xl mx-auto">
-                            <header className="mb-16 flex justify-between items-end">
-                                <div>
-                                    <h2 className="text-5xl font-light tracking-tighter text-stone-100">{activeRoom}</h2>
-                                    <div className="h-0.5 w-16 bg-stone-800 mt-6"></div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-[10px] font-black text-stone-600 tracking-widest uppercase mb-1">Unit Count</p>
-                                    <span className="text-2xl font-extralight text-stone-400">{items.filter(i => i.room === activeRoom).length}</span>
-                                </div>
+                    {/* MICRO CONTENT */}
+                    <main className="flex-1 overflow-y-auto p-4 md:p-10 no-scrollbar">
+                        <div className="max-w-4xl mx-auto">
+                            <header className="mb-8 border-b border-white/5 pb-4 flex justify-between items-end">
+                                <h2 className="text-2xl font-black tracking-widest text-white">{activeRoom}</h2>
+                                <span className="text-stone-700">{items.filter(i => i.room === activeRoom).length} ITEMS</span>
                             </header>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                                {Object.keys(CATEGORIES).map(cat => groupedItems[cat] && (
-                                    <section key={cat} className="space-y-6">
-                                        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                                            <i data-lucide={CATEGORIES[cat].icon} className="w-4 h-4 text-stone-600"></i>
-                                            <h3 className="text-[10px] font-black tracking-[0.4em] uppercase text-stone-600">{cat}</h3>
+                            <div className="space-y-8">
+                                {Object.keys(grouped).map(cat => (
+                                    <section key={cat}>
+                                        <div className="flex items-center gap-2 mb-3 text-stone-600 opacity-50">
+                                            <i data-lucide={CAT_CONFIG[cat] || 'dot'} className="w-3 h-3"></i>
+                                            <h3 className="tracking-[0.4em]">{cat}</h3>
                                         </div>
-                                        <div className="space-y-3">
-                                            {groupedItems[cat].map(item => (
-                                                <div key={item.id} className="masonry-card p-5 rounded-[1.5rem] flex justify-between items-center group">
-                                                    <div className="flex items-center gap-4 min-w-0">
-                                                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-stone-500">
-                                                            <i data-lucide={getFoodIcon(item.name)} className="w-5 h-5"></i>
-                                                        </div>
-                                                        <div className="min-w-0">
-                                                            <p className="text-sm font-medium text-stone-200 capitalize">{item.name}</p>
-                                                            <p className="text-[9px] text-stone-600 font-bold uppercase mt-0.5 tracking-tighter">Qty: {item.qty}</p>
-                                                        </div>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                                            {grouped[cat].map(item => (
+                                                <div key={item.id} className="mini-card p-2 px-3 rounded flex justify-between items-center group">
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-stone-300 font-medium">{item.name}</p>
+                                                        <p className="text-[8px] text-stone-700">Q: {item.qty}</p>
                                                     </div>
-                                                    <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-700 hover:text-white transition-all p-2">
-                                                        <i data-lucide="x" className="w-4 h-4"></i>
-                                                    </button>
+                                                    <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-white">×</button>
                                                 </div>
                                             ))}
                                         </div>
@@ -223,49 +164,35 @@
                                 ))}
                             </div>
                         </div>
-
-                        {/* Mobile Action */}
-                        <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="lg:hidden fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-40">
-                            <i data-lucide="plus" className="w-8 h-8"></i>
-                        </button>
                     </main>
 
-                    {/* Entry Sheet */}
+                    {/* COMPACT MODAL */}
                     {isModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/90 backdrop-blur-sm">
-                            <div className="bg-[#121212] w-full max-w-xl rounded-[3rem] p-10 border border-white/10 shadow-2xl">
-                                <div className="flex justify-between items-center mb-10">
-                                    <h2 className="text-[10px] font-black tracking-[0.5em] uppercase text-stone-600">Stock Entry</h2>
-                                    <button onClick={() => setIsModalOpen(false)} className="text-stone-700 hover:text-white p-2"><i data-lucide="x" className="w-8 h-8"></i></button>
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90">
+                            <div className="bg-[#111] w-full max-w-sm rounded p-6 border border-white/10">
+                                <div className="flex justify-between items-center mb-6">
+                                    <p className="tracking-widest text-stone-600">NEW ENTRY</p>
+                                    <button onClick={() => setIsModalOpen(false)}>×</button>
                                 </div>
-                                <form onSubmit={handleAddItem} className="space-y-10">
-                                    <div className="space-y-4">
-                                        <label className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">1. Location & Category</label>
-                                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                                            {ROOMS.map(r => (
-                                                <button key={r} type="button" onClick={() => setModalRoom(r)} className={`px-4 py-2 rounded-xl text-[10px] font-bold border transition-all ${modalRoom === r ? 'bg-white text-black border-white' : 'bg-transparent text-stone-600 border-white/10'}`}>{r}</button>
-                                            ))}
-                                        </div>
-                                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                                            {Object.keys(CATEGORIES).filter(c => CATEGORIES[c].rooms.includes(modalRoom)).map(c => (
-                                                <button key={c} type="button" onClick={() => setModalCat(c)} className={`px-4 py-2 rounded-xl text-[10px] font-bold border transition-all flex items-center gap-2 whitespace-nowrap ${modalCat === c ? 'bg-white text-black border-white' : 'bg-transparent text-stone-600 border-white/10'}`}>
-                                                    <i data-lucide={CATEGORIES[c].icon} className="w-3 h-3"></i> {c}
-                                                </button>
-                                            ))}
-                                        </div>
+                                <div className="space-y-4">
+                                    <div className="flex gap-1 overflow-x-auto no-scrollbar">
+                                        {ROOMS.map(r => (
+                                            <button key={r} onClick={() => setModalRoom(r)} className={`px-2 py-1 rounded text-[8px] border ${modalRoom === r ? 'bg-white text-black' : 'border-white/5 text-stone-600'}`}>{r}</button>
+                                        ))}
                                     </div>
-                                    <div className="space-y-6 pt-6 border-t border-white/5">
-                                        <input autoFocus type="text" placeholder="Item Name (e.g. Spinach)" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 border-b border-white/10 py-6 outline-none text-2xl font-light text-stone-100 placeholder:text-stone-800" />
-                                        <div className="flex gap-6 items-end">
-                                            <div className="flex-1">
-                                                <input type="text" placeholder="Quantity" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-full bg-white/5 border-b border-white/10 py-4 outline-none text-lg text-stone-400 font-bold" />
-                                            </div>
-                                            <button type="submit" disabled={isSyncing} className="bg-white text-black h-16 px-12 rounded-2xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-3 active:scale-95 transition-all">
-                                                {isSyncing ? <i data-lucide="refresh-cw" className="w-4 h-4 animate-spin"></i> : <i data-lucide="plus" className="w-4 h-4"></i>} Add Stock
-                                            </button>
-                                        </div>
+                                    <div className="flex gap-1 overflow-x-auto no-scrollbar">
+                                        {Object.keys(CAT_CONFIG).map(c => (
+                                            <button key={c} onClick={() => setModalCat(c)} className={`px-2 py-1 rounded text-[8px] border ${modalCat === c ? 'bg-white text-black' : 'border-white/5 text-stone-600'}`}>{c}</button>
+                                        ))}
                                     </div>
-                                </form>
+                                    <form onSubmit={handleAddItem} className="space-y-4 pt-4 border-t border-white/5">
+                                        <input autoFocus type="text" placeholder="NAME" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 p-3 outline-none border border-white/5" />
+                                        <div className="flex gap-2">
+                                            <input type="text" placeholder="QTY" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-20 bg-white/5 p-3 outline-none border border-white/5" />
+                                            <button type="submit" className="flex-1 bg-stone-100 text-black font-black tracking-widest">{isSyncing ? '...' : 'ADD'}</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     )}
