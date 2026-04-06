@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Pro</title>
+    <title>FancyPantry Professional</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -22,23 +22,25 @@
         .note-box { background: #141413; border: 1px solid #222120; padding: 16px; position: relative; }
         .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.2rem; line-height: 1; }
         
-        /* Muted Header Styles */
         .handwritten-header { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.15rem; 
+            font-size: 1.1rem; 
             letter-spacing: 0.1em; 
             text-transform: uppercase; 
         }
         
-        /* Dynamic Header Colors based on Room */
-        .room-Fridge .handwritten-header { color: #93c5fd; opacity: 0.8; } /* Muted Light Blue */
-        .room-Freezer .handwritten-header { color: #6366f1; opacity: 0.8; } /* Muted Dark Blue */
-        .room-DryGoods .handwritten-header { color: #86efac; opacity: 0.8; } /* Muted Green */
-        .room-ShoppingList .handwritten-header { color: #c084fc; opacity: 0.8; } /* Muted Purple */
+        /* Muted Custom Palette */
+        .room-Fridge .handwritten-header { color: #bae6fd; opacity: 0.9; } /* Light Sky Blue */
+        .room-Freezer .handwritten-header { color: #94a3b8; opacity: 0.9; } /* Frosty Steel Blue */
+        .room-DryGoods .handwritten-header { color: #86efac; opacity: 0.9; } /* Muted Sage */
+        .room-ShoppingList .handwritten-header { color: #d8b4fe; opacity: 0.9; } /* Dusty Plum */
 
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 10px; }
         .room-btn.active { color: #fff; border-bottom: 2px solid #71717a; }
-        .out-of-stock { color: #8a4d5e !important; }
+        
+        /* Shopping list items now white, Rose Pink only used for 0 qty in main rooms */
+        .room-ShoppingList .out-of-stock-text { color: #d4d4d8 !important; }
+        .out-of-stock-text { color: #8a4d5e; } 
         
         input.inline-edit { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); outline: none; color: inherit; font-family: inherit; padding: 0px 4px; border-radius: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -125,11 +127,12 @@
                 if (activeRoom === "Shopping List") {
                     filtered = items.filter(i => parseFloat(i.qty || 0) === 0);
                 } else {
-                    // Logic fix: Ensure items belonging to fridge categories show up in Fridge even if room name is messy
+                    // SUPER FILTER: Check both Room string AND Category definition
                     filtered = items.filter(i => {
-                        const cleanRoom = i.room?.replace(/\s/g, '');
-                        const activeClean = activeRoom.replace(/\s/g, '');
-                        return cleanRoom === activeClean;
+                        const itemRoom = (i.room || "").replace(/\s/g, '').toLowerCase();
+                        const targetRoom = activeRoom.replace(/\s/g, '').toLowerCase();
+                        const catMatch = CATEGORIES[i.category]?.[1].some(r => r.replace(/\s/g, '').toLowerCase() === targetRoom);
+                        return itemRoom === targetRoom || catMatch;
                     });
                 }
 
@@ -153,13 +156,13 @@
 
             const renderBox = (cat) => (
                 <div key={cat} className="note-box">
-                    <div className="flex items-center gap-2 mb-4 opacity-70">
-                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-40"></i>
+                    <div className="flex items-center gap-2 mb-4 opacity-80">
+                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-30"></i>
                         <h3 className="handwritten-header">{cat}</h3>
                     </div>
                     <ul className="space-y-4">
                         {grouped[cat].map(item => (
-                            <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
+                            <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock-text' : ''}`}>
                                 {editingId === item.id ? (
                                     <div className="flex items-center gap-2 w-full">
                                         <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
@@ -172,8 +175,8 @@
                                 ) : (
                                     <>
                                         <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
-                                            <span className="handwritten truncate capitalize">{item.name}</span>
-                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3 h-3 opacity-50 shrink-0"></i>}
+                                            <span className="handwritten truncate">{item.name}</span>
+                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3 h-3 opacity-40 shrink-0"></i>}
                                         </div>
                                         <div className="flex items-center gap-3 shrink-0">
                                             <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
@@ -199,7 +202,7 @@
 
                     <div className="flex-container">
                         {Object.keys(grouped).length === 0 ? (
-                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">No items here</p>
+                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">Stock level nominal</p>
                         ) : (
                             columnedCategories.map((col, i) => (
                                 <div key={i} className="column">
