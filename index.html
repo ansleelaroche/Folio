@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>FancyPantry Notes</title>
+    <title>FancyPantry Notes Pro</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -24,42 +24,48 @@
             position: fixed;
             bottom: -2%;
             right: -2%;
-            width: 250px;
-            opacity: 0.1;
+            width: 200px;
+            opacity: 0.08;
             pointer-events: none;
             filter: invert(1);
         }
 
         .note-box {
-            background: #161615;
-            border: 1px solid #262524;
-            padding: 14px;
+            background: #141413;
+            border: 1px solid #222120;
+            padding: 12px;
             height: fit-content;
         }
 
         .handwritten {
             font-family: 'Covered By Your Grace', cursive;
-            font-size: 1.15rem;
-            line-height: 1.2;
+            font-size: 1.1rem;
+            line-height: 1.1;
             color: #d1d1d1;
         }
 
+        .handwritten-header {
+            font-family: 'Covered By Your Grace', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 0.1em;
+            color: #525252;
+            text-transform: uppercase;
+        }
+
         .room-btn {
-            letter-spacing: 0.2em;
             transition: all 0.2s;
             border-bottom: 2px solid transparent;
-            font-size: 9px;
         }
 
         .room-btn.active {
             color: #fff;
-            border-bottom: 2px solid #a1a1aa;
+            border-bottom: 2px solid #71717a;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="antialiased p-4 md:p-8">
+<body class="antialiased p-4 md:p-6">
     <svg class="botanical-art" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <path d="M10,90 Q30,70 20,40 T50,20 T90,10" stroke="white" fill="none" stroke-width="0.3"/>
     </svg>
@@ -72,22 +78,46 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        const ROOMS = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
-        
-        // Helper to capitalize first letter of every word
+        const ROOM_ICONS = {
+            "Fridge": "refrigerator",
+            "Freezer": "snowflake",
+            "Pantry": "package",
+            "Counter": "timer",
+            "Cabinets": "archive"
+        };
+
+        const CATEGORIES = {
+            // FRIDGE/FREEZER
+            "Produce": ["leaf", ["Fridge", "Counter"]],
+            "Dairy": ["milk", ["Fridge"]],
+            "Protein": ["bone", ["Fridge", "Freezer"]],
+            "Drinks": ["droplets", ["Fridge", "Pantry"]],
+            "Condiments": ["utensils", ["Fridge", "Pantry"]],
+            "Meats & Seafood": ["anchor", ["Freezer"]],
+            "Prepared Meals": ["box", ["Freezer"]],
+            "Frozen Veg & Fruit": ["leaf", ["Freezer"]],
+            "Desserts": ["ice-cream", ["Freezer"]],
+            
+            // PANTRY/COUNTER/CABINETS
+            "Snacks": ["zap", ["Pantry", "Counter"]],
+            "Pasta & Grains": ["wheat", ["Pantry"]],
+            "Sides": ["layout-grid", ["Pantry"]],
+            "Cereal": ["shrub", ["Pantry"]],
+            "Cans & Jars": ["container", ["Pantry", "Cabinets"]],
+            "Baking Essentials": ["cookie", ["Cabinets", "Pantry"]],
+            "Supplies": ["cog", ["Cabinets", "Pantry"]],
+            "Dishware": ["utensils-2", ["Cabinets"]],
+            "Misc": ["more-horizontal", ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"]]
+        };
+
         const titleCase = (str) => {
             return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         };
 
-        // Check if item is dog food ingredient
         const isDogFood = (name) => {
             const n = name.toLowerCase();
-            return n.includes('ground turkey') || 
-                   n.includes('veggies') || 
-                   n.includes('berries') || 
-                   n.includes('kidney beans') || 
-                   n.includes('white rice') || 
-                   n.includes('sweet potato');
+            return n.includes('ground turkey') || n.includes('veggies') || n.includes('berries') || 
+                   n.includes('kidney beans') || n.includes('white rice') || n.includes('sweet potato');
         };
 
         function PantryApp() {
@@ -143,11 +173,12 @@
 
             return (
                 <div className="max-w-5xl mx-auto">
-                    <nav className="flex justify-center gap-6 mb-10 overflow-x-auto no-scrollbar pb-2">
-                        {ROOMS.map(r => (
+                    <nav className="flex justify-center gap-4 md:gap-8 mb-8 overflow-x-auto no-scrollbar py-2">
+                        {Object.keys(ROOM_ICONS).map(r => (
                             <button key={r} onClick={() => setActiveRoom(r)} 
-                                className={`room-btn font-black uppercase py-1 ${activeRoom === r ? 'active' : 'text-stone-800'}`}>
-                                {r}
+                                className={`room-btn flex items-center gap-2 px-3 py-1.5 rounded-full text-[9px] font-bold uppercase transition-all ${activeRoom === r ? 'active bg-white/5' : 'text-stone-700'}`}>
+                                <i data-lucide={ROOM_ICONS[r]} className="w-3.5 h-3.5"></i>
+                                <span className="hidden sm:inline">{r}</span>
                             </button>
                         ))}
                     </nav>
@@ -155,16 +186,19 @@
                     <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
                         {Object.keys(grouped).map(cat => (
                             <div key={cat} className="note-box break-inside-avoid">
-                                <h3 className="text-[8px] font-black tracking-[0.4em] uppercase text-stone-700 mb-3 border-b border-white/5 pb-1">{cat}</h3>
-                                <ul className="space-y-1">
+                                <div className="flex items-center gap-2 mb-4 opacity-40">
+                                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3 h-3 text-white"></i>
+                                    <h3 className="handwritten-header">{cat}</h3>
+                                </div>
+                                <ul className="space-y-1.5">
                                     {grouped[cat].map(item => (
-                                        <li key={item.id} className="flex justify-between items-center group py-0.5">
+                                        <li key={item.id} className="flex justify-between items-center group">
                                             <div className="flex items-center gap-2">
                                                 <span className="handwritten">{titleCase(item.name)}</span>
                                                 {isDogFood(item.name) && <i data-lucide="paw-print" className="w-2.5 h-2.5 text-stone-600"></i>}
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[9px] font-bold text-stone-800">x{item.qty}</span>
+                                                <span className="text-[9px] font-bold text-stone-800 tracking-tighter">x{item.qty}</span>
                                                 <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
                                             </div>
                                         </li>
@@ -181,21 +215,26 @@
 
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95">
-                            <div className="bg-[#111] w-full max-w-sm p-8 border border-white/5 shadow-2xl rounded-2xl">
+                            <div className="bg-[#111] w-full max-w-sm p-8 border border-white/5 rounded-2xl">
                                 <div className="flex justify-between items-center mb-6">
-                                    <p className="text-[9px] font-black tracking-[0.3em] text-stone-700 uppercase">Entry</p>
+                                    <p className="handwritten-header !text-stone-600">NEW ENTRY</p>
                                     <button onClick={() => setIsModalOpen(false)} className="text-stone-800 hover:text-white"><i data-lucide="x" className="w-5 h-5"></i></button>
                                 </div>
                                 <form onSubmit={handleAddItem} className="space-y-6">
-                                    <div className="flex gap-1 overflow-x-auto no-scrollbar">
-                                        {ROOMS.map(r => (
+                                    <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">
+                                        {Object.keys(ROOM_ICONS).map(r => (
                                             <button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-2.5 py-1.5 text-[8px] font-bold border transition-all ${modalRoom === r ? 'bg-stone-200 text-black border-stone-200' : 'bg-transparent text-stone-800 border-white/5'}`}>{r}</button>
                                         ))}
                                     </div>
-                                    <input autoFocus type="text" placeholder="Ingredient..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-transparent border-b border-white/10 py-2 text-xl font-light outline-none text-stone-200" />
+                                    <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">
+                                        {Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (
+                                            <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-2.5 py-1.5 text-[8px] font-bold border transition-all whitespace-nowrap ${modalCat === c ? 'bg-stone-400 text-black border-stone-400' : 'bg-transparent text-stone-800 border-white/5'}`}>{c}</button>
+                                        ))}
+                                    </div>
+                                    <input autoFocus type="text" placeholder="Entry..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-transparent border-b border-white/10 py-2 text-xl font-light outline-none text-stone-200" />
                                     <div className="flex gap-4 items-end">
                                         <input type="text" placeholder="Qty" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-16 bg-transparent border-b border-white/10 py-1 outline-none text-stone-600 text-sm" />
-                                        <button type="submit" className="flex-1 bg-stone-300 py-3 text-black text-[9px] font-black tracking-widest uppercase rounded">Add Stock</button>
+                                        <button type="submit" className="flex-1 bg-stone-300 py-3 text-black text-[9px] font-black tracking-widest uppercase rounded">Save</button>
                                     </div>
                                 </form>
                             </div>
