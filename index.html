@@ -211,7 +211,7 @@
             </div>
             <ul className="space-y-4">
                 {grouped[cat].map(item => (
-                    <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
+                    <li key={item.id} className={`flex justify-between items-start group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
                         {editingId === item.id ? (
                             <div className="flex items-center gap-2 w-full">
                                 <input 
@@ -234,14 +234,16 @@
                             </div>
                         ) : (
                             <>
-                                <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
-                                    {/* This titleCase call ensures every word starts with a Capital */}
-                                    <span className="handwritten truncate">{titleCase(item.name)}</span>
-                                    {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 text-amber-200/40 shrink-0"></i>}
+                                <div className="flex items-start gap-2 cursor-text min-w-0 flex-1 mr-2" onClick={() => startEdit(item)}>
+                                    {/* Removed 'truncate' and added 'whitespace-normal' and 'break-words' */}
+                                    <span className="handwritten whitespace-normal break-words leading-tight capitalize">
+                                        {titleCase(item.name)}
+                                    </span>
+                                    {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 text-amber-200/40 shrink-0 mt-1"></i>}
                                 </div>
-                                <div className="flex items-center gap-3 shrink-0">
+                                <div className="flex items-center gap-3 shrink-0 pt-0.5">
                                     <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                    <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
+                                    <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px] px-1">×</button>
                                 </div>
                             </>
                         )}
