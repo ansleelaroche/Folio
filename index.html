@@ -15,37 +15,13 @@
         
         body { background-color: #0d0d0c; color: #d4d4d8; font-family: 'Inter', sans-serif; min-height: 100vh; }
         .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); }
-        
-        /* Note Box - Ensuring it contains its children properly */
-        .note-box { 
-            background: #141413; 
-            border: 1px solid #222120; 
-            padding: 16px; 
-            height: fit-content;
-            break-inside: avoid;
-            position: relative;
-        }
-
+        .note-box { background: #141413; border: 1px solid #222120; padding: 16px; height: fit-content; break-inside: avoid; position: relative; }
         .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.25rem; line-height: 1; }
         .handwritten-header { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; letter-spacing: 0.1em; color: #525252; text-transform: uppercase; }
-        
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
         .room-btn.active { color: #fff; border-bottom: 2px solid #71717a; }
-        
         .out-of-stock { color: #8a4d5e !important; }
-
-        /* Stable Inline Inputs */
-        input.inline-edit { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,255,255,0.1);
-            outline: none; 
-            color: inherit; 
-            font-family: inherit;
-            padding: 0px 4px;
-            border-radius: 4px;
-            margin: -2px 0;
-        }
-
+        input.inline-edit { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); outline: none; color: inherit; font-family: inherit; padding: 0px 4px; border-radius: 4px; margin: -2px 0; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -59,7 +35,7 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard" };
+        const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
         const CATEGORIES = {
             "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
             "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
@@ -125,8 +101,16 @@
             };
 
             const grouped = useMemo(() => {
-                const roomItems = items.filter(i => i.room === activeRoom);
-                const sorted = [...roomItems].sort((a, b) => (parseFloat(a.qty) === 0 ? 1 : -1));
+                let filtered;
+                if (activeRoom === "Shopping List") {
+                    filtered = items.filter(i => parseFloat(i.qty) === 0);
+                } else {
+                    filtered = items.filter(i => i.room === activeRoom && parseFloat(i.qty) > 0);
+                }
+
+                // Alphabetize
+                const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+
                 return sorted.reduce((acc, i) => {
                     const c = i.category || "Misc";
                     if (!acc[c]) acc[c] = [];
@@ -137,74 +121,64 @@
 
             return (
                 <div className="max-w-5xl mx-auto pb-32">
-                    <nav className="flex justify-center gap-6 md:gap-12 mb-10 py-2">
+                    <nav className="flex justify-center gap-4 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2">
                         {Object.keys(ROOM_ICONS).map(r => (
-                            <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase ${activeRoom === r ? 'active bg-white/5' : 'text-stone-800'}`}>
+                            <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-3 py-2 rounded-full text-[10px] font-bold uppercase ${activeRoom === r ? 'active bg-white/5' : 'text-stone-800'}`}>
                                 <i data-lucide={ROOM_ICONS[r]} className="w-4 h-4"></i><span>{r}</span>
                             </button>
                         ))}
                     </nav>
 
                     <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                        {Object.keys(grouped).map(cat => (
-                            <div key={cat} className="note-box">
-                                <div className="flex items-center gap-2 mb-5 opacity-40">
-                                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
-                                    <h3 className="handwritten-header">{cat}</h3>
+                        {Object.keys(grouped).length === 0 ? (
+                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center col-span-full py-20 italic">No items found</p>
+                        ) : (
+                            Object.keys(grouped).map(cat => (
+                                <div key={cat} className="note-box">
+                                    <div className="flex items-center gap-2 mb-5 opacity-40">
+                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
+                                        <h3 className="handwritten-header">{cat}</h3>
+                                    </div>
+                                    <ul className="space-y-4">
+                                        {grouped[cat].map(item => (
+                                            <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
+                                                {editingId === item.id ? (
+                                                    <div className="flex items-center gap-2 w-full">
+                                                        <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
+                                                        <div className="flex items-center gap-1 shrink-0">
+                                                            <span className="text-[8px] text-stone-700">x</span>
+                                                            <input className="w-8 inline-edit text-[9px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
+                                                            <button onClick={() => saveInlineEdit(item.id)} className="bg-stone-100 text-black rounded p-0.5 ml-1"><i data-lucide="check" className="w-3.5 h-3.5"></i></button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
+                                                            <span className="handwritten truncate capitalize">{item.name}</span>
+                                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 opacity-50 shrink-0"></i>}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 shrink-0">
+                                                            <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
+                                                            <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <ul className="space-y-4">
-                                    {grouped[cat].map(item => (
-                                        <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
-                                            {editingId === item.id ? (
-                                                <div className="flex items-center gap-2 w-full">
-                                                    <input 
-                                                        className="inline-edit handwritten flex-1 min-w-0" 
-                                                        value={editValue} 
-                                                        onChange={(e) => setEditValue(e.target.value)} 
-                                                        autoFocus 
-                                                    />
-                                                    <div className="flex items-center gap-1 shrink-0">
-                                                        <span className="text-[8px] text-stone-700">x</span>
-                                                        <input 
-                                                            className="w-8 inline-edit text-[9px] font-bold text-center" 
-                                                            value={editQty} 
-                                                            onChange={(e) => setEditQty(e.target.value)} 
-                                                        />
-                                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-stone-100 text-black rounded p-0.5 ml-1">
-                                                            <i data-lucide="check" className="w-3.5 h-3.5"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
-                                                        <span className="handwritten truncate capitalize">{item.name}</span>
-                                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 opacity-50 shrink-0"></i>}
-                                                    </div>
-                                                    <div className="flex items-center gap-3 shrink-0">
-                                                        <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                                        <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
 
-                    <button onClick={() => {setModalRoom(activeRoom); setIsModalOpen(true)}} className="fixed bottom-10 right-10 w-14 h-14 bg-stone-100 text-black rounded-full shadow-2xl flex items-center justify-center z-50"><i data-lucide="plus" className="w-6 h-6"></i></button>
+                    <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="fixed bottom-10 right-10 w-14 h-14 bg-stone-100 text-black rounded-full shadow-2xl flex items-center justify-center z-50"><i data-lucide="plus" className="w-6 h-6"></i></button>
 
                     {isModalOpen && (
                         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
                             <div className="bg-[#111] w-full max-w-sm p-8 border border-white/5 rounded-2xl shadow-2xl">
-                                <div className="flex justify-between items-center mb-8">
-                                    <p className="handwritten-header !text-stone-600">NEW ENTRY</p>
-                                    <button onClick={() => setIsModalOpen(false)}><i data-lucide="x" className="w-6 h-6 text-stone-600 hover:text-white"></i></button>
-                                </div>
+                                <div className="flex justify-between items-center mb-8"><p className="handwritten-header !text-stone-600">NEW ENTRY</p><button onClick={() => setIsModalOpen(false)}><i data-lucide="x" className="w-6 h-6 text-stone-600 hover:text-white"></i></button></div>
                                 <form onSubmit={handleAddItem} className="space-y-6">
-                                    <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">{Object.keys(ROOM_ICONS).map(r => (<button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-3 py-2 text-[8px] font-bold border ${modalRoom === r ? 'bg-stone-200 text-black' : 'text-stone-800 border-white/5'}`}>{r}</button>))}</div>
+                                    <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">{Object.keys(ROOM_ICONS).filter(k => k !== "Shopping List").map(r => (<button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-3 py-2 text-[8px] font-bold border ${modalRoom === r ? 'bg-stone-200 text-black' : 'text-stone-800 border-white/5'}`}>{r}</button>))}</div>
                                     <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">{Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (<button type="button" key={c} onClick={() => setModalCat(c)} className={`px-2.5 py-1.5 text-[8px] font-bold border whitespace-nowrap ${modalCat === c ? 'bg-stone-400 text-black' : 'text-stone-800 border-white/5'}`}>{c}</button>))}</div>
                                     <input autoFocus type="text" placeholder="Name..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-transparent border-b border-white/10 py-2 text-xl font-light outline-none text-stone-200" />
                                     <div className="flex gap-4 items-end"><input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-16 bg-transparent border-b border-white/10 py-1 outline-none text-stone-600 text-sm" /><button type="submit" className="flex-1 bg-stone-300 py-3 text-black text-[9px] font-black tracking-widest uppercase rounded">Save</button></div>
