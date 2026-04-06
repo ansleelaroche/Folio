@@ -16,27 +16,30 @@
         body { background-color: #0d0d0c; color: #d4d4d8; font-family: 'Inter', sans-serif; min-height: 100vh; }
         .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); }
         
-        /* Flex Columns: Keeps width uniform but allows variable height */
-        .flex-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-
-        .column {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
+        .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
         .note-box { background: #141413; border: 1px solid #222120; padding: 16px; position: relative; }
-        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.25rem; line-height: 1; }
-        .handwritten-header { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; letter-spacing: 0.1em; color: #525252; text-transform: uppercase; }
-        .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.2rem; line-height: 1; }
+        
+        /* Muted Header Styles */
+        .handwritten-header { 
+            font-family: 'Covered By Your Grace', cursive; 
+            font-size: 1.15rem; 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase; 
+        }
+        
+        /* Dynamic Header Colors based on Room */
+        .room-Fridge .handwritten-header { color: #93c5fd; opacity: 0.8; } /* Muted Light Blue */
+        .room-Freezer .handwritten-header { color: #6366f1; opacity: 0.8; } /* Muted Dark Blue */
+        .room-DryGoods .handwritten-header { color: #86efac; opacity: 0.8; } /* Muted Green */
+        .room-ShoppingList .handwritten-header { color: #c084fc; opacity: 0.8; } /* Muted Purple */
+
+        .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 10px; }
         .room-btn.active { color: #fff; border-bottom: 2px solid #71717a; }
         .out-of-stock { color: #8a4d5e !important; }
+        
         input.inline-edit { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); outline: none; color: inherit; font-family: inherit; padding: 0px 4px; border-radius: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
@@ -52,6 +55,7 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
+        
         const CATEGORIES = {
             "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
             "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
@@ -119,13 +123,17 @@
             const grouped = useMemo(() => {
                 let filtered;
                 if (activeRoom === "Shopping List") {
-                    filtered = items.filter(i => parseFloat(i.qty) === 0);
+                    filtered = items.filter(i => parseFloat(i.qty || 0) === 0);
                 } else {
-                    filtered = items.filter(i => i.room === activeRoom);
+                    // Logic fix: Ensure items belonging to fridge categories show up in Fridge even if room name is messy
+                    filtered = items.filter(i => {
+                        const cleanRoom = i.room?.replace(/\s/g, '');
+                        const activeClean = activeRoom.replace(/\s/g, '');
+                        return cleanRoom === activeClean;
+                    });
                 }
 
                 const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-
                 return sorted.reduce((acc, i) => {
                     const c = i.category || "Misc";
                     if (!acc[c]) acc[c] = [];
@@ -134,7 +142,6 @@
                 }, {});
             }, [items, activeRoom]);
 
-            // Distribute categories into 3 stable columns
             const columnedCategories = useMemo(() => {
                 const cols = [[], [], []];
                 const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
@@ -146,8 +153,8 @@
 
             const renderBox = (cat) => (
                 <div key={cat} className="note-box">
-                    <div className="flex items-center gap-2 mb-5 opacity-40">
-                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
+                    <div className="flex items-center gap-2 mb-4 opacity-70">
+                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-40"></i>
                         <h3 className="handwritten-header">{cat}</h3>
                     </div>
                     <ul className="space-y-4">
@@ -166,7 +173,7 @@
                                     <>
                                         <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
                                             <span className="handwritten truncate capitalize">{item.name}</span>
-                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 opacity-50 shrink-0"></i>}
+                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3 h-3 opacity-50 shrink-0"></i>}
                                         </div>
                                         <div className="flex items-center gap-3 shrink-0">
                                             <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
@@ -181,10 +188,10 @@
             );
 
             return (
-                <div className="max-w-7xl mx-auto pb-32">
+                <div className={`max-w-7xl mx-auto pb-32 room-${activeRoom.replace(/\s/g, '')}`}>
                     <nav className="flex justify-center gap-4 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2">
                         {Object.keys(ROOM_ICONS).map(r => (
-                            <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-3 py-2 rounded-full text-[10px] font-bold uppercase ${activeRoom === r ? 'active bg-white/5' : 'text-stone-800'}`}>
+                            <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase ${activeRoom === r ? 'active bg-white/5' : 'text-stone-800'}`}>
                                 <i data-lucide={ROOM_ICONS[r]} className="w-4 h-4"></i><span>{r}</span>
                             </button>
                         ))}
@@ -192,7 +199,7 @@
 
                     <div className="flex-container">
                         {Object.keys(grouped).length === 0 ? (
-                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">Empty room</p>
+                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">No items here</p>
                         ) : (
                             columnedCategories.map((col, i) => (
                                 <div key={i} className="column">
