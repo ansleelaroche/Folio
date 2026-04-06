@@ -58,14 +58,28 @@
 
     const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
     
+    // Updated Categories with internal mapping
     const CATEGORIES = {
-        "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
-        "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
-        "Meats & Seafood": ["anchor", ["Freezer"]], "Prepared Meals": ["box", ["Freezer"]], "Frozen Veg & Fruit": ["leaf", ["Freezer"]],
-        "Desserts": ["ice-cream", ["Freezer"]], "Bakery & Breads": ["wheat", ["Dry Goods"]], "Snacks": ["zap", ["Dry Goods"]],
-        "Pasta & Grains": ["shrub", ["Dry Goods"]], "Cereal": ["box-select", ["Dry Goods"]], "Cans & Jars": ["container", ["Dry Goods"]],
-        "Baking Essentials": ["cookie", ["Dry Goods"]], "Spreads & Jars": ["cup-soda", ["Dry Goods"]], "Sides": ["list-todo", ["Dry Goods"]],
-        "Supplies": ["cog", ["Dry Goods"]], "Dishware": ["utensils-2", ["Dry Goods"]], "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"]]
+        "Produce": ["leaf", ["Fridge", "Dry Goods"]], 
+        "Dairy": ["milk", ["Fridge"]], 
+        "Protein": ["bone", ["Fridge", "Freezer"]],
+        "Drinks": ["droplets", ["Fridge", "Dry Goods"]], 
+        "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
+        "Meats & Seafood": ["anchor", ["Freezer"]], 
+        "Prepared Meals": ["box", ["Freezer"]], 
+        "Frozen Veg & Fruit": ["leaf", ["Freezer"]],
+        "Desserts": ["ice-cream", ["Freezer"]], 
+        "Bakery & Breads": ["wheat", ["Dry Goods"]], 
+        "Snacks": ["zap", ["Dry Goods"]],
+        "Pasta & Grains": ["shrub", ["Dry Goods"]], 
+        "Cereal": ["box-select", ["Dry Goods"]], 
+        "Cans & Jars": ["container", ["Dry Goods"]],
+        "Baking Essentials": ["cookie", ["Dry Goods"]], 
+        "Spreads & Jars": ["cup-soda", ["Dry Goods"]], 
+        "Sides": ["list-todo", ["Dry Goods"]],
+        "Supplies": ["cog", ["Dry Goods"]], 
+        "Dishware": ["utensils-2", ["Dry Goods"]], 
+        "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"]]
     };
 
     const titleCase = (str) => str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -123,26 +137,24 @@
         };
 
         const grouped = useMemo(() => {
-            let filtered;
             const target = activeRoom.toLowerCase().replace(/\s/g, '');
+            
+            // 1. Get items for the room
+            let filtered = items.filter(i => {
+                const dbRoom = (i.room || "").toLowerCase().replace(/\s/g, '');
+                if (target === "shoppinglist") return parseFloat(i.qty || 0) === 0;
+                if (target === "drygoods") return ["drygoods", "pantry", "counter", "cabinets"].includes(dbRoom);
+                return dbRoom === target;
+            });
 
-            if (target === "shoppinglist") {
-                filtered = items.filter(i => parseFloat(i.qty || 0) === 0);
-            } else {
-                filtered = items.filter(i => {
-                    const dbRoom = (i.room || "").toLowerCase().replace(/\s/g, '');
-                    // For Dry Goods, we want to capture anything that was Pantry, Counter, or Cabinet
-                    if (target === "drygoods") {
-                        return dbRoom === "drygoods" || dbRoom === "pantry" || dbRoom === "counter" || dbRoom === "cabinets";
-                    }
-                    // For Fridge and Freezer, do a strict fuzzy check
-                    return dbRoom === target;
-                });
-            }
-
+            // 2. Alphabetize
             const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+
+            // 3. Group by category (with "Misc" fallback to prevent vanishing items)
             return sorted.reduce((acc, i) => {
-                const c = i.category || "Misc";
+                let c = i.category || "Misc";
+                // If the category isn't in our config, put it in Misc so it's visible
+                if (!CATEGORIES[c]) c = "Misc";
                 if (!acc[c]) acc[c] = [];
                 acc[c].push(i);
                 return acc;
@@ -151,9 +163,8 @@
 
         const columnedCategories = useMemo(() => {
             const cols = [[], [], []];
-            // Only show categories that actually have items in this room
-            const activeCatsInRoom = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
-            activeCatsInRoom.forEach((cat, index) => {
+            const currentCats = Object.keys(grouped);
+            currentCats.forEach((cat, index) => {
                 cols[index % 3].push(cat);
             });
             return cols;
@@ -207,7 +218,7 @@
 
                 <div className="flex-container">
                     {Object.keys(grouped).length === 0 ? (
-                        <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">No items here</p>
+                        <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">Empty Room</p>
                     ) : (
                         columnedCategories.map((col, i) => (
                             <div key={i} className="column">
