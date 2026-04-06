@@ -38,17 +38,27 @@
         const ROOMS = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
 
         const ALL_CATEGORIES = {
+            // FRIDGE / COUNTER
             "Produce": { rooms: ["Fridge", "Counter"], bar: "bg-emerald-600", text: "text-emerald-500", icon: "leaf", keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber", "cilantro", "kale"] },
             "Dairy": { rooms: ["Fridge"], bar: "bg-stone-300", text: "text-stone-300", icon: "milk", keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
-            "Protein": { rooms: ["Fridge", "Counter"], bar: "bg-orange-700", text: "text-orange-600", icon: "bone", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
-            "Drinks": { rooms: ["Fridge", "Pantry"], bar: "bg-teal-800", text: "text-teal-600", icon: "droplets", keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
-            "Condiments": { rooms: ["Fridge", "Pantry"], bar: "bg-amber-600", text: "text-amber-500", icon: "utensils", keywords: ["mayo", "ranch", "ketchup", "mustard", "sauce", "dressing", "aioli", "dip", "salsa", "jam", "syrup", "hot sauce", "vinegar"] },
-            "Meats & Seafood": { rooms: ["Freezer"], bar: "bg-rose-900", text: "text-rose-500", icon: "anchor", keywords: ["frozen chicken", "frozen meat", "shrimp", "fillet", "ground beef"] },
+            "Protein": { rooms: ["Fridge", "Freezer"], bar: "bg-orange-700", text: "text-orange-600", icon: "bone", keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+            
+            // FREEZER
+            "Meats & Seafood": { rooms: ["Freezer"], bar: "bg-rose-900", text: "text-rose-500", icon: "anchor", keywords: ["frozen chicken", "frozen meat", "fillet", "ground beef"] },
             "Prepared Meals": { rooms: ["Freezer"], bar: "bg-indigo-800", text: "text-indigo-400", icon: "box", keywords: ["pizza", "tv dinner", "lasagna", "meal", "leftover"] },
-            "Frozen Veg & Fruit": { rooms: ["Freezer"], bar: "bg-cyan-700", text: "text-cyan-500", icon: "leaf", keywords: ["frozen peas", "frozen corn", "frozen berries", "mixed veg"] },
-            "Appetizers": { rooms: ["Freezer"], bar: "bg-orange-900", text: "text-orange-500", icon: "zap", keywords: ["nuggets", "fries", "bagel bites", "potstickers", "egg rolls"] },
-            "Desserts": { rooms: ["Freezer"], bar: "bg-pink-900", text: "text-pink-400", icon: "ice-cream", keywords: ["ice cream", "popsicle", "sorbet", "gelato", "dough"] },
-            "Pantry Staples": { rooms: ["Pantry", "Cabinets", "Counter"], bar: "bg-yellow-600", text: "text-yellow-600", icon: "container", keywords: ["flour", "sugar", "pasta", "rice", "oil", "can", "soup", "bread", "cereal", "snack", "chip", "spice"] },
+            "Frozen Veg & Fruit": { rooms: ["Freezer"], bar: "bg-cyan-700", text: "text-cyan-500", icon: "leaf", keywords: ["frozen peas", "frozen corn", "frozen berries"] },
+            "Desserts": { rooms: ["Freezer"], bar: "bg-pink-900", text: "text-pink-400", icon: "ice-cream", keywords: ["ice cream", "popsicle", "sorbet"] },
+
+            // COUNTER & PANTRY
+            "Bakery & Breads": { rooms: ["Counter", "Pantry"], bar: "bg-amber-800", text: "text-amber-600", icon: "wheat", keywords: ["bread", "bagel", "tortilla", "muffin", "loaf", "bakery", "croissant"] },
+            "Quick Snacks": { rooms: ["Counter", "Pantry"], bar: "bg-yellow-700", text: "text-yellow-600", icon: "zap", keywords: ["snack", "granola", "bar", "chip", "cracker", "lunch snack"] },
+            
+            // CABINETS
+            "Baking Essentials": { rooms: ["Cabinets", "Pantry"], bar: "bg-stone-400", text: "text-stone-400", icon: "cookie", keywords: ["flour", "sugar", "brown sugar", "baking powder", "baking soda", "yeast", "cocoa"] },
+            "Seasonings & Oils": { rooms: ["Cabinets", "Pantry"], bar: "bg-yellow-900", text: "text-yellow-800", icon: "flask-conical", keywords: ["salt", "pepper", "oil", "olive oil", "spice", "seasoning", "vinegar", "herb"] },
+            "Spreads & Jars": { rooms: ["Cabinets", "Pantry"], bar: "bg-orange-900", text: "text-orange-800", icon: "container", keywords: ["peanut butter", "honey", "nutella", "jam", "jelly", "spread"] },
+            "Dishware": { rooms: ["Cabinets"], bar: "bg-blue-900", text: "text-blue-500", icon: "utensils", keywords: ["plate", "cup", "bowl", "mug", "glass", "dish"] },
+
             "Misc": { rooms: ROOMS, bar: "bg-stone-500", text: "text-stone-500", icon: "more-horizontal", keywords: [] }
         };
 
@@ -66,24 +76,14 @@
             useEffect(() => { fetchItems(); }, []);
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, isModalOpen, modalRoom, modalCat]);
 
-            // SMART AUTO-CATEGORIZE LOGIC
             useEffect(() => {
                 if (!newName) return;
                 const lowerName = newName.toLowerCase();
-                
                 for (const [catName, config] of Object.entries(ALL_CATEGORIES)) {
                     if (config.keywords && config.keywords.some(k => lowerName.includes(k))) {
-                        // Priority 1: If the category belongs to current modalRoom, switch to it
-                        if (config.rooms.includes(modalRoom)) {
-                            setModalCat(catName);
-                            return;
-                        } 
-                        // Priority 2: If category doesn't belong to current room, suggest the room (optional, but here we switch room automatically)
-                        else {
-                            setModalRoom(config.rooms[0]);
-                            setModalCat(catName);
-                            return;
-                        }
+                        setModalRoom(config.rooms[0]);
+                        setModalCat(catName);
+                        return;
                     }
                 }
             }, [newName]);
@@ -210,7 +210,7 @@
                                     <form onSubmit={handleAddItem} className="space-y-6 pt-4 border-t border-white/5">
                                         <div className="space-y-2">
                                             <label className="text-[8px] font-black text-stone-700 tracking-widest ml-1">NAME</label>
-                                            <input autoFocus type="text" placeholder="e.g. Pizza" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 outline-none text-stone-100 placeholder:text-stone-800" />
+                                            <input autoFocus type="text" placeholder="e.g. Plates" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl px-5 py-4 outline-none text-stone-100 placeholder:text-stone-800" />
                                         </div>
                                         <div className="flex gap-4">
                                             <div className="flex-1 space-y-2">
