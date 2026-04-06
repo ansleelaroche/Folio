@@ -16,16 +16,22 @@
         body { background-color: #0d0d0c; color: #d4d4d8; font-family: 'Inter', sans-serif; min-height: 100vh; }
         .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); }
         
-        /* Fixed Grid Layout to prevent jumping */
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(1, minmax(0, 1fr));
+        /* Flex Columns: Keeps width uniform but allows variable height */
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
             gap: 1.5rem;
         }
-        @media (min-width: 640px) { .grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        @media (min-width: 1024px) { .grid-container { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-        .note-box { background: #141413; border: 1px solid #222120; padding: 16px; height: 100%; position: relative; }
+        .column {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .note-box { background: #141413; border: 1px solid #222120; padding: 16px; position: relative; }
         .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.25rem; line-height: 1; }
         .handwritten-header { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; letter-spacing: 0.1em; color: #525252; text-transform: uppercase; }
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
@@ -110,7 +116,6 @@
                 setItems(prev => prev.filter(i => i.id !== id));
             };
 
-            // GROUPING LOGIC
             const grouped = useMemo(() => {
                 let filtered;
                 if (activeRoom === "Shopping List") {
@@ -119,7 +124,6 @@
                     filtered = items.filter(i => i.room === activeRoom);
                 }
 
-                // Alphabetize all items within the group
                 const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
 
                 return sorted.reduce((acc, i) => {
@@ -130,10 +134,51 @@
                 }, {});
             }, [items, activeRoom]);
 
-            // Ensure categories stay in a fixed order for the grid
-            const sortedCategoryKeys = useMemo(() => {
-                return Object.keys(CATEGORIES).filter(cat => grouped[cat]);
+            // Distribute categories into 3 stable columns
+            const columnedCategories = useMemo(() => {
+                const cols = [[], [], []];
+                const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
+                activeCats.forEach((cat, index) => {
+                    cols[index % 3].push(cat);
+                });
+                return cols;
             }, [grouped]);
+
+            const renderBox = (cat) => (
+                <div key={cat} className="note-box">
+                    <div className="flex items-center gap-2 mb-5 opacity-40">
+                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
+                        <h3 className="handwritten-header">{cat}</h3>
+                    </div>
+                    <ul className="space-y-4">
+                        {grouped[cat].map(item => (
+                            <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
+                                {editingId === item.id ? (
+                                    <div className="flex items-center gap-2 w-full">
+                                        <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
+                                        <div className="flex items-center gap-1 shrink-0">
+                                            <span className="text-[8px] text-stone-700">x</span>
+                                            <input className="w-8 inline-edit text-[9px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
+                                            <button onClick={() => saveInlineEdit(item.id)} className="bg-stone-100 text-black rounded p-0.5 ml-1"><i data-lucide="check" className="w-3.5 h-3.5"></i></button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
+                                            <span className="handwritten truncate capitalize">{item.name}</span>
+                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 opacity-50 shrink-0"></i>}
+                                        </div>
+                                        <div className="flex items-center gap-3 shrink-0">
+                                            <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
+                                            <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
+                                        </div>
+                                    </>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            );
 
             return (
                 <div className="max-w-7xl mx-auto pb-32">
@@ -145,43 +190,13 @@
                         ))}
                     </nav>
 
-                    <div className="grid-container">
-                        {sortedCategoryKeys.length === 0 ? (
-                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center col-span-full py-20 italic">Empty room</p>
+                    <div className="flex-container">
+                        {Object.keys(grouped).length === 0 ? (
+                            <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-20 italic">Empty room</p>
                         ) : (
-                            sortedCategoryKeys.map(cat => (
-                                <div key={cat} className="note-box">
-                                    <div className="flex items-center gap-2 mb-5 opacity-40">
-                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 text-white"></i>
-                                        <h3 className="handwritten-header">{cat}</h3>
-                                    </div>
-                                    <ul className="space-y-4">
-                                        {grouped[cat].map(item => (
-                                            <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 ? 'out-of-stock' : ''}`}>
-                                                {editingId === item.id ? (
-                                                    <div className="flex items-center gap-2 w-full">
-                                                        <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
-                                                        <div className="flex items-center gap-1 shrink-0">
-                                                            <span className="text-[8px] text-stone-700">x</span>
-                                                            <input className="w-8 inline-edit text-[9px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
-                                                            <button onClick={() => saveInlineEdit(item.id)} className="bg-stone-100 text-black rounded p-0.5 ml-1"><i data-lucide="check" className="w-3.5 h-3.5"></i></button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
-                                                            <span className="handwritten truncate capitalize">{item.name}</span>
-                                                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 opacity-50 shrink-0"></i>}
-                                                        </div>
-                                                        <div className="flex items-center gap-3 shrink-0">
-                                                            <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                                            <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[10px]">×</button>
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            columnedCategories.map((col, i) => (
+                                <div key={i} className="column">
+                                    {col.map(cat => renderBox(cat))}
                                 </div>
                             ))
                         )}
