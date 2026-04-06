@@ -12,19 +12,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        body { background-color: #121212; color: #E7E5E4; min-height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
-        
-        .sidebar-glass { background: rgba(28, 28, 28, 0.6); backdrop-filter: blur(20px); border-right: 1px solid rgba(255, 255, 255, 0.05); }
-        .card-glass { background: rgba(38, 38, 38, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.03); transition: all 0.2s ease; }
-        .card-glass:hover { background: rgba(45, 45, 45, 0.8); border-color: rgba(255, 255, 255, 0.1); }
-        
-        .vines-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; opacity: 0.08; }
-        
-        .active-glow { position: relative; }
-        .active-glow::before { content: ''; position: absolute; left: -12px; top: 20%; height: 60%; width: 3px; background: #525252; border-radius: 0 4px 4px 0; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .animate-slide-up { animation: slideUp 0.3s ease-out; }
+        body { background-color: #121212; color: #E7E5E4; min-height: 100vh; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .sidebar-glass { background: rgba(24, 24, 27, 0.95); border-right: 1px solid rgba(255, 255, 255, 0.05); }
+        .card-glass { background: rgba(39, 39, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .vines-bg { position: fixed; inset: 0; pointer-events: none; z-index: -1; opacity: 0.1; }
+        .active-glow { border-left: 3px solid #71717a; background: rgba(255, 255, 255, 0.03); }
+        @keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        .animate-slide { animation: slideIn 0.3s ease-out; }
     </style>
 </head>
 <body class="antialiased tracking-tight">
@@ -40,23 +34,24 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const ROOMS = ["Fridge", "Freezer", "Pantry", "Counter", "Cabinets"];
-        const CATEGORIES = {
-            "Produce": { icon: "leaf", color: "#4ade80", rooms: ["Fridge", "Counter"], keywords: ["apple", "lettuce", "onion", "carrot", "fruit", "veg", "tomato", "potato", "garlic"] },
-            "Dairy": { icon: "milk", color: "#e7e5e4", rooms: ["Fridge"], keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream"] },
-            "Protein": { icon: "beef", color: "#f87171", rooms: ["Fridge", "Freezer"], keywords: ["chicken", "beef", "meat", "fish", "steak", "bacon"] },
-            "Drinks": { icon: "cup-soda", color: "#38bdf8", rooms: ["Fridge", "Pantry"], keywords: ["water", "soda", "juice", "wine", "beer", "coffee"] },
-            "Condiments": { icon: "utensils", color: "#fbbf24", rooms: ["Fridge", "Pantry"], keywords: ["mayo", "ranch", "ketchup", "sauce", "syrup"] },
-            "Baking": { icon: "cookie", color: "#a8a29e", rooms: ["Cabinets", "Pantry"], keywords: ["flour", "sugar", "yeast", "cocoa"] },
-            "Frozen": { icon: "snowflake", color: "#22d3ee", rooms: ["Freezer"], keywords: ["frozen", "ice", "pizza"] },
-            "Misc": { icon: "archive", color: "#78716c", rooms: ROOMS, keywords: [] }
+        const CATEGORIES_CONFIG = {
+            "Produce": { icon: "leaf", rooms: ["Fridge", "Counter"], keywords: ["apple", "banana", "lettuce", "onion", "carrot", "broccoli", "spinach", "fruit", "veg", "tomato", "potato", "garlic", "lemon", "lime", "berry", "cucumber"] },
+            "Dairy": { icon: "milk", rooms: ["Fridge"], keywords: ["milk", "cheese", "yogurt", "butter", "egg", "cream", "sour", "brie", "cheddar", "parm", "dairy"] },
+            "Protein": { icon: "bone", rooms: ["Fridge", "Freezer"], keywords: ["chicken", "beef", "pork", "fish", "tofu", "steak", "bacon", "salmon", "shrimp", "turkey", "ham", "meat", "protein"] },
+            "Drinks": { icon: "cup-soda", rooms: ["Fridge", "Pantry"], keywords: ["water", "soda", "juice", "coke", "wine", "beer", "drink", "beverage", "sparkling", "pop", "coffee", "tea"] },
+            "Condiments": { icon: "utensils", rooms: ["Fridge", "Pantry"], keywords: ["mayo", "ranch", "ketchup", "mustard", "sauce", "dressing", "aioli", "dip", "salsa", "jam", "syrup"] },
+            "Meats & Seafood": { icon: "anchor", rooms: ["Freezer"], keywords: ["frozen chicken", "frozen meat", "shrimp", "fillet", "ground beef"] },
+            "Prepared Meals": { icon: "box", rooms: ["Freezer"], keywords: ["pizza", "tv dinner", "lasagna", "meal", "leftover"] },
+            "Bakery & Breads": { icon: "wheat", rooms: ["Counter", "Pantry"], keywords: ["bread", "bagel", "tortilla", "muffin", "loaf", "bakery"] },
+            "Baking Essentials": { icon: "cookie", rooms: ["Cabinets", "Pantry"], keywords: ["flour", "sugar", "brown sugar", "baking powder", "baking soda"] },
+            "Dishware": { icon: "utensils-crosssec", rooms: ["Cabinets"], keywords: ["plate", "cup", "bowl", "mug"] },
+            "Misc": { icon: "archive", rooms: ROOMS, keywords: [] }
         };
 
         function PantryApp() {
             const [activeRoom, setActiveRoom] = useState("Fridge");
             const [items, setItems] = useState([]);
             const [isModalOpen, setIsModalOpen] = useState(false);
-            
-            // Form State
             const [modalRoom, setModalRoom] = useState("Fridge");
             const [modalCat, setModalCat] = useState("Misc");
             const [newName, setNewName] = useState("");
@@ -66,12 +61,11 @@
             useEffect(() => { fetchItems(); }, []);
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, isModalOpen, modalRoom, modalCat]);
 
-            // Brain: Logic to switch rooms/categories based on typing
             useEffect(() => {
                 if (!newName) return;
                 const low = newName.toLowerCase();
-                for (const [name, cfg] of Object.entries(CATEGORIES)) {
-                    if (cfg.keywords.some(k => low.includes(k))) {
+                for (const [name, cfg] of Object.entries(CATEGORIES_CONFIG)) {
+                    if (cfg.keywords?.some(k => low.includes(k))) {
                         setModalCat(name);
                         if (!cfg.rooms.includes(modalRoom)) setModalRoom(cfg.rooms[0]);
                         return;
@@ -109,78 +103,70 @@
                 setItems(prev => prev.filter(i => i.id !== id));
             };
 
-            const filteredItems = useMemo(() => {
+            const groupedItems = useMemo(() => {
                 const roomItems = items.filter(i => i.room === activeRoom);
-                return roomItems.reduce((acc, i) => {
-                    const cat = i.category || "Misc";
-                    if (!acc[cat]) acc[cat] = [];
-                    acc[cat].push(i);
+                return roomItems.reduce((acc, item) => {
+                    // Match category case-insensitively or default to Misc
+                    const dbCat = (item.category || "Misc").toLowerCase();
+                    const matchedCat = Object.keys(CATEGORIES_CONFIG).find(k => k.toLowerCase() === dbCat) || "Misc";
+                    if (!acc[matchedCat]) acc[matchedCat] = [];
+                    acc[matchedCat].push(item);
                     return acc;
                 }, {});
             }, [items, activeRoom]);
 
             return (
-                <div className="flex h-screen w-full">
+                <div className="flex h-screen w-full overflow-hidden">
                     {/* SIDEBAR */}
-                    <aside className="hidden md:flex flex-col w-72 sidebar-glass p-8 z-20">
-                        <div className="mb-12">
-                            <h1 className="text-xl font-light tracking-[0.2em] uppercase italic">FancyPantry</h1>
-                            <p className="text-[10px] text-stone-500 font-bold tracking-widest mt-1">STOCK MANAGEMENT</p>
+                    <aside className="hidden lg:flex flex-col w-64 sidebar-glass z-30">
+                        <div className="p-8 pb-4">
+                            <h1 className="text-lg font-light tracking-[0.3em] uppercase italic">FancyPantry</h1>
+                            <div className="h-px w-8 bg-stone-700 mt-4"></div>
                         </div>
                         
-                        <div className="space-y-8 flex-1 overflow-y-auto no-scrollbar">
-                            <nav className="space-y-4">
-                                <label className="text-[9px] font-black text-stone-600 tracking-widest">LOCATIONS</label>
-                                {ROOMS.map(r => (
-                                    <button key={r} onClick={() => setActiveRoom(r)} className={`flex items-center w-full text-left text-sm transition-all ${activeRoom === r ? 'text-white active-glow translate-x-2' : 'text-stone-500 hover:text-stone-300'}`}>
-                                        {r}
-                                    </button>
-                                ))}
-                            </nav>
+                        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+                            <p className="px-4 text-[9px] font-black text-stone-600 tracking-[0.2em] mb-4 uppercase">Locations</p>
+                            {ROOMS.map(r => (
+                                <button key={r} onClick={() => setActiveRoom(r)} className={`w-full text-left px-4 py-3 rounded-lg text-xs transition-all ${activeRoom === r ? 'text-white active-glow' : 'text-stone-500 hover:text-stone-300'}`}>
+                                    {r}
+                                </button>
+                            ))}
+                        </nav>
 
-                            <div className="space-y-4">
-                                <label className="text-[9px] font-black text-stone-600 tracking-widest">CATEGORIES</label>
-                                {Object.entries(CATEGORIES).map(([name, cfg]) => (
-                                    <div key={name} className="flex items-center gap-3 text-xs text-stone-500 opacity-60">
-                                        <i data-lucide={cfg.icon} className="w-3.5 h-3.5"></i>
-                                        <span>{name}</span>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="p-6">
+                            <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="w-full bg-stone-200 text-stone-950 py-4 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-white transition-all shadow-xl">
+                                Add Entry
+                            </button>
                         </div>
-
-                        <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="mt-8 bg-stone-100 text-stone-900 py-4 rounded-xl font-black text-[10px] tracking-widest uppercase hover:bg-white transition-all">
-                            Add New Item
-                        </button>
                     </aside>
 
-                    {/* MAIN CONTENT */}
-                    <main className="flex-1 overflow-y-auto p-6 md:p-16 relative">
-                        <div className="max-w-5xl mx-auto">
-                            <header className="mb-12 flex justify-between items-end">
+                    {/* MAIN */}
+                    <main className="flex-1 h-screen overflow-y-auto p-6 md:p-12 lg:p-20 relative no-scrollbar">
+                        <div className="max-w-6xl mx-auto">
+                            <header className="mb-12 flex justify-between items-end border-b border-white/5 pb-8">
                                 <div>
-                                    <h2 className="text-4xl font-light tracking-tight">{activeRoom}</h2>
-                                    <div className="h-1 w-12 bg-stone-800 mt-4"></div>
+                                    <p className="text-[10px] font-black text-stone-600 tracking-[0.4em] uppercase mb-2">Inventory System</p>
+                                    <h2 className="text-5xl font-light tracking-tighter text-stone-200">{activeRoom}</h2>
                                 </div>
-                                <span className="text-[10px] font-bold text-stone-600 tracking-widest">UNIT COUNT: {items.filter(i => i.room === activeRoom).length}</span>
+                                <span className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">{items.filter(i => i.room === activeRoom).length} Items total</span>
                             </header>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                                {Object.keys(CATEGORIES).map(cat => filteredItems[cat] && (
-                                    <section key={cat} className="space-y-6">
-                                        <div className="flex items-center gap-3 border-b border-white/5 pb-3">
-                                            <i data-lucide={CATEGORIES[cat].icon} className="w-4 h-4 text-stone-500"></i>
-                                            <h3 className="text-[10px] font-black tracking-[0.3em] uppercase text-stone-500">{cat}</h3>
+                            <div className="columns-1 md:columns-2 xl:columns-3 gap-8 space-y-8">
+                                {Object.keys(CATEGORIES_CONFIG).map(cat => groupedItems[cat] && (
+                                    <section key={cat} className="break-inside-avoid space-y-4 mb-8">
+                                        <div className="flex items-center gap-3 opacity-40">
+                                            <i data-lucide={CATEGORIES_CONFIG[cat].icon} className="w-3.5 h-3.5"></i>
+                                            <h3 className="text-[10px] font-black tracking-[0.3em] uppercase">{cat}</h3>
                                         </div>
-                                        <div className="grid gap-2">
-                                            {filteredItems[cat].map(item => (
-                                                <div key={item.id} className="card-glass p-4 rounded-xl flex justify-between items-center group">
+                                        <div className="space-y-2">
+                                            {groupedItems[cat].map(item => (
+                                                <div key={item.id} className="card-glass p-4 rounded-xl flex justify-between items-center group relative overflow-hidden">
                                                     <div className="min-w-0">
                                                         <p className="text-sm font-medium text-stone-200 lowercase first-letter:uppercase">{item.name}</p>
-                                                        <p className="text-[10px] text-stone-600 font-bold mt-0.5 uppercase tracking-tighter">Quantity: {item.qty}</p>
+                                                        <p className="text-[9px] text-stone-600 font-bold mt-1 uppercase tracking-widest">Qty: {item.qty}</p>
                                                     </div>
-                                                    <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-700 hover:text-red-400 transition-all">
-                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
+                                                    <button onClick={() => removeItem(item.id)} className="opacity-0 group-hover:opacity-100 text-stone-700 hover:text-red-400 transition-all p-2">
+                                                        <i data-lucide="x" className="w-4 h-4"></i>
                                                     </button>
                                                 </div>
                                             ))}
@@ -190,54 +176,51 @@
                             </div>
                         </div>
 
-                        {/* Mobile Add Button */}
-                        <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="md:hidden fixed bottom-8 right-8 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-30">
+                        {/* MOBILE BUTTON */}
+                        <button onClick={() => { setModalRoom(activeRoom); setIsModalOpen(true); }} className="lg:hidden fixed bottom-8 right-8 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-40">
                             <i data-lucide="plus" className="w-8 h-8"></i>
                         </button>
                     </main>
 
                     {/* MODAL */}
                     {isModalOpen && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                            <div className="bg-[#1a1a1a] w-full max-w-lg rounded-[2.5rem] p-8 border border-white/5 animate-slide-up">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+                            <div className="bg-[#18181b] w-full max-w-lg rounded-[2.5rem] p-8 border border-white/10 shadow-2xl animate-slide">
                                 <div className="flex justify-between items-center mb-8">
-                                    <h2 className="text-[10px] font-black tracking-[0.4em] uppercase text-stone-500">Inventory Entry</h2>
-                                    <button onClick={() => setIsModalOpen(false)} className="text-stone-600 hover:text-white"><i data-lucide="x" className="w-6 h-6"></i></button>
+                                    <h2 className="text-[9px] font-black tracking-[0.4em] uppercase text-stone-600">Stock Entry</h2>
+                                    <button onClick={() => setIsModalOpen(false)} className="text-stone-700 hover:text-white p-2"><i data-lucide="x" className="w-6 h-6"></i></button>
                                 </div>
 
                                 <div className="space-y-8">
                                     <div className="space-y-3">
-                                        <label className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">Location</label>
-                                        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                                        <label className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">Select Room</label>
+                                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
                                             {ROOMS.map(r => (
-                                                <button key={r} onClick={() => setModalRoom(r)} className={`px-4 py-2 rounded-lg text-[10px] font-bold transition-all border ${modalRoom === r ? 'bg-stone-100 text-stone-900 border-stone-100' : 'bg-transparent text-stone-600 border-white/10'}`}>{r}</button>
+                                                <button key={r} onClick={() => setModalRoom(r)} className={`px-4 py-2 rounded-lg text-[10px] font-bold transition-all border ${modalRoom === r ? 'bg-stone-200 text-stone-950 border-stone-200' : 'bg-transparent text-stone-600 border-white/10'}`}>{r}</button>
                                             ))}
                                         </div>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <label className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">Category</label>
-                                        <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                                            {Object.keys(CATEGORIES).filter(c => CATEGORIES[c].rooms.includes(modalRoom)).map(c => (
-                                                <button key={c} onClick={() => setModalCat(c)} className={`px-4 py-2 rounded-lg text-[10px] font-bold transition-all flex items-center gap-2 border whitespace-nowrap ${modalCat === c ? 'bg-stone-100 text-stone-900 border-stone-100' : 'bg-transparent text-stone-600 border-white/10'}`}>
-                                                    <i data-lucide={CATEGORIES[c].icon} className="w-3 h-3"></i> {c}
+                                        <label className="text-[9px] font-bold text-stone-700 tracking-widest uppercase">Select Category</label>
+                                        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                                            {Object.keys(CATEGORIES_CONFIG).filter(c => CATEGORIES_CONFIG[c].rooms.includes(modalRoom)).map(c => (
+                                                <button key={c} onClick={() => setModalCat(c)} className={`px-4 py-2 rounded-lg text-[10px] font-bold transition-all flex items-center gap-2 border whitespace-nowrap ${modalCat === c ? 'bg-stone-200 text-stone-950 border-stone-200' : 'bg-transparent text-stone-600 border-white/10'}`}>
+                                                    <i data-lucide={CATEGORIES_CONFIG[c].icon} className="w-3.5 h-3.5"></i> {c}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
                                     <form onSubmit={handleAddItem} className="space-y-6 pt-6 border-t border-white/5">
-                                        <div className="space-y-2">
-                                            <input autoFocus type="text" placeholder="Item name..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none text-stone-200 placeholder:text-stone-800" />
-                                        </div>
+                                        <input autoFocus type="text" placeholder="Item name..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none text-stone-100 placeholder:text-stone-800" />
                                         <div className="flex gap-4">
-                                            <input type="text" placeholder="Qty" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-24 bg-white/5 border border-white/5 rounded-2xl px-6 py-4 outline-none text-stone-200 text-center" />
-                                            <button type="submit" disabled={isSyncing} className="flex-1 bg-stone-100 text-stone-900 rounded-2xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2">
-                                                {isSyncing ? <i data-lucide="refresh-cw" className="w-4 h-4 animate-spin"></i> : <i data-lucide="plus" className="w-4 h-4"></i>} Add to Inventory
+                                            <input type="text" placeholder="Qty" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-24 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 outline-none text-stone-200 text-center" />
+                                            <button type="submit" disabled={isSyncing} className="flex-1 bg-stone-200 text-stone-950 rounded-2xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-3 active:scale-95 transition-all">
+                                                {isSyncing ? <i data-lucide="refresh-cw" className="w-4 h-4 animate-spin"></i> : <i data-lucide="plus" className="w-4 h-4"></i>} Add Item
                                             </button>
                                         </div>
                                     </form>
-                                    <p className="text-center text-[8px] font-bold text-stone-800 tracking-widest uppercase italic">Multi-entry active</p>
                                 </div>
                             </div>
                         </div>
