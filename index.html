@@ -138,7 +138,7 @@
         const grouped = useMemo(() => {
             const target = activeRoom.toLowerCase().replace(/\s/g, '');
             
-            // 1. Filter by Room
+            // 1. Initial Filter by Room
             let filtered = items.filter(i => {
                 const dbRoom = (i.room || "").toLowerCase().replace(/\s/g, '');
                 if (target === "shoppinglist") return parseFloat(i.qty || 0) === 0;
@@ -146,16 +146,31 @@
                 return dbRoom === target;
             });
 
-            // 2. Alphabetize
-            const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+            // 2. The "Triple Threat" Sort
+            const sorted = [...filtered].sort((a, b) => {
+                const aQty = parseFloat(a.qty || 0);
+                const bQty = parseFloat(b.qty || 0);
+                const aIsDog = isDogFood(a.name);
+                const bIsDog = isDogFood(b.name);
 
-            // 3. Group by Category (Case-Insensitive)
+                // Tier 1: Out of Stock (Qty 0) always goes to the bottom
+                if (aQty === 0 && bQty > 0) return 1;
+                if (aQty > 0 && bQty === 0) return -1;
+
+                // Tier 2: If both are in stock, Dog Food goes to the top
+                if (aQty > 0 && bQty > 0) {
+                    if (aIsDog && !bIsDog) return -1;
+                    if (!aIsDog && bIsDog) return 1;
+                }
+
+                // Tier 3: Alphabetical within their respective tiers
+                return a.name.localeCompare(b.name);
+            });
+
+            // 3. Group by Category
             return sorted.reduce((acc, i) => {
                 const dbCat = (i.category || "Misc").toLowerCase().trim();
-                
-                // Find the proper display name from our CATEGORIES config
                 const matchedKey = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
-                
                 if (!acc[matchedKey]) acc[matchedKey] = [];
                 acc[matchedKey].push(i);
                 return acc;
@@ -210,7 +225,7 @@
                                 <>
                                     <div className="flex items-center gap-2 cursor-text min-w-0" onClick={() => startEdit(item)}>
                                         <span className="handwritten truncate">{item.name}</span>
-                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3 h-3 opacity-40 shrink-0"></i>}
+                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-3.5 h-3.5 text-amber-200/40 shrink-0"></i>}
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
                                         <span className="text-[9px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
