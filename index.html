@@ -15,7 +15,7 @@
     
     html, body { 
         background-color: #0d0d0c; 
-        color: #e2e2e7; /* Brighter overall text */
+        color: #f4f4f5; /* Brighter overall text */
         font-family: 'Inter', sans-serif; 
         margin: 0; padding: 0;
         width: 100%; overflow-x: hidden;
@@ -29,51 +29,61 @@
     .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
     .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    .note-box { background: #141413; border: 1px solid #2a2a28; padding: 16px; position: relative; height: auto; }
-    .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.35rem; line-height: 1.2; color: #f4f4f5; }
+    .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; height: auto; }
+    .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; line-height: 1.2; color: #ffffff; }
     
     .handwritten-header { 
         font-family: 'Covered By Your Grace', cursive; 
-        font-size: 1.2rem; 
+        font-size: 1.25rem; 
         letter-spacing: 0.1em; 
         text-transform: uppercase;
-        border-bottom: 2px solid currentColor; /* Thicker underline */
+        border-bottom: 2px solid currentColor;
         padding-bottom: 2px;
         display: inline-block;
         margin-bottom: 8px;
-        opacity: 1 !important; /* Force full visibility */
+        opacity: 1 !important;
     }
     
-    /* Brighter Muted Palette */
-    .room-Fridge .handwritten-header { color: #bae6fd; }
-    .room-Freezer .handwritten-header { color: #cbd5e1; } /* Lightened from steel to light grey-blue */
-    .room-DryGoods .handwritten-header { color: #86efac; }
+    /* Room Colors - Boosted Saturation */
+    .room-Fridge .handwritten-header { color: #7dd3fc; } 
+    .room-Freezer .handwritten-header { color: #e2e8f0; } 
+    .room-DryGoods .handwritten-header { color: #4ade80; }
     .room-ShoppingList .handwritten-header { color: #d8b4fe; }
 
-    /* High-Visibility Room Buttons */
-    .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 12px; letter-spacing: 0.05em; font-weight: 700; color: #52525b; }
-    .room-btn.active { color: #ffffff; border-bottom: 2px solid #a1a1aa; }
+    /* HIGH VISIBILITY NAVIGATION */
+    .room-btn { 
+        transition: all 0.2s; 
+        border-bottom: 2px solid transparent; 
+        font-size: 13px; 
+        letter-spacing: 0.05em; 
+        font-weight: 800; 
+        color: #a1a1aa; /* Light Gray instead of dark zinc */
+        background: rgba(255,255,255,0.03); /* Subtle button shape */
+    }
+    .room-btn.active { 
+        color: #ffffff !important; 
+        background: rgba(255,255,255,0.15);
+        border-bottom: 2px solid #ffffff; 
+    }
     
-    /* Quantities & State colors */
-    .qty-text { color: #ffffff; font-weight: 900; } /* Bold white for quantities */
-    .out-of-stock-text { color: #f43f5e; } /* Brighter rose-red for out of stock */
-    .room-ShoppingList .out-of-stock-text { color: #f4f4f5 !important; }
+    .qty-text { color: #ffffff; font-weight: 900; }
+    .out-of-stock-text { color: #fb7185; } /* Brighter Rose */
+    .room-ShoppingList .out-of-stock-text { color: #ffffff !important; }
     
-    /* Edit Popup Styles */
     .edit-popup {
         position: absolute;
         top: -10px; left: -10px; right: -10px;
         z-index: 50;
         background: #1c1c1b;
-        border: 1px solid #444;
+        border: 2px solid #52525b;
         padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.9);
     }
 
     input.edit-input { 
         background: #000; 
-        border: 1px solid #52525b; 
+        border: 1px solid #71717a; 
         color: #fff; 
         padding: 12px; 
         border-radius: 6px;
@@ -82,7 +92,7 @@
     }
 
     .stepper-btn {
-        background: #3f3f46;
+        background: #52525b;
         color: white;
         border-radius: 6px;
         width: 48px;
