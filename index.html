@@ -11,101 +11,119 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Inter:wght@400;700;900&display=swap');
-    
-    html, body { 
-        background-color: #0d0d0c; 
-        color: #f4f4f5; /* Brighter overall text */
-        font-family: 'Inter', sans-serif; 
-        margin: 0; padding: 0;
-        width: 100%; overflow-x: hidden;
-        -webkit-text-size-adjust: 100%;
-        touch-action: manipulation;
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Inter:wght@400;700;900&display=swap');
+        
+        html, body { 
+            background-color: #0d0d0c; 
+            color: #f4f4f5; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; padding: 0;
+            width: 100%; overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
 
-    body { -webkit-tap-highlight-color: transparent; min-height: 100vh; }
-    .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); z-index: 0; }
-    
-    .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
-    .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
+        body { -webkit-tap-highlight-color: transparent; min-height: 100vh; }
+        .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); z-index: 0; }
+        
+        .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
+        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; height: auto; }
-    .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; line-height: 1.2; color: #ffffff; }
-    
-    .handwritten-header { 
-        font-family: 'Covered By Your Grace', cursive; 
-        font-size: 1.25rem; 
-        letter-spacing: 0.1em; 
-        text-transform: uppercase;
-        border-bottom: 2px solid currentColor;
-        padding-bottom: 2px;
-        display: inline-block;
-        margin-bottom: 8px;
-        opacity: 1 !important;
-    }
-    
-    /* Room Colors - Boosted Saturation */
-    .room-Fridge .handwritten-header { color: #7dd3fc; } 
-    .room-Freezer .handwritten-header { color: #e2e8f0; } 
-    .room-DryGoods .handwritten-header { color: #4ade80; }
-    .room-ShoppingList .handwritten-header { color: #d8b4fe; }
+        .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; height: auto; }
+        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; line-height: 1.2; color: #ffffff; }
+        
+        .handwritten-header { 
+            font-family: 'Covered By Your Grace', cursive; 
+            font-size: 1.25rem; 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 2px;
+            display: inline-block;
+            margin-bottom: 8px;
+            opacity: 1 !important;
+        }
+        
+        .room-Fridge .handwritten-header { color: #7dd3fc; } 
+        .room-Freezer .handwritten-header { color: #e2e8f0; } 
+        .room-DryGoods .handwritten-header { color: #4ade80; }
+        .room-ShoppingList .handwritten-header { color: #d8b4fe; }
 
-    /* HIGH VISIBILITY NAVIGATION */
-    .room-btn { 
-        transition: all 0.2s; 
-        border-bottom: 2px solid transparent; 
-        font-size: 13px; 
-        letter-spacing: 0.05em; 
-        font-weight: 800; 
-        color: #a1a1aa; /* Light Gray instead of dark zinc */
-        background: rgba(255,255,255,0.03); /* Subtle button shape */
-    }
-    .room-btn.active { 
-        color: #ffffff !important; 
-        background: rgba(255,255,255,0.15);
-        border-bottom: 2px solid #ffffff; 
-    }
-    
-    .qty-text { color: #ffffff; font-weight: 900; }
-    .out-of-stock-text { color: #fb7185; } /* Brighter Rose */
-    .room-ShoppingList .out-of-stock-text { color: #ffffff !important; }
-    
-    .edit-popup {
-        position: absolute;
-        top: -10px; left: -10px; right: -10px;
-        z-index: 50;
-        background: #1c1c1b;
-        border: 2px solid #52525b;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-    }
+        /* FIXED NAVIGATION: Wraps on mobile so nothing cuts off */
+        nav.room-nav {
+            display: flex;
+            flex-wrap: wrap; /* This fixes the cutoff */
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            background: #0d0d0c;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
 
-    input.edit-input { 
-        background: #000; 
-        border: 1px solid #71717a; 
-        color: #fff; 
-        padding: 12px; 
-        border-radius: 6px;
-        font-size: 16px !important; 
-        width: 100%;
-    }
+        .room-btn { 
+            transition: all 0.2s; 
+            font-size: 13px; 
+            letter-spacing: 0.05em; 
+            font-weight: 800; 
+            color: #a1a1aa !important; /* Force brighter gray */
+            background: rgba(255,255,255,0.05); 
+            padding: 10px 16px;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .stepper-btn {
-        background: #52525b;
-        color: white;
-        border-radius: 6px;
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .room-btn.active { 
+            color: #ffffff !important; /* Pure white */
+            background: rgba(255,255,255,0.2);
+            border: 1px solid #ffffff; 
+        }
+        
+        .qty-text { color: #ffffff; font-weight: 900; }
+        .out-of-stock-text { color: #fb7185; } 
+        .room-ShoppingList .out-of-stock-text { color: #ffffff !important; }
+        
+        .edit-popup {
+            position: absolute;
+            top: -10px; left: -10px; right: -10px;
+            z-index: 50;
+            background: #1c1c1b;
+            border: 2px solid #52525b;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
 
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-</style>
+        input.edit-input { 
+            background: #000; 
+            border: 1px solid #71717a; 
+            color: #fff; 
+            padding: 12px; 
+            border-radius: 6px;
+            font-size: 16px !important; 
+            width: 100%;
+        }
+
+        .stepper-btn {
+            background: #52525b;
+            color: white;
+            border-radius: 6px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
 </head>
-<body class="antialiased p-4 md:p-6">
+<body class="antialiased">
     <svg class="botanical-art" viewBox="0 0 100 100"><path d="M10,90 Q30,70 20,40 T50,20 T90,10" stroke="white" fill="none" stroke-width="0.3"/></svg>
     <div id="root"></div>
 
@@ -203,21 +221,26 @@
 
         return (
             <div className={`max-w-7xl mx-auto pb-40 room-${activeRoom.replace(/\s/g, '')}`}>
-                <nav className="flex justify-center gap-2 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2 sticky top-0 bg-[#0d0d0c] z-[100] border-b border-white/5 px-2">
+                <nav className="room-nav">
                     {Object.keys(ROOM_ICONS).map(r => (
-                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-5 py-4 rounded-full transition-all whitespace-nowrap ${activeRoom === r ? 'active bg-white/10' : 'text-stone-700'}`}>
-                            <i data-lucide={ROOM_ICONS[r]} className="w-5 h-5"></i><span>{r}</span>
+                        <button 
+                            key={r} 
+                            onClick={() => setActiveRoom(r)} 
+                            className={`room-btn ${activeRoom === r ? 'active' : ''}`}
+                        >
+                            <i data-lucide={ROOM_ICONS[r]} className="w-5 h-5"></i>
+                            <span>{r}</span>
                         </button>
                     ))}
                 </nav>
 
-                <div className="flex-container px-2">
+                <div className="flex-container px-4 mt-6">
                     {columnedCategories.map((col, i) => (
                         <div key={i} className="column">
                             {col.map(cat => (
                                 <div key={cat} className="note-box">
-                                    <div className="flex items-center gap-2 mb-6 opacity-80">
-                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-30"></i>
+                                    <div className="flex items-center gap-2 mb-6 opacity-90">
+                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white"></i>
                                         <h3 className="handwritten-header">{cat}</h3>
                                     </div>
                                     <ul className="space-y-6">
@@ -229,7 +252,7 @@
                                                         {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 mt-1 shrink-0"></i>}
                                                     </div>
                                                     <div className="ml-2 pt-1">
-                                                        <span className="text-[11px] font-bold">x{item.qty}</span>
+                                                        <span className="text-[12px] font-black qty-text">x{item.qty}</span>
                                                     </div>
                                                 </div>
 
