@@ -216,63 +216,62 @@
         }, [grouped]);
 
         const renderBox = (cat) => (
-    <div key={cat} className="note-box">
-        <div className="flex items-center gap-2 mb-6 opacity-90">
-            <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white"></i>
-            <h3 className="handwritten-header">{cat}</h3>
-        </div>
-        <ul className="space-y-6">
-            {grouped[cat].map(item => (
-                <li key={item.id} className="relative block"> {/* Changed to block to isolate the popup */}
-                    
-                    {/* 1. STATIC VIEW: Wrapped in a div so baseline only affects THIS text */}
-                    <div 
-                        className={`flex justify-between items-baseline cursor-pointer ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} 
-                        onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
-                    >
-                        <div className="flex items-baseline gap-2 flex-1">
-                            <span className="handwritten whitespace-normal break-words capitalize leading-tight">
-                                {titleCase(item.name)}
-                            </span>
-                            {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 shrink-0"></i>}
-                        </div>
-                        <div className="ml-2">
-                            <span className="text-[12px] font-black qty-text">x{item.qty}</span>
-                        </div>
-                    </div>
-
-                    {/* 2. POPUP: Now sits outside the flex-baseline container */}
-                    {editingId === item.id && (
-                        <div className="edit-popup !items-start">
-                            <input 
-                                className="edit-input handwritten text-xl mb-4" 
-                                value={editValue} 
-                                onChange={e => setEditValue(e.target.value)} 
-                                autoFocus 
-                            />
-                            <div className="flex justify-between items-center w-full">
-                                <div className="flex items-center gap-3">
-                                    <button onClick={() => setEditQty(Math.max(0, parseFloat(editQty||0)-1))} className="stepper-btn">
-                                        <i data-lucide="minus"></i>
-                                    </button>
-                                    <input type="number" className="edit-input w-16 text-center font-bold" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                    <button onClick={() => setEditQty(parseFloat(editQty||0)+1)} className="stepper-btn">
-                                        <i data-lucide="plus"></i>
-                                    </button>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => removeItem(item.id)} className="text-red-800 text-[10px] font-bold uppercase px-2">Delete</button>
-                                    <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-tighter">Done</button>
-                                </div>
+        <div key={cat} className="note-box">
+            <div className="flex items-center gap-2 mb-6 opacity-90">
+                <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white"></i>
+                <h3 className="handwritten-header">{cat}</h3>
+            </div>
+            <ul className="space-y-6">
+                {grouped[cat].map(item => (
+                    <li key={item.id} className="relative">
+                        {/* 1. THE LINE ITEM: Using flex-end + padding-bottom for perfect alignment without the "Baseline Glitch" */}
+                        <div 
+                            className={`flex justify-between items-end cursor-pointer ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} 
+                            onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
+                        >
+                            <div className="flex items-end gap-2 flex-1 pb-[2px]"> 
+                                <span className="handwritten whitespace-normal break-words capitalize leading-tight">
+                                    {titleCase(item.name)}
+                                </span>
+                                {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 shrink-0 mb-[3px]"></i>}
                             </div>
-                            <button onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest">Cancel</button>
+                            <div className="ml-2 pb-[4px]">
+                                <span className="text-[12px] font-black qty-text">x{item.qty}</span>
+                            </div>
                         </div>
-                    )}
-                </li>
-            ))}
-        </ul>
-    </div>
-);
+
+                        {/* 2. THE POPUP: No longer fighting a baseline rule */}
+                        {editingId === item.id && (
+                            <div className="edit-popup" style={{ top: '-5px', display: 'block' }}>
+                                <input 
+                                    className="edit-input handwritten text-xl mb-4" 
+                                    value={editValue} 
+                                    onChange={e => setEditValue(e.target.value)} 
+                                    autoFocus 
+                                />
+                                <div className="flex justify-between items-center w-full">
+                                    <div className="flex items-center gap-3">
+                                        <button type="button" onClick={() => setEditQty(Math.max(0, parseFloat(editQty||0)-1))} className="stepper-btn">
+                                            <i data-lucide="minus"></i>
+                                        </button>
+                                        <input type="number" className="edit-input w-16 text-center font-bold" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                        <button type="button" onClick={() => setEditQty(parseFloat(editQty||0)+1)} className="stepper-btn">
+                                            <i data-lucide="plus"></i>
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button type="button" onClick={() => removeItem(item.id)} className="text-red-800 text-[10px] font-bold uppercase px-2">Delete</button>
+                                        <button type="button" onClick={() => handleUpdate(item.id)} className="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-tighter">Done</button>
+                                    </div>
+                                </div>
+                                <button type="button" onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest text-center">Cancel</button>
+                            </div>
+                        )}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 
         return (
             <div className={`max-w-7xl mx-auto pb-40 room-${activeRoom.replace(/\s/g, '')}`}>
