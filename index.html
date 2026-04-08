@@ -29,20 +29,49 @@
         .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
         .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-        .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; height: auto; }
-        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.4rem; line-height: 1.2; color: #ffffff; }
-        
-        .handwritten-header { 
-            font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.25rem; 
-            letter-spacing: 0.1em; 
-            text-transform: uppercase;
-            border-bottom: 2px solid currentColor;
-            padding-bottom: 2px;
-            display: inline-block;
-            margin-bottom: 8px;
-            opacity: 1 !important;
-        }
+        /* Base style for Mobile (Big & Tap-friendly) */
+.handwritten { 
+    font-family: 'Covered By Your Grace', cursive; 
+    font-size: 1.4rem; 
+    line-height: 1.2; 
+    color: #ffffff; 
+}
+
+.note-box { 
+    background: #141413; 
+    border: 1px solid #3f3f46; 
+    padding: 16px; 
+    position: relative; 
+    height: auto; 
+}
+
+/* Desktop Specific Adjustments (Wider than 768px) */
+@media (min-width: 768px) {
+    .handwritten { 
+        font-size: 1.1rem; /* Shrinks the text for desktop */
+        line-height: 1.1;
+    }
+    .handwritten-header {
+        font-size: 1rem; /* Shrinks headers slightly */
+        margin-bottom: 6px;
+    }
+    .note-box {
+        padding: 12px; /* Tightens the boxes */
+    }
+    .flex-container {
+        gap: 1rem; /* Brings boxes closer together */
+    }
+    ul.space-y-6 {
+        /* This targets the spacing between list items */
+        margin-top: 1rem;
+    }
+    /* Reduces the gap between items in the list on desktop */
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+    }
+}
         
         .room-Fridge .handwritten-header { color: #7dd3fc; } 
         .room-Freezer .handwritten-header { color: #e2e8f0; } 
