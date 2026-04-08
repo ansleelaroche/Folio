@@ -67,9 +67,14 @@
     }
     /* Reduces the gap between items in the list on desktop */
     .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-y-reverse: 0;
-    margin-top: calc(0.1rem * calc(1 - var(--tw-space-y-reverse)));
-    margin-bottom: calc(0.1rem * var(--tw-space-y-reverse));
+        --tw-space-y-reverse: 0 !important;
+        margin-top: 0.4rem !important; /* This "important" tag forces the change */
+        margin-bottom: 0px !important;
+    }
+
+/* Also add this to tighten the very first item in the list */
+ul.space-y-6 {
+    margin-top: 0.5rem !important;
 }
 }
         
