@@ -29,129 +29,81 @@
         .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
         .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-        /* Base style for Mobile (Big & Tap-friendly) */
-.handwritten { 
-    font-family: 'Covered By Your Grace', cursive; 
-    font-size: 1.4rem; 
-    line-height: 1.2; 
-    color: #ffffff; 
-}
+        /* MOBILE STYLES (Default) */
+        .handwritten { 
+            font-family: 'Covered By Your Grace', cursive; 
+            font-size: 1.4rem; 
+            line-height: 1.2; 
+            color: #ffffff; 
+        }
 
-.note-box { 
-    background: #141413; 
-    border: 1px solid #3f3f46; 
-    padding: 16px; 
-    position: relative; 
-    height: auto; 
-}
-
-/* Desktop Specific Adjustments (Wider than 768px) */
-@media (min-width: 768px) {
-    .handwritten { 
-        font-size: 0.9rem; /* Shrinks the text for desktop */
-        line-height: 1;
-    }
-    .handwritten-header {
-        font-size: 0.85rem; /* Shrinks headers slightly */
-        margin-bottom: 4px;
-    }
-    .note-box {
-        padding: 8px; /* Tightens the boxes */
-    }
-    .flex-container {
-        gap: 1rem; /* Brings boxes closer together */
-    }
-    ul.space-y-6 {
-        /* This targets the spacing between list items */
-        margin-top: 1rem;
-    }
-    /* Reduces the gap between items in the list on desktop */
-    .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-        --tw-space-y-reverse: 0 !important;
-        margin-top: 0.4rem !important; /* This "important" tag forces the change */
-        margin-bottom: 0px !important;
-    }
-
-/* Also add this to tighten the very first item in the list */
-ul.space-y-6 {
-    margin-top: 0.5rem !important;
-}
-}
+        .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; height: auto; }
+        
+        .handwritten-header { 
+            font-family: 'Covered By Your Grace', cursive; 
+            font-size: 1.25rem; 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 2px;
+            display: inline-block;
+            margin-bottom: 8px;
+            opacity: 1 !important;
+        }
         
         .room-Fridge .handwritten-header { color: #7dd3fc; } 
         .room-Freezer .handwritten-header { color: #e2e8f0; } 
         .room-DryGoods .handwritten-header { color: #4ade80; }
         .room-ShoppingList .handwritten-header { color: #d8b4fe; }
 
-        /* FIXED NAVIGATION: Wraps on mobile so nothing cuts off */
         nav.room-nav {
-            display: flex;
-            flex-wrap: wrap; /* This fixes the cutoff */
-            justify-content: center;
-            gap: 12px;
-            padding: 16px;
-            position: sticky;
-            top: 0;
-            background: #0d0d0c;
-            z-index: 100;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 16px;
+            position: sticky; top: 0; background: #0d0d0c; z-index: 100;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .room-btn { 
-            transition: all 0.2s; 
-            font-size: 13px; 
-            letter-spacing: 0.05em; 
-            font-weight: 800; 
-            color: #a1a1aa !important; /* Force brighter gray */
-            background: rgba(255,255,255,0.05); 
-            padding: 10px 16px;
-            border-radius: 9999px;
-            border: 1px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.2s; font-size: 13px; font-weight: 800; 
+            color: #a1a1aa !important; background: rgba(255,255,255,0.05); 
+            padding: 10px 16px; border-radius: 9999px; border: 1px solid transparent;
+            display: flex; align-items: center; gap: 8px;
         }
 
-        .room-btn.active { 
-            color: #ffffff !important; /* Pure white */
-            background: rgba(255,255,255,0.2);
-            border: 1px solid #ffffff; 
-        }
+        .room-btn.active { color: #ffffff !important; background: rgba(255,255,255,0.2); border: 1px solid #ffffff; }
         
         .qty-text { color: #ffffff; font-weight: 900; }
         .out-of-stock-text { color: #fb7185; } 
-        .room-ShoppingList .out-of-stock-text { color: #ffffff !important; }
         
+        /* DESKTOP STYLES (Responsive Override) */
+        @media (min-width: 768px) {
+            .handwritten { font-size: 0.95rem; line-height: 1; }
+            .handwritten-header { font-size: 0.85rem; margin-bottom: 4px; }
+            .note-box { padding: 8px; }
+            .flex-container { gap: 1rem; }
+            .qty-text { margin-top: -1px !important; } /* Nudge quantity up to match baseline */
+            
+            /* Tighter List Spacing */
+            .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+                margin-top: 0.45rem !important;
+                margin-bottom: 0px !important;
+            }
+            ul.space-y-6 { margin-top: 0.5rem !important; }
+        }
+
         .edit-popup {
-            position: absolute;
-            top: -10px; left: -10px; right: -10px;
-            z-index: 50;
-            background: #1c1c1b;
-            border: 2px solid #52525b;
-            padding: 16px;
-            border-radius: 12px;
+            position: absolute; top: -10px; left: -10px; right: -10px; z-index: 50;
+            background: #1c1c1b; border: 2px solid #52525b; padding: 16px; border-radius: 12px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
 
         input.edit-input { 
-            background: #000; 
-            border: 1px solid #71717a; 
-            color: #fff; 
-            padding: 12px; 
-            border-radius: 6px;
-            font-size: 16px !important; 
-            width: 100%;
+            background: #000; border: 1px solid #71717a; color: #fff; 
+            padding: 12px; border-radius: 6px; font-size: 16px !important; width: 100%;
         }
 
         .stepper-btn {
-            background: #52525b;
-            color: white;
-            border-radius: 6px;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #52525b; color: white; border-radius: 6px;
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -253,15 +205,54 @@ ul.space-y-6 {
             return cols;
         }, [grouped]);
 
+        const renderBox = (cat) => (
+            <div key={cat} className="note-box">
+                <div className="flex items-center gap-2 mb-6 opacity-90">
+                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white"></i>
+                    <h3 className="handwritten-header">{cat}</h3>
+                </div>
+                <ul className="space-y-6">
+                    {grouped[cat].map(item => (
+                        <li key={item.id} className="relative">
+                            {/* Changed items-start to items-baseline for alignment fix */}
+                            <div className={`flex justify-between items-baseline ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                <div className="flex items-baseline gap-2 flex-1 cursor-pointer">
+                                    <span className="handwritten whitespace-normal break-words capitalize leading-tight">{titleCase(item.name)}</span>
+                                    {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 shrink-0"></i>}
+                                </div>
+                                <div className="ml-2">
+                                    <span className="text-[12px] font-black qty-text">x{item.qty}</span>
+                                </div>
+                            </div>
+
+                            {editingId === item.id && (
+                                <div className="edit-popup">
+                                    <input className="edit-input handwritten text-xl mb-4" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={() => setEditQty(Math.max(0, parseFloat(editQty||0)-1))} className="stepper-btn"><i data-lucide="minus"></i></button>
+                                            <input type="number" className="edit-input w-16 text-center font-bold" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                            <button onClick={() => setEditQty(parseFloat(editQty||0)+1)} className="stepper-btn"><i data-lucide="plus"></i></button>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => removeItem(item.id)} className="text-red-800 text-[10px] font-bold uppercase px-2">Delete</button>
+                                            <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-tighter">Done</button>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest">Cancel</button>
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+
         return (
             <div className={`max-w-7xl mx-auto pb-40 room-${activeRoom.replace(/\s/g, '')}`}>
                 <nav className="room-nav">
                     {Object.keys(ROOM_ICONS).map(r => (
-                        <button 
-                            key={r} 
-                            onClick={() => setActiveRoom(r)} 
-                            className={`room-btn ${activeRoom === r ? 'active' : ''}`}
-                        >
+                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn ${activeRoom === r ? 'active' : ''}`}>
                             <i data-lucide={ROOM_ICONS[r]} className="w-5 h-5"></i>
                             <span>{r}</span>
                         </button>
@@ -271,47 +262,7 @@ ul.space-y-6 {
                 <div className="flex-container px-4 mt-6">
                     {columnedCategories.map((col, i) => (
                         <div key={i} className="column">
-                            {col.map(cat => (
-                                <div key={cat} className="note-box">
-                                    <div className="flex items-center gap-2 mb-6 opacity-90">
-                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white"></i>
-                                        <h3 className="handwritten-header">{cat}</h3>
-                                    </div>
-                                    <ul className="space-y-6">
-                                        {grouped[cat].map(item => (
-                                            <li key={item.id} className="relative">
-                                                <div className={`flex justify-between items-start ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
-                                                    <div className="flex items-start gap-2 flex-1 cursor-pointer">
-                                                        <span className="handwritten whitespace-normal break-words capitalize leading-tight">{titleCase(item.name)}</span>
-                                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 mt-1 shrink-0"></i>}
-                                                    </div>
-                                                    <div className="ml-2 pt-1">
-                                                        <span className="text-[12px] font-black qty-text">x{item.qty}</span>
-                                                    </div>
-                                                </div>
-
-                                                {editingId === item.id && (
-                                                    <div className="edit-popup">
-                                                        <input className="edit-input handwritten text-xl mb-4" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                        <div className="flex justify-between items-center">
-                                                            <div className="flex items-center gap-3">
-                                                                <button onClick={() => setEditQty(Math.max(0, parseFloat(editQty||0)-1))} className="stepper-btn"><i data-lucide="minus"></i></button>
-                                                                <input type="number" className="edit-input w-16 text-center font-bold" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                                <button onClick={() => setEditQty(parseFloat(editQty||0)+1)} className="stepper-btn"><i data-lucide="plus"></i></button>
-                                                            </div>
-                                                            <div className="flex gap-2">
-                                                                <button onClick={() => removeItem(item.id)} className="text-red-800 text-[10px] font-bold uppercase px-2">Delete</button>
-                                                                <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-tighter">Done</button>
-                                                            </div>
-                                                        </div>
-                                                        <button onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest">Cancel</button>
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
+                            {col.map(cat => renderBox(cat))}
                         </div>
                     ))}
                 </div>
