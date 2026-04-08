@@ -232,7 +232,7 @@
                 {grouped[cat].map(item => (
                     <li key={item.id} className="relative block mb-4">
                         
-                        {/* THE STATIC LINE (Simplified) */}
+                        {/* THE STATIC LINE */}
                         <div 
                             className={`flex justify-between items-center cursor-pointer ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} 
                             onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
@@ -247,8 +247,8 @@
                                 <span className="qty-text text-[12px] font-black">x{item.qty}</span>
                             </div>
                         </div>
-                
-                        {/* THE POPUP (Isolated) */}
+
+                        {/* THE POPUP */}
                         {editingId === item.id && (
                             <div className="edit-popup">
                                 <input 
@@ -275,24 +275,6 @@
                                 <button type="button" onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest text-center">Cancel</button>
                             </div>
                         )}
-                    </li>
-                ))}
-
-                        {/* 2. THE STATIC TEXT (Simplified for Desktop/Mobile Harmony) */}
-                        <div 
-                            className={`flex justify-between items-center cursor-pointer ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} 
-                            onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
-                        >
-                            <div className="flex items-center gap-2 flex-1 min-w-0"> 
-                                <span className="handwritten whitespace-normal break-words capitalize leading-tight">
-                                    {titleCase(item.name)}
-                                </span>
-                                {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 shrink-0"></i>}
-                            </div>
-                            <div className="ml-2 shrink-0">
-                                <span className="text-[12px] font-black qty-text">x{item.qty}</span>
-                            </div>
-                        </div>
                     </li>
                 ))}
             </ul>
