@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FancyPantry Professional</title>
+    <title>FancyPantry Pro</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -13,41 +13,40 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Inter:wght@400;700;900&display=swap');
         
-        /* Stop mobile bouncing and zoom glitches */
         html, body { 
             background-color: #0d0d0c; 
             color: #d4d4d8; 
             font-family: 'Inter', sans-serif; 
-            min-height: 100%;
-            overflow-x: hidden;
+            margin: 0; padding: 0;
+            width: 100%; overflow-x: hidden;
             -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
         }
 
-        body { -webkit-tap-highlight-color: transparent; }
-
+        body { -webkit-tap-highlight-color: transparent; min-height: 100vh; }
         .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); z-index: 0; }
         
         .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
         .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-        .note-box { background: #141413; border: 1px solid #222120; padding: 16px; position: relative; }
-        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.3rem; line-height: 1.1; }
+        .note-box { background: #141413; border: 1px solid #222120; padding: 16px; position: relative; height: auto; }
+        .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.3rem; line-height: 1.2; }
         
         .handwritten-header { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.2rem; 
+            font-size: 1.15rem; 
             letter-spacing: 0.1em; 
             text-transform: uppercase;
             border-bottom: 1px solid currentColor;
             padding-bottom: 2px;
             display: inline-block;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
         
-        .room-Fridge .handwritten-header { color: #bae6fd; opacity: 0.9; }
-        .room-Freezer .handwritten-header { color: #94a3b8; opacity: 0.9; }
-        .room-DryGoods .handwritten-header { color: #86efac; opacity: 0.9; }
-        .room-ShoppingList .handwritten-header { color: #d8b4fe; opacity: 0.9; }
+        .room-Fridge .handwritten-header { color: #bae6fd; }
+        .room-Freezer .handwritten-header { color: #94a3b8; }
+        .room-DryGoods .handwritten-header { color: #86efac; }
+        .room-ShoppingList .handwritten-header { color: #d8b4fe; }
 
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 12px; letter-spacing: 0.05em; font-weight: 700; }
         .room-btn.active { color: #fff; border-bottom: 2px solid #71717a; }
@@ -55,30 +54,41 @@
         .out-of-stock-text { color: #8a4d5e; } 
         .room-ShoppingList .out-of-stock-text { color: #d4d4d8 !important; }
         
-        /* Critical 16px font to stop iOS/Android zoom glitch */
-        input.inline-edit { 
-            background: rgba(255,255,255,0.07); 
-            border: 1px solid rgba(255,255,255,0.15); 
-            outline: none; 
+        /* Floating Edit UI */
+        .edit-popup {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            z-index: 50;
+            background: #1a1a19;
+            border: 1px solid #444;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        input.edit-input { 
+            background: #000; 
+            border: 1px solid #333; 
             color: #fff; 
             font-family: inherit; 
-            padding: 8px 12px; 
+            padding: 10px; 
             border-radius: 6px;
-            font-size: 16px !important; 
+            font-size: 16px !important; /* Forces mobile not to zoom */
             width: 100%;
         }
 
         .stepper-btn {
-            background: rgba(255,255,255,0.1);
+            background: #333;
             border-radius: 6px;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             touch-action: manipulation;
         }
-        .stepper-btn:active { background: rgba(255,255,255,0.3); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
@@ -88,13 +98,12 @@
     <div id="root"></div>
 
     <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
+    const { useState, useEffect, useMemo } = React;
     const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
-    
     const CATEGORIES = {
         "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
         "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
@@ -106,32 +115,21 @@
     };
 
     const titleCase = (str) => str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    const isDogFood = (name) => {
-        const n = name.toLowerCase();
-        return ["ground turkey", "veggies", "berries", "kidney beans", "white rice", "sweet potato"].some(k => n.includes(k));
-    };
+    const isDogFood = (name) => ["ground turkey", "veggies", "berries", "kidney beans", "white rice", "sweet potato"].some(k => name.toLowerCase().includes(k));
 
     function PantryApp() {
         const [activeRoom, setActiveRoom] = useState("Fridge");
         const [items, setItems] = useState([]);
         const [isModalOpen, setIsModalOpen] = useState(false);
-        const [modalRoom, setModalRoom] = useState("Fridge");
-        const [modalCat, setModalCat] = useState("Misc");
-        const [newName, setNewName] = useState("");
-        const [newQty, setNewQty] = useState("");
-        
         const [editingId, setEditingId] = useState(null);
         const [editValue, setEditValue] = useState("");
         const [editQty, setEditQty] = useState("");
+        const [modalCat, setModalCat] = useState("Misc");
+        const [newName, setNewName] = useState("");
+        const [newQty, setNewQty] = useState("");
 
         useEffect(() => { fetchItems(); }, []);
-        
-        // RESET FIX: Clear editing state and fix scroll when room changes
-        useEffect(() => {
-            setEditingId(null);
-            window.scrollTo(0, 0);
-        }, [activeRoom]);
-
+        useEffect(() => { setEditingId(null); window.scrollTo(0,0); }, [activeRoom]);
         useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen]);
 
         async function fetchItems() {
@@ -139,31 +137,17 @@
             if (data) setItems(data);
         }
 
-        const startEdit = (item) => {
-            setEditingId(item.id);
-            setEditValue(item.name);
-            setEditQty(item.qty);
-        };
-
-        const saveInlineEdit = async (id) => {
-            const formatted = titleCase(editValue.trim());
-            await supabase.from('FancyPantry').update({ name: formatted, qty: editQty }).eq('id', id);
+        const handleUpdate = async (id) => {
+            await supabase.from('FancyPantry').update({ name: titleCase(editValue), qty: editQty }).eq('id', id);
             setEditingId(null);
             fetchItems();
         };
 
-        const handleAddItem = async (e) => {
-            e.preventDefault();
-            if (!newName) return;
-            const formattedName = titleCase(newName.trim());
-            await supabase.from('FancyPantry').insert([{ name: formattedName, qty: newQty || "1", room: modalRoom, category: modalCat }]);
-            setIsModalOpen(false); setNewName(""); setNewQty("");
-            fetchItems();
-        };
-
         const removeItem = async (id) => {
-            await supabase.from('FancyPantry').delete().eq('id', id);
-            setItems(prev => prev.filter(i => i.id !== id));
+            if(confirm("Remove this item?")) {
+                await supabase.from('FancyPantry').delete().eq('id', id);
+                setItems(prev => prev.filter(i => i.id !== id));
+            }
         };
 
         const grouped = useMemo(() => {
@@ -175,21 +159,16 @@
                 return dbRoom === target;
             });
 
-            const sorted = [...filtered].sort((a, b) => {
-                const aQty = parseFloat(a.qty || 0);
-                const bQty = parseFloat(b.qty || 0);
-                const aIsDog = isDogFood(a.name);
-                const bIsDog = isDogFood(b.name);
+            return [...filtered].sort((a, b) => {
+                const aQty = parseFloat(a.qty || 0), bQty = parseFloat(b.qty || 0);
                 if (aQty === 0 && bQty > 0) return 1;
                 if (aQty > 0 && bQty === 0) return -1;
                 if (aQty > 0 && bQty > 0) {
-                    if (aIsDog && !bIsDog) return -1;
-                    if (!aIsDog && bIsDog) return 1;
+                    if (isDogFood(a.name) && !isDogFood(b.name)) return -1;
+                    if (!isDogFood(a.name) && isDogFood(b.name)) return 1;
                 }
                 return a.name.localeCompare(b.name);
-            });
-
-            return sorted.reduce((acc, i) => {
+            }).reduce((acc, i) => {
                 const dbCat = (i.category || "Misc").toLowerCase().trim();
                 const matchedKey = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
                 if (!acc[matchedKey]) acc[matchedKey] = [];
@@ -199,102 +178,94 @@
         }, [items, activeRoom]);
 
         const columnedCategories = useMemo(() => {
-            const cols = [[], [], []];
-            const colHeights = [0, 0, 0];
-            const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]);
-            const sortedByLength = activeCats.sort((a, b) => grouped[b].length - grouped[a].length);
-
-            sortedByLength.forEach(cat => {
-                const shortestColIndex = colHeights.indexOf(Math.min(...colHeights));
-                cols[shortestColIndex].push(cat);
-                colHeights[shortestColIndex] += (grouped[cat].length + 5);
-            });
+            const cols = [[], [], []], h = [0, 0, 0];
+            Object.keys(CATEGORIES).filter(cat => grouped[cat])
+                .sort((a, b) => grouped[b].length - grouped[a].length)
+                .forEach(cat => {
+                    const idx = h.indexOf(Math.min(...h));
+                    cols[idx].push(cat);
+                    h[idx] += (grouped[cat].length + 5);
+                });
             return cols;
         }, [grouped]);
 
-        const renderBox = (cat) => (
-            <div key={cat} className="note-box">
-                <div className="flex items-center gap-2 mb-4 opacity-80">
-                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-30"></i>
-                    <h3 className="handwritten-header">{cat}</h3>
-                </div>
-                <ul className="space-y-4">
-                    {grouped[cat].map(item => (
-                        <li key={item.id} className={`flex justify-between items-start group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
-                            {editingId === item.id ? (
-                                <div className="flex flex-col gap-4 w-full p-3 bg-white/5 rounded-xl border border-white/10">
-                                    <input 
-                                        className="inline-edit handwritten w-full" 
-                                        value={editValue} 
-                                        onChange={(e) => setEditValue(e.target.value)} 
-                                        autoFocus 
-                                    />
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <button type="button" onClick={() => setEditQty(Math.max(0, parseFloat(editQty || 0) - 1))} className="stepper-btn"><i data-lucide="minus" className="w-5 h-5"></i></button>
-                                            <input type="number" className="w-14 inline-edit text-center font-bold" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
-                                            <button type="button" onClick={() => setEditQty(parseFloat(editQty || 0) + 1)} className="stepper-btn"><i data-lucide="plus" className="w-5 h-5"></i></button>
-                                        </div>
-                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded-lg px-6 py-2 font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">
-                                            Done
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="flex items-start gap-2 cursor-text min-w-0 flex-1 mr-2" onClick={() => startEdit(item)}>
-                                        <span className="handwritten whitespace-normal break-words leading-tight capitalize">
-                                            {titleCase(item.name)}
-                                        </span>
-                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 shrink-0 mt-0.5"></i>}
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0 pt-0.5">
-                                        <span className="text-[11px] font-bold tracking-tighter" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                        <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 md:group-hover:opacity-100 text-stone-800 hover:text-red-500 text-[18px] px-2 leading-none">×</button>
-                                    </div>
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-
         return (
             <div className={`max-w-7xl mx-auto pb-40 room-${activeRoom.replace(/\s/g, '')}`}>
-                <nav className="flex justify-center gap-2 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2 px-2 sticky top-0 bg-[#0d0d0c] z-50 border-b border-white/5">
+                <nav className="flex justify-center gap-2 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2 sticky top-0 bg-[#0d0d0c] z-[100] border-b border-white/5 px-2">
                     {Object.keys(ROOM_ICONS).map(r => (
-                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-3 px-6 py-4 rounded-full transition-all whitespace-nowrap ${activeRoom === r ? 'active bg-white/10' : 'text-stone-700'}`}>
+                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-5 py-4 rounded-full transition-all whitespace-nowrap ${activeRoom === r ? 'active bg-white/10' : 'text-stone-700'}`}>
                             <i data-lucide={ROOM_ICONS[r]} className="w-5 h-5"></i><span>{r}</span>
                         </button>
                     ))}
                 </nav>
 
-                <div className="flex-container">
-                    {Object.keys(grouped).length === 0 ? (
-                        <p className="text-stone-800 text-[10px] uppercase tracking-widest text-center w-full py-24 italic">Stock level nominal</p>
-                    ) : (
-                        columnedCategories.map((col, i) => (
-                            <div key={i} className="column">
-                                {col.map(cat => renderBox(cat))}
-                            </div>
-                        ))
-                    )}
+                <div className="flex-container px-2">
+                    {columnedCategories.map((col, i) => (
+                        <div key={i} className="column">
+                            {col.map(cat => (
+                                <div key={cat} className="note-box">
+                                    <div className="flex items-center gap-2 mb-6 opacity-80">
+                                        <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-3.5 h-3.5 opacity-30"></i>
+                                        <h3 className="handwritten-header">{cat}</h3>
+                                    </div>
+                                    <ul className="space-y-6">
+                                        {grouped[cat].map(item => (
+                                            <li key={item.id} className="relative">
+                                                <div className={`flex justify-between items-start ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`} onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                                    <div className="flex items-start gap-2 flex-1 cursor-pointer">
+                                                        <span className="handwritten whitespace-normal break-words capitalize leading-tight">{titleCase(item.name)}</span>
+                                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 mt-1 shrink-0"></i>}
+                                                    </div>
+                                                    <div className="ml-2 pt-1">
+                                                        <span className="text-[11px] font-bold">x{item.qty}</span>
+                                                    </div>
+                                                </div>
+
+                                                {editingId === item.id && (
+                                                    <div className="edit-popup">
+                                                        <input className="edit-input handwritten text-xl mb-4" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                        <div className="flex justify-between items-center">
+                                                            <div className="flex items-center gap-3">
+                                                                <button onClick={() => setEditQty(Math.max(0, parseFloat(editQty||0)-1))} className="stepper-btn"><i data-lucide="minus"></i></button>
+                                                                <input type="number" className="edit-input w-16 text-center font-bold" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                                <button onClick={() => setEditQty(parseFloat(editQty||0)+1)} className="stepper-btn"><i data-lucide="plus"></i></button>
+                                                            </div>
+                                                            <div className="flex gap-2">
+                                                                <button onClick={() => removeItem(item.id)} className="text-red-800 text-[10px] font-bold uppercase px-2">Delete</button>
+                                                                <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-6 py-2 rounded-lg font-black text-[10px] uppercase tracking-tighter">Done</button>
+                                                            </div>
+                                                        </div>
+                                                        <button onClick={() => setEditingId(null)} className="w-full mt-4 text-[9px] text-stone-500 uppercase font-bold tracking-widest">Cancel</button>
+                                                    </div>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
 
-                <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-all"><i data-lucide="plus" className="w-8 h-8"></i></button>
+                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-[80] active:scale-90 transition-all"><i data-lucide="plus" className="w-8 h-8"></i></button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
                         <div className="bg-[#111] w-full max-w-sm p-8 border border-white/5 rounded-3xl shadow-2xl">
-                            <div className="flex justify-between items-center mb-8"><p className="handwritten-header !text-stone-600">NEW ENTRY</p><button onClick={() => setIsModalOpen(false)}><i data-lucide="x" className="w-6 h-6 text-stone-600"></i></button></div>
-                            <form onSubmit={handleAddItem} className="space-y-6">
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">{Object.keys(ROOM_ICONS).filter(k => k !== "Shopping List").map(r => (<button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-5 py-4 text-[11px] font-bold border rounded-xl ${modalRoom === r ? 'bg-white text-black' : 'text-stone-800 border-white/5'}`}>{r}</button>))}</div>
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">{Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (
-                                    <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-4 py-3 text-[11px] font-bold border rounded-xl whitespace-nowrap ${modalCat === c ? 'bg-stone-400 text-black' : 'text-stone-800 border-white/5'}`}>{c}</button>
-                                ))}</div>
-                                <input autoFocus type="text" placeholder="Name..." value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-transparent border-b border-white/10 py-4 text-2xl font-light outline-none text-white" style={{ fontSize: '16px' }} />
-                                <div className="flex gap-4 items-end"><input type="number" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-24 bg-transparent border-b border-white/10 py-2 outline-none text-white text-lg" style={{ fontSize: '16px' }} /><button type="submit" className="flex-1 bg-white py-5 text-black text-[11px] font-black tracking-widest uppercase rounded-xl">Save</button></div>
+                            <form onSubmit={async e => {
+                                e.preventDefault();
+                                await supabase.from('FancyPantry').insert([{ name: titleCase(newName), qty: newQty || "1", room: activeRoom === "Shopping List" ? "Fridge" : activeRoom, category: modalCat }]);
+                                setIsModalOpen(false); setNewName(""); fetchItems();
+                            }} className="space-y-6">
+                                <div className="flex justify-between items-center mb-4"><h3 className="handwritten-header">New Item</h3><button type="button" onClick={() => setIsModalOpen(false)}><i data-lucide="x" className="w-6 h-6 text-stone-600"></i></button></div>
+                                <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                                    {Object.keys(CATEGORIES).map(c => <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-4 py-3 text-[10px] border rounded-xl whitespace-nowrap font-bold ${modalCat === c ? 'bg-stone-200 text-black' : 'text-stone-800 border-white/5'}`}>{c}</button>)}
+                                </div>
+                                <input className="edit-input w-full" placeholder="Name..." value={newName} onChange={e => setNewName(e.target.value)} />
+                                <div className="flex gap-4">
+                                    <input type="number" className="edit-input w-24" placeholder="Qty" value={newQty} onChange={e => setNewQty(e.target.value)} />
+                                    <button type="submit" className="flex-1 bg-white py-4 text-black font-black text-[11px] uppercase rounded-xl tracking-widest">Save</button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -302,9 +273,7 @@
             </div>
         );
     }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<PantryApp />);
-</script>
+    ReactDOM.createRoot(document.getElementById('root')).render(<PantryApp />);
+    </script>
 </body>
 </html>
