@@ -11,102 +11,99 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
     
     body { 
         background-color: #0a0a0a; 
         color: #e4e4e7; 
         font-family: 'Inter', sans-serif; 
         min-height: 100vh;
-        background-image: radial-gradient(circle at 50% 0%, #161616 0%, #0a0a0a 100%);
+        margin: 0;
+        /* Subtle dark texture to mimic a chalkboard slate */
+        background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #0a0a0a 100%);
     }
 
-    .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    /* FIX: Pinning the art to the bottom right of the SCREEN, not the page */
+    .botanical-art { 
+        position: fixed; 
+        bottom: 10px; 
+        right: 10px; 
+        width: 150px; 
+        opacity: 0.15; 
+        pointer-events: none; 
+        filter: invert(1); 
+        z-index: 0;
+    }
+    
+    .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
     .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    /* LUXURY CARD DESIGN */
+    /* CHALKBOARD CARDS */
     .note-box { 
         background: #111110; 
-        border: 1px solid #222; 
-        padding: 24px; 
-        position: relative;
+        border: 1px solid #2a2a2a; 
+        padding: 20px; 
+        border-radius: 4px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        border-radius: 4px; /* Sharp, architectural corners */
     }
 
-    /* EDITORIAL TYPOGRAPHY */
+    /* THE ELEGANT SERIF HEADERS */
     .handwritten-header { 
         font-family: 'DM Serif Display', serif; 
         font-size: 1.5rem; 
         letter-spacing: 0.03em; 
-        text-transform: capitalize; /* More high-end than all-caps */
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        padding-bottom: 8px;
         display: block;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
         opacity: 1 !important;
     }
-
-    .handwritten { 
-        font-family: 'Inter', sans-serif; 
-        font-weight: 300; /* Light and airy */
-        font-size: 1rem; 
-        line-height: 1.4; 
-        color: #d1d1d6; 
-    }
     
-    /* SOPHISTICATED JEWEL TONES */
+    /* THE CHALKBOARD LIST FONT */
+    .handwritten { 
+        font-family: 'Covered By Your Grace', cursive; 
+        font-size: 1.35rem; /* Large enough for chalk feel */
+        line-height: 1.2; 
+        color: #f4f4f5; 
+    }
+
+    /* ROOM PALETTE */
     .room-Fridge .handwritten-header { color: #fdfcf0; } /* Champagne */
     .room-Freezer .handwritten-header { color: #e0e7ff; } /* Ice Blue */
     .room-DryGoods .handwritten-header { color: #dcfce7; } /* Soft Mint */
     .room-ShoppingList .handwritten-header { color: #f5f3ff; } /* Soft Petal */
 
-    /* NAVIGATION BUTTONS */
-    .room-btn { 
-        transition: all 0.3s ease; 
-        font-size: 12px; 
-        font-weight: 700; 
-        letter-spacing: 0.1em; 
-        color: #52525b; 
-        text-transform: uppercase;
-    }
-    .room-btn:hover { color: #ffffff; }
+    /* NAVIGATION */
+    .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; font-weight: 800; color: #71717a; letter-spacing: 0.1em; }
     .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
-
-    /* REFINED PULSE */
+    
+    /* THE ROSE GLOW PULSE */
     @keyframes rose-glow {
-        0% { color: #fda4af; text-shadow: 0 0 0px rgba(253,164,175,0); }
-        50% { color: #fb7185; text-shadow: 0 0 10px rgba(251,113,133,0.3); }
-        100% { color: #fda4af; text-shadow: 0 0 0px rgba(253,164,175,0); }
+        0% { color: #fda4af; opacity: 1; }
+        50% { color: #fb7185; opacity: 0.5; }
+        100% { color: #fda4af; opacity: 1; }
     }
 
     .out-of-stock-text span, 
     .out-of-stock-text { 
         animation: rose-glow 3s infinite ease-in-out;
-        font-weight: 600;
     } 
     
     .room-ShoppingList .out-of-stock-text span,
     .room-ShoppingList .out-of-stock-text { 
         animation: none !important;
         color: #f4f4f5 !important; 
-        text-shadow: none !important;
+        opacity: 1 !important;
     }
 
-    /* DESKTOP COMPACT SCALING */
+    /* DESKTOP SCALING */
     @media (min-width: 768px) {
-        .handwritten { font-size: 0.85rem; }
-        .handwritten-header { font-size: 1.1rem; }
-        .note-box { padding: 16px; }
+        .handwritten { font-size: 1rem; }
+        .handwritten-header { font-size: 1.2rem; }
+        .note-box { padding: 12px; }
     }
 
-    input.inline-edit { 
-        background: #000; 
-        border: 1px solid #444; 
-        color: white; 
-        padding: 4px 8px; 
-        border-radius: 2px;
-    }
+    input.inline-edit { background: #000; border: 1px solid #444; color: white; padding: 4px; border-radius: 4px; font-family: inherit; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
 </style>
 </head>
@@ -259,40 +256,40 @@
         }, [grouped]);
         
         const renderBox = (cat) => (
-            <div key={cat} className="note-box">
-                <div className="flex items-center gap-2 mb-4">
-                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20 mb-1"></i>
-                    <h3 className="handwritten-header">{cat}</h3>
-                </div>
-                <ul className="space-y-4">
-                    {grouped[cat].map(item => (
-                        <li key={item.id} className={`flex justify-between items-start group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
-                            {editingId === item.id ? (
-                                <div className="flex items-center gap-2 w-full">
-                                    <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <span className="text-[10px] text-white/50">x</span>
-                                        <input className="w-10 inline-edit text-[11px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
-                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded p-1 ml-1"><i data-lucide="check" className="w-4 h-4"></i></button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="flex items-start gap-2 cursor-text min-w-0 flex-1 mr-2" onClick={() => startEdit(item)}>
-                                        <span className="handwritten whitespace-normal break-words leading-tight capitalize text-white">{titleCase(item.name)}</span>
-                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/60 shrink-0 mt-1"></i>}
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0 pt-0.5">
-                                        <span className="text-[11px] font-black tracking-tighter text-white/80" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                        <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-red-500/50 hover:text-red-500 text-[12px] px-1 font-bold">×</button>
-                                    </div>
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
+        <div key={cat} className="note-box">
+            <div className="flex items-center gap-2 mb-4">
+                <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20"></i>
+                <h3 className="handwritten-header">{cat}</h3>
             </div>
-        );
+            <ul className="space-y-4">
+                {grouped[cat].map(item => (
+                    <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
+                        {editingId === item.id ? (
+                            <div className="flex items-center gap-2 w-full">
+                                <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
+                                <div className="flex items-center gap-1 shrink-0">
+                                    <span className="text-[10px] text-white/50">x</span>
+                                    <input className="w-10 inline-edit text-[11px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
+                                    <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded p-1 ml-1"><i data-lucide="check" className="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="flex items-start gap-2 cursor-text min-w-0 flex-1 mr-2" onClick={() => startEdit(item)}>
+                                    <span className="handwritten whitespace-normal break-words leading-tight capitalize text-white">{titleCase(item.name)}</span>
+                                    {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/60 shrink-0 mt-1"></i>}
+                                </div>
+                                <div className="flex items-center gap-3 shrink-0">
+                                    <span className="text-[11px] font-black tracking-tighter text-white/80" onClick={() => startEdit(item)}>x{item.qty}</span>
+                                    <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-red-500/50 hover:text-red-500 text-[14px] px-1">×</button>
+                                </div>
+                            </>
+                        )}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 
         return (
             <div className={`max-w-7xl mx-auto pb-32 room-${activeRoom.replace(/\s/g, '')}`}>
