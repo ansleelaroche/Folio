@@ -15,9 +15,8 @@
         
         body { 
             background-color: #080807;
-            /* Enhanced Background: More noticeable texture and deeper glow */
             background-image: 
-                radial-gradient(circle at 50% -20%, rgba(30, 58, 138, 0.4) 0%, rgba(8, 8, 7, 1) 85%),
+                radial-gradient(circle at 50% -20%, rgba(30, 58, 138, 0.45) 0%, rgba(8, 8, 7, 1) 85%),
                 url('https://www.transparenttextures.com/patterns/stardust.png');
             background-attachment: fixed;
             color: #f4f4f5; 
@@ -26,29 +25,20 @@
             margin: 0;
         }
 
-        /* Balanced Layout Container */
-        .flex-container { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 1.5rem; 
-            position: relative; 
-            z-index: 1; 
-            justify-content: center; 
-            padding: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
+        .botanical-art { 
+            position: fixed; bottom: 10px; right: 10px; width: 140px; 
+            opacity: 0.15; pointer-events: none; filter: invert(1); z-index: 0;
         }
 
-        .column { 
-            flex: 1; 
-            min-width: 300px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1.5rem; 
+        .flex-container { 
+            display: flex; flex-wrap: wrap; gap: 1.5rem; 
+            position: relative; z-index: 1; justify-content: center; 
+            padding: 20px; max-width: 1600px; margin: 0 auto;
         }
+
+        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
         @media (min-width: 1024px) { 
-            /* Desktop Scale-down to make it look "Heavily Designed" and not giant */
             .flex-container { transform: scale(0.85); transform-origin: top center; width: 118%; margin-left: -9%; }
         }
 
@@ -59,9 +49,7 @@
             padding: 24px; 
             box-shadow: 0 25px 60px rgba(0,0,0,0.6);
             border-radius: 2px;
-            transition: border 0.3s ease;
         }
-        .note-box:hover { border-color: rgba(255,255,255,0.2); }
 
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
@@ -71,13 +59,12 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 10px;
             margin-bottom: 18px;
+            text-transform: capitalize; /* Ensures "dairy" becomes "Dairy" */
         }
         
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.25rem; 
-            color: #ffffff; 
-            line-height: 1.2;
+            font-size: 1.25rem; color: #ffffff; line-height: 1.2;
         }
 
         .room-nav { display: flex; justify-content: center; align-items: center; gap: 3rem; padding: 50px 10px; }
@@ -87,7 +74,6 @@
         }
         .room-btn.active { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
 
-        /* Pulsing Out-of-Stock Glow */
         @keyframes rose-glow {
             0% { color: #fb7185; opacity: 1; }
             50% { color: #881337; opacity: 0.5; }
@@ -118,11 +104,19 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+    // Metadata for Icons and Colors
     const META = {
-        "Produce": ["leaf", "#86efac"], "Dairy": ["milk", "#bae6fd"], "Protein": ["bone", "#fca5a5"],
-        "Drinks": ["droplets", "#93c5fd"], "Condiments": ["utensils", "#fcd34d"], "Snacks": ["zap", "#fdba74"],
-        "Meats & Seafood": ["anchor", "#f87171"], "Prepared Meals": ["package", "#cbd5e1"], 
-        "Frozen Veg & Fruit": ["wind", "#4ade80"], "Desserts": ["ice-cream", "#f9a8d4"], "Misc": ["more-horizontal", "#d4d4d8"]
+        "Produce": ["leaf", "#86efac"], 
+        "Dairy": ["milk", "#bae6fd"], 
+        "Protein": ["bone", "#fca5a5"],
+        "Drinks": ["droplets", "#93c5fd"], 
+        "Condiments": ["utensils", "#fcd34d"], 
+        "Snacks": ["zap", "#fdba74"],
+        "Meats & Seafood": ["anchor", "#f87171"], 
+        "Prepared Meals": ["package", "#cbd5e1"], 
+        "Frozen Veg & Fruit": ["wind", "#4ade80"], 
+        "Desserts": ["ice-cream", "#f9a8d4"], 
+        "Misc": ["more-horizontal", "#d4d4d8"]
     };
 
     function PantryApp() {
@@ -169,7 +163,6 @@
             }, {});
         }, [items, activeRoom]);
 
-        // BALANCED COLUMN LOGIC: Distributes boxes based on item count
         const columnedCategories = useMemo(() => {
             const cols = [[], [], []];
             const colHeights = [0, 0, 0];
@@ -178,7 +171,7 @@
             activeCats.forEach(cat => {
                 const shortest = colHeights.indexOf(Math.min(...colHeights));
                 cols[shortest].push(cat);
-                colHeights[shortest] += (grouped[cat].length + 4); // +4 accounts for header height
+                colHeights[shortest] += (grouped[cat].length + 4);
             });
             return cols;
         }, [grouped]);
@@ -194,35 +187,41 @@
                 <div className="flex-container">
                     {columnedCategories.map((col, i) => (
                         <div key={i} className="column">
-                            {col.map(cat => (
-                                <div key={cat} className="note-box">
-                                    <h3 className="handwritten-header" style={{ color: META[cat]?.[1] || '#fff' }}>
-                                        <i data-lucide={META[cat]?.[0] || 'box'} className="w-5 h-5"></i>
-                                        {cat}
-                                    </h3>
-                                    <ul className="space-y-5">
-                                        {grouped[cat].map(item => (
-                                            <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
-                                                {editingId === item.id ? (
-                                                    <div className="edit-row">
-                                                        <input className="edit-input" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                        <input className="edit-input !w-10 text-center" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                        <button onClick={() => handleUpdate(item.id)} className="save-btn font-black">DONE</button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
-                                                        <span className="handwritten capitalize">{item.name}</span>
-                                                        <div className="flex items-center gap-4">
-                                                            <span className="text-[10px] font-black opacity-30">x{item.qty}</span>
-                                                            <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500 text-[14px]">×</button>
+                            {col.map(cat => {
+                                // Match logic: find key regardless of case
+                                const normalizedCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+                                const meta = META[normalizedCat] || META["Misc"];
+                                
+                                return (
+                                    <div key={cat} className="note-box">
+                                        <h3 className="handwritten-header" style={{ color: meta[1] }}>
+                                            <i data-lucide={meta[0]} className="w-4 h-4"></i>
+                                            {cat}
+                                        </h3>
+                                        <ul className="space-y-5">
+                                            {grouped[cat].map(item => (
+                                                <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
+                                                    {editingId === item.id ? (
+                                                        <div className="edit-row">
+                                                            <input className="edit-input" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                            <input className="edit-input !w-10 text-center" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                            <button onClick={() => handleUpdate(item.id)} className="bg-white text-black text-[8px] font-black px-2 py-1 rounded">DONE</button>
                                                         </div>
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
+                                                    ) : (
+                                                        <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                                            <span className="handwritten capitalize">{item.name}</span>
+                                                            <div className="flex items-center gap-4">
+                                                                <span className="text-[10px] font-black opacity-30">x{item.qty}</span>
+                                                                <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500 text-[14px]">×</button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                );
+                            })}
                         </div>
                     ))}
                 </div>
