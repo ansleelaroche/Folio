@@ -11,103 +11,107 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
-    
-    body { 
-        background-color: #0a0a0a; 
-        color: #e4e4e7; 
-        font-family: 'Inter', sans-serif; 
-        min-height: 100vh;
-        margin: 0;
-        /* Subtle dark texture to mimic a chalkboard slate */
-        background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #0a0a0a 100%);
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
+        
+        body { 
+            background-color: #0a0a0a; 
+            color: #e4e4e7; 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #0a0a0a 100%);
+            background-attachment: fixed;
+        }
 
-    /* FIX: Pinning the art to the bottom right of the SCREEN, not the page */
-    .botanical-art { 
-        position: fixed; 
-        bottom: 10px; 
-        right: 10px; 
-        width: 150px; 
-        opacity: 0.15; 
-        pointer-events: none; 
-        filter: invert(1); 
-        z-index: 0;
-    }
-    
-    .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
-    .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
+        /* FIXED: Art stays in the corner of the screen, not the page */
+        .botanical-art { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            width: 180px; 
+            opacity: 0.12; 
+            pointer-events: none; 
+            filter: invert(1); 
+            z-index: 0;
+        }
+        
+        .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
+        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    /* CHALKBOARD CARDS */
-    .note-box { 
-        background: #111110; 
-        border: 1px solid #2a2a2a; 
-        padding: 20px; 
-        border-radius: 4px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+        /* LUXURY CHALKBOARD CARDS */
+        .note-box { 
+            background: #111110; 
+            border: 1px solid #2a2a2a; 
+            padding: 24px; 
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transition: border 0.3s ease;
+        }
+        .note-box:hover { border-color: #444; }
 
-    /* THE ELEGANT SERIF HEADERS */
-    .handwritten-header { 
-        font-family: 'DM Serif Display', serif; 
-        font-size: 1.5rem; 
-        letter-spacing: 0.03em; 
-        border-bottom: 1px solid rgba(255,255,255,0.15);
-        padding-bottom: 8px;
-        display: block;
-        margin-bottom: 12px;
-        opacity: 1 !important;
-    }
-    
-    /* THE CHALKBOARD LIST FONT */
-    .handwritten { 
-        font-family: 'Covered By Your Grace', cursive; 
-        font-size: 1.35rem; /* Large enough for chalk feel */
-        line-height: 1.2; 
-        color: #f4f4f5; 
-    }
+        /* EDITORIAL SERIF HEADERS */
+        .handwritten-header { 
+            font-family: 'DM Serif Display', serif; 
+            font-size: 1.6rem; 
+            letter-spacing: 0.02em; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            display: block;
+            margin-bottom: 16px;
+        }
+        
+        /* CHALKBOARD LIST FONT */
+        .handwritten { 
+            font-family: 'Covered By Your Grace', cursive; 
+            font-size: 1.4rem; 
+            line-height: 1.2; 
+            color: #ffffff; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
 
-    /* ROOM PALETTE */
-    .room-Fridge .handwritten-header { color: #fdfcf0; } /* Champagne */
-    .room-Freezer .handwritten-header { color: #e0e7ff; } /* Ice Blue */
-    .room-DryGoods .handwritten-header { color: #dcfce7; } /* Soft Mint */
-    .room-ShoppingList .handwritten-header { color: #f5f3ff; } /* Soft Petal */
+        /* ROOM COLORS */
+        .room-Fridge .handwritten-header { color: #fdfcf0; }
+        .room-Freezer .handwritten-header { color: #e0e7ff; }
+        .room-DryGoods .handwritten-header { color: #dcfce7; }
+        .room-ShoppingList .handwritten-header { color: #f5f3ff; }
 
-    /* NAVIGATION */
-    .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; font-weight: 800; color: #71717a; letter-spacing: 0.1em; }
-    .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
-    
-    /* THE ROSE GLOW PULSE */
-    @keyframes rose-glow {
-        0% { color: #fda4af; opacity: 1; }
-        50% { color: #fb7185; opacity: 0.5; }
-        100% { color: #fda4af; opacity: 1; }
-    }
+        /* NAVIGATION */
+        .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; font-weight: 800; color: #52525b; letter-spacing: 0.15em; text-transform: uppercase; }
+        .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
+        
+        /* ROSE GLOW PULSE */
+        @keyframes rose-glow {
+            0% { color: #fda4af; opacity: 1; transform: scale(1); }
+            50% { color: #fb7185; opacity: 0.6; transform: scale(0.98); }
+            100% { color: #fda4af; opacity: 1; transform: scale(1); }
+        }
 
-    .out-of-stock-text span, 
-    .out-of-stock-text { 
-        animation: rose-glow 3s infinite ease-in-out;
-    } 
-    
-    .room-ShoppingList .out-of-stock-text span,
-    .room-ShoppingList .out-of-stock-text { 
-        animation: none !important;
-        color: #f4f4f5 !important; 
-        opacity: 1 !important;
-    }
+        .out-of-stock-text .handwritten { 
+            animation: rose-glow 3s infinite ease-in-out;
+            display: inline-block;
+        } 
+        
+        .room-ShoppingList .out-of-stock-text .handwritten { 
+            animation: none !important;
+            color: #ffffff !important; 
+            opacity: 1 !important;
+        }
 
-    /* DESKTOP SCALING */
-    @media (min-width: 768px) {
-        .handwritten { font-size: 1rem; }
-        .handwritten-header { font-size: 1.2rem; }
-        .note-box { padding: 12px; }
-    }
+        @media (min-width: 768px) {
+            .handwritten { font-size: 1.1rem; }
+            .handwritten-header { font-size: 1.3rem; }
+            .note-box { padding: 16px; }
+            .flex-container { gap: 1rem; }
+        }
 
-    input.inline-edit { background: #000; border: 1px solid #444; color: white; padding: 4px; border-radius: 4px; font-family: inherit; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-</style>
+        input.inline-edit { background: #000; border: 1px solid #444; color: white; padding: 6px; border-radius: 4px; font-family: inherit; width: 100%; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .add-btn { width: 3.5rem; height: 3.5rem; transition: transform 0.2s; }
+        @media (min-width: 768px) { .add-btn { width: 2.5rem; height: 2.5rem; } }
+    </style>
 </head>
-<body class="antialiased p-4 md:p-6">
+<body class="antialiased p-4 md:p-10">
     <svg class="botanical-art" viewBox="0 0 100 100"><path d="M10,90 Q30,70 20,40 T50,20 T90,10" stroke="white" fill="none" stroke-width="0.3"/></svg>
     <div id="root"></div>
 
@@ -118,7 +122,6 @@
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
-    
     const CATEGORIES = {
         "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
         "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
@@ -133,20 +136,17 @@
         "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "spinach", "kale", "pepper", "carrot"],
         "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream"],
         "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs"],
-        "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "milk", "seltz"],
+        "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "seltz"],
         "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup"],
         "Snacks": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy"],
         "Bakery & Breads": ["bread", "bagel", "tortilla", "muffin", "bun", "pita", "toast"],
         "Pasta & Grains": ["pasta", "rice", "noodle", "quinoa", "couscous", "spaghetti", "penne"],
         "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"],
-        "Meats & Seafood": ["fish", "shrimp", "salmon", "shrimp", "cod", "tuna"]
+        "Meats & Seafood": ["fish", "shrimp", "salmon", "cod", "tuna"]
     };
 
     const titleCase = (str) => str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    const isDogFood = (name) => {
-        const n = name.toLowerCase();
-        return ["ground turkey", "veggies", "berries", "kidney beans", "white rice", "sweet potato"].some(k => n.includes(k));
-    };
+    const isDogFood = (name) => ["ground turkey", "veggies", "berries", "kidney beans", "white rice", "sweet potato"].some(k => name.toLowerCase().includes(k));
 
     function PantryApp() {
         const [activeRoom, setActiveRoom] = useState("Fridge");
@@ -172,37 +172,24 @@
             setNewName(val);
             const lowerVal = val.toLowerCase();
             for (const [cat, keywords] of Object.entries(AUTO_MAP)) {
-                if (keywords.some(k => lowerVal.includes(k))) {
-                    setModalCat(cat);
-                    break;
-                }
+                if (keywords.some(k => lowerVal.includes(k))) { setModalCat(cat); break; }
             }
         };
 
-        const startEdit = (item) => {
-            setEditingId(item.id);
-            setEditValue(item.name);
-            setEditQty(item.qty);
-        };
-
         const saveInlineEdit = async (id) => {
-            const formatted = titleCase(editValue.trim());
-            await supabase.from('FancyPantry').update({ name: formatted, qty: editQty }).eq('id', id);
-            setEditingId(null);
-            fetchItems();
+            await supabase.from('FancyPantry').update({ name: titleCase(editValue), qty: editQty }).eq('id', id);
+            setEditingId(null); fetchItems();
         };
 
         const handleAddItem = async (e) => {
             e.preventDefault();
             if (!newName) return;
-            const formattedName = titleCase(newName.trim());
-            await supabase.from('FancyPantry').insert([{ name: formattedName, qty: newQty || "1", room: modalRoom, category: modalCat }]);
-            setIsModalOpen(false); setNewName(""); setNewQty(""); setModalCat("Misc");
-            fetchItems();
+            await supabase.from('FancyPantry').insert([{ name: titleCase(newName), qty: newQty || "1", room: modalRoom, category: modalCat }]);
+            setIsModalOpen(false); setNewName(""); setNewQty(""); setModalCat("Misc"); fetchItems();
         };
 
         const removeItem = async (id) => {
-            if(confirm("Delete this item permanently?")) {
+            if(confirm("Permanently delete?")) {
                 await supabase.from('FancyPantry').delete().eq('id', id);
                 setItems(prev => prev.filter(i => i.id !== id));
             }
@@ -213,13 +200,10 @@
             const csvRows = items.map(i => [`"${i.name}"`, `"${i.qty}"`, `"${i.room}"`, `"${i.category || 'Misc'}"`].join(","));
             const csvContent = [headers.join(","), ...csvRows].join("\n");
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `FancyPantry_Inventory_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
+            link.href = URL.createObjectURL(blob);
+            link.download = `FancyPantry_Inventory.csv`;
             link.click();
-            document.body.removeChild(link);
         };
 
         const grouped = useMemo(() => {
@@ -236,8 +220,7 @@
                 if (aQty > 0 && bQty === 0) return -1;
                 return a.name.localeCompare(b.name);
             }).reduce((acc, i) => {
-                const dbCat = (i.category || "Misc").toLowerCase().trim();
-                const matchedKey = Object.keys(CATEGORIES).find(k => k.toLowerCase() === dbCat) || "Misc";
+                const matchedKey = Object.keys(CATEGORIES).find(k => k.toLowerCase() === (i.category || "Misc").toLowerCase().trim()) || "Misc";
                 if (!acc[matchedKey]) acc[matchedKey] = [];
                 acc[matchedKey].push(i);
                 return acc;
@@ -248,65 +231,63 @@
             const cols = [[], [], []], colHeights = [0, 0, 0];
             const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]).sort((a, b) => grouped[b].length - grouped[a].length);
             activeCats.forEach(cat => {
-                const shortestColIndex = colHeights.indexOf(Math.min(...colHeights));
-                cols[shortestColIndex].push(cat);
-                colHeights[shortestColIndex] += (grouped[cat].length + 5);
+                const idx = colHeights.indexOf(Math.min(...colHeights));
+                cols[idx].push(cat); colHeights[idx] += (grouped[cat].length + 5);
             });
             return cols;
         }, [grouped]);
         
         const renderBox = (cat) => (
-        <div key={cat} className="note-box">
-            <div className="flex items-center gap-2 mb-4">
-                <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20"></i>
-                <h3 className="handwritten-header">{cat}</h3>
+            <div key={cat} className="note-box">
+                <div className="flex items-center gap-2 mb-4">
+                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20"></i>
+                    <h3 className="handwritten-header">{cat}</h3>
+                </div>
+                <ul className="space-y-4">
+                    {grouped[cat].map(item => (
+                        <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
+                            {editingId === item.id ? (
+                                <div className="flex items-center gap-2 w-full">
+                                    <input className="inline-edit handwritten" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <input className="w-10 inline-edit text-[11px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
+                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded p-1"><i data-lucide="check" className="w-4 h-4"></i></button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="flex items-start gap-2 cursor-pointer flex-1" onClick={() => startEdit(item)}>
+                                        <span className="handwritten capitalize">{titleCase(item.name)}</span>
+                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 mt-1"></i>}
+                                    </div>
+                                    <div className="flex items-center gap-3 shrink-0">
+                                        <span className="text-[11px] font-black tracking-tighter text-white/60">x{item.qty}</span>
+                                        <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500 text-[14px]">×</button>
+                                    </div>
+                                </>
+                            )}
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <ul className="space-y-4">
-                {grouped[cat].map(item => (
-                    <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
-                        {editingId === item.id ? (
-                            <div className="flex items-center gap-2 w-full">
-                                <input className="inline-edit handwritten flex-1 min-w-0" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
-                                <div className="flex items-center gap-1 shrink-0">
-                                    <span className="text-[10px] text-white/50">x</span>
-                                    <input className="w-10 inline-edit text-[11px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
-                                    <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded p-1 ml-1"><i data-lucide="check" className="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="flex items-start gap-2 cursor-text min-w-0 flex-1 mr-2" onClick={() => startEdit(item)}>
-                                    <span className="handwritten whitespace-normal break-words leading-tight capitalize text-white">{titleCase(item.name)}</span>
-                                    {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/60 shrink-0 mt-1"></i>}
-                                </div>
-                                <div className="flex items-center gap-3 shrink-0">
-                                    <span className="text-[11px] font-black tracking-tighter text-white/80" onClick={() => startEdit(item)}>x{item.qty}</span>
-                                    <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-red-500/50 hover:text-red-500 text-[14px] px-1">×</button>
-                                </div>
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+        );
 
         return (
             <div className={`max-w-7xl mx-auto pb-32 room-${activeRoom.replace(/\s/g, '')}`}>
-                <nav className="flex justify-center items-center gap-4 md:gap-8 mb-10 overflow-x-auto no-scrollbar py-2">
+                <nav className="flex justify-center items-center gap-4 md:gap-8 mb-12 overflow-x-auto no-scrollbar py-2">
                     {Object.keys(ROOM_ICONS).map(r => (
-                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full uppercase tracking-widest ${activeRoom === r ? 'active bg-white/10' : ''}`}>
+                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full ${activeRoom === r ? 'active bg-white/5' : ''}`}>
                             <i data-lucide={ROOM_ICONS[r]} className="w-4 h-4"></i><span>{r}</span>
                         </button>
                     ))}
-                    <button onClick={downloadInventory} className="flex items-center gap-2 px-3 py-2 rounded-full text-[10px] font-bold uppercase text-white/40 hover:text-white border border-dashed border-white/20 ml-4 transition-all">
+                    <button onClick={downloadInventory} className="flex items-center gap-2 px-3 py-2 rounded-full text-[10px] font-bold uppercase text-white/20 hover:text-white border border-dashed border-white/10 ml-4 transition-all">
                         <i data-lucide="download" className="w-3 h-3"></i><span>Export</span>
                     </button>
                 </nav>
 
                 <div className="flex-container px-2">
                     {Object.keys(grouped).length === 0 ? (
-                        <p className="text-white/20 text-[11px] uppercase tracking-widest text-center w-full py-24 italic">Room Inventory Empty</p>
+                        <p className="text-white/10 text-[11px] uppercase tracking-widest text-center w-full py-24 italic">Inventory Empty</p>
                     ) : (
                         columnedCategories.map((col, i) => (
                             <div key={i} className="column">
@@ -316,44 +297,33 @@
                     )}
                 </div>
 
-                <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="add-btn fixed bottom-10 right-10 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-95 transition-transform">
-    <i data-lucide="plus"></i>
-</button>
+                <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="add-btn fixed bottom-10 right-10 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform">
+                    <i data-lucide="plus" className="w-6 h-6 md:w-4 md:h-4"></i>
+                </button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/98 backdrop-blur-md">
-                        <div className="bg-[#111] w-full max-w-md p-8 border border-white/10 rounded-3xl shadow-2xl">
-                            <div className="flex justify-between items-center mb-10">
-                                <p className="handwritten-header !text-white/90 !border-white/20 text-lg">ADD TO PANTRY</p>
-                                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                                    <i data-lucide="x" className="w-6 h-6 text-white/40 hover:text-white"></i>
-                                </button>
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+                        <div className="bg-[#111] w-full max-w-md p-8 border border-white/10 rounded-2xl shadow-2xl">
+                            <div className="flex justify-between items-center mb-8">
+                                <p className="handwritten-header !text-white/80 !border-white/10 text-lg">Add To Pantry</p>
+                                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full"><i data-lucide="x" className="w-6 h-6 text-white/40"></i></button>
                             </div>
-                            <form onSubmit={handleAddItem} className="space-y-10">
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-4">Select Room</p>
-                                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                                        {Object.keys(ROOM_ICONS).filter(k => k !== "Shopping List").map(r => (
-                                            <button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-4 py-2 text-[10px] font-black border transition-all rounded-lg ${modalRoom === r ? 'bg-white text-black border-white' : 'text-white/40 border-white/10 hover:border-white/30'}`}>{r.toUpperCase()}</button>
-                                        ))}
-                                    </div>
+                            <form onSubmit={handleAddItem} className="space-y-8">
+                                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                                    {Object.keys(ROOM_ICONS).filter(k => k !== "Shopping List").map(r => (
+                                        <button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-4 py-2 text-[10px] font-black border rounded-lg transition-all ${modalRoom === r ? 'bg-white text-black border-white' : 'text-white/20 border-white/5'}`}>{r.toUpperCase()}</button>
+                                    ))}
                                 </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-4">Select Category</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (
-                                            <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-3 py-2 text-[9px] font-bold border rounded-lg transition-all ${modalCat === c ? 'bg-white/90 text-black border-white' : 'text-white/30 border-white/5 hover:border-white/20'}`}>{c}</button>
-                                        ))}
-                                    </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (
+                                        <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-3 py-2 text-[9px] font-bold border rounded-lg transition-all ${modalCat === c ? 'bg-white/80 text-black border-white' : 'text-white/20 border-white/5'}`}>{c}</button>
+                                    ))}
                                 </div>
-                                <div className="space-y-4">
-                                    <input autoFocus type="text" placeholder="What are we adding?" value={newName} onChange={(e) => handleNameChange(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-3 text-2xl font-light outline-none focus:border-white transition-colors text-white placeholder:text-white/10" />
-                                    <div className="flex gap-6 items-end pt-4">
-                                        <div className="flex-1">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Quantity</p>
-                                            <input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-2 outline-none text-white text-xl focus:border-white transition-colors" />
-                                        </div>
-                                        <button type="submit" className="flex-[2] bg-white h-14 text-black text-[11px] font-black tracking-[0.2em] uppercase rounded-xl hover:bg-gray-200 transition-colors">SAVE ENTRY</button>
+                                <div className="space-y-6">
+                                    <input autoFocus type="text" placeholder="Item Name..." value={newName} onChange={(e) => handleNameChange(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-3 text-2xl font-light outline-none focus:border-white transition-colors text-white placeholder:text-white/10" />
+                                    <div className="flex gap-4 items-end">
+                                        <div className="flex-1"><input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-2 outline-none text-white text-xl focus:border-white" /></div>
+                                        <button type="submit" className="flex-[2] bg-white h-12 text-black text-[10px] font-black tracking-widest uppercase rounded-xl hover:bg-gray-200">Save Entry</button>
                                     </div>
                                 </div>
                             </form>
@@ -364,8 +334,7 @@
         );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<PantryApp />);
+    ReactDOM.createRoot(document.getElementById('root')).render(<PantryApp />);
     </script>
 </body>
 </html>
