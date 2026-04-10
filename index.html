@@ -11,85 +11,103 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=Inter:wght@400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;700;900&display=swap');
     
-    body { background-color: #0d0d0c; color: #f4f4f5; font-family: 'Inter', sans-serif; min-height: 100vh; }
-    .botanical-art { position: fixed; bottom: -2%; right: -2%; width: 180px; opacity: 0.08; pointer-events: none; filter: invert(1); }
-    
+    body { 
+        background-color: #0a0a0a; 
+        color: #e4e4e7; 
+        font-family: 'Inter', sans-serif; 
+        min-height: 100vh;
+        background-image: radial-gradient(circle at 50% 0%, #161616 0%, #0a0a0a 100%);
+    }
+
     .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; }
     .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
 
-    /* MOBILE SIZING (Default) */
-    .note-box { background: #141413; border: 1px solid #3f3f46; padding: 16px; position: relative; }
-    .handwritten { font-family: 'Covered By Your Grace', cursive; font-size: 1.25rem; line-height: 1.1; color: #ffffff; }
+    /* LUXURY CARD DESIGN */
+    .note-box { 
+        background: #111110; 
+        border: 1px solid #222; 
+        padding: 24px; 
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        border-radius: 4px; /* Sharp, architectural corners */
+    }
+
+    /* EDITORIAL TYPOGRAPHY */
     .handwritten-header { 
-        font-family: 'Covered By Your Grace', cursive; 
-        font-size: 1.15rem; 
-        letter-spacing: 0.1em; 
-        text-transform: uppercase;
-        border-bottom: 2px solid currentColor;
-        padding-bottom: 2px;
-        display: inline-block;
-        margin-bottom: 4px;
+        font-family: 'DM Serif Display', serif; 
+        font-size: 1.5rem; 
+        letter-spacing: 0.03em; 
+        text-transform: capitalize; /* More high-end than all-caps */
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 12px;
+        display: block;
+        margin-bottom: 16px;
         opacity: 1 !important;
     }
 
-    /* DESKTOP SCALING (Half-size for Desktop) */
-    @media (min-width: 768px) {
-        .flex-container { gap: 1rem; }
-        .column { gap: 1rem; min-width: 250px; }
-        .note-box { padding: 10px; border-width: 0.5px; }
-        .handwritten { font-size: 0.9rem; } /* Sized down for desktop */
-        .handwritten-header { font-size: 0.8rem; margin-bottom: 2px; border-bottom-width: 1px; }
-        .qty-text { font-size: 9px !important; }
-        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; } /* Tighter spacing */
+    .handwritten { 
+        font-family: 'Inter', sans-serif; 
+        font-weight: 300; /* Light and airy */
+        font-size: 1rem; 
+        line-height: 1.4; 
+        color: #d1d1d6; 
     }
     
-    .room-Fridge .handwritten-header { color: #7dd3fc; }
-    .room-Freezer .handwritten-header { color: #cbd5e1; }
-    .room-DryGoods .handwritten-header { color: #4ade80; }
-    .room-ShoppingList .handwritten-header { color: #d8b4fe; }
+    /* SOPHISTICATED JEWEL TONES */
+    .room-Fridge .handwritten-header { color: #fdfcf0; } /* Champagne */
+    .room-Freezer .handwritten-header { color: #e0e7ff; } /* Ice Blue */
+    .room-DryGoods .handwritten-header { color: #dcfce7; } /* Soft Mint */
+    .room-ShoppingList .handwritten-header { color: #f5f3ff; } /* Soft Petal */
 
-    /* ROOM LABELS (Remaining Large as requested) */
-    .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; color: #a1a1aa; font-weight: 700; }
-    .room-btn:hover { color: #e2e8f0; }
+    /* NAVIGATION BUTTONS */
+    .room-btn { 
+        transition: all 0.3s ease; 
+        font-size: 12px; 
+        font-weight: 700; 
+        letter-spacing: 0.1em; 
+        color: #52525b; 
+        text-transform: uppercase;
+    }
+    .room-btn:hover { color: #ffffff; }
     .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
-    
-    @keyframes pulse-red {
-        0% { opacity: 1; color: #fb7185; }
-        50% { opacity: 0.5; color: #991b1b; }
-        100% { opacity: 1; color: #fb7185; }
+
+    /* REFINED PULSE */
+    @keyframes rose-glow {
+        0% { color: #fda4af; text-shadow: 0 0 0px rgba(253,164,175,0); }
+        50% { color: #fb7185; text-shadow: 0 0 10px rgba(251,113,133,0.3); }
+        100% { color: #fda4af; text-shadow: 0 0 0px rgba(253,164,175,0); }
     }
 
     .out-of-stock-text span, 
     .out-of-stock-text { 
-        animation: pulse-red 2s infinite ease-in-out;
-        font-weight: 900;
+        animation: rose-glow 3s infinite ease-in-out;
+        font-weight: 600;
     } 
     
     .room-ShoppingList .out-of-stock-text span,
     .room-ShoppingList .out-of-stock-text { 
         animation: none !important;
         color: #f4f4f5 !important; 
-        opacity: 1 !important;
+        text-shadow: none !important;
     }
-    
-    input.inline-edit { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); outline: none; color: white; font-family: inherit; padding: 2px 6px; border-radius: 4px; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
 
-    /* Floating Add Button Sizing */
-    .add-btn {
-        width: 3.5rem; height: 3.5rem; /* Mobile Size */
-    }
-    .add-btn i { width: 2rem; height: 2rem; }
-
+    /* DESKTOP COMPACT SCALING */
     @media (min-width: 768px) {
-        .add-btn {
-            width: 2rem; height: 2rem; /* Desktop Size (Half) */
-            bottom: 2rem; right: 2rem;
-        }
-        .add-btn i { width: 1.2rem; height: 1.2rem; }
+        .handwritten { font-size: 0.85rem; }
+        .handwritten-header { font-size: 1.1rem; }
+        .note-box { padding: 16px; }
     }
+
+    input.inline-edit { 
+        background: #000; 
+        border: 1px solid #444; 
+        color: white; 
+        padding: 4px 8px; 
+        border-radius: 2px;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body class="antialiased p-4 md:p-6">
@@ -243,7 +261,7 @@
         const renderBox = (cat) => (
             <div key={cat} className="note-box">
                 <div className="flex items-center gap-2 mb-4">
-                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/50"></i>
+                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20 mb-1"></i>
                     <h3 className="handwritten-header">{cat}</h3>
                 </div>
                 <ul className="space-y-4">
