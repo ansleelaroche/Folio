@@ -10,88 +10,88 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/framer-motion/10.16.4/framer-motion.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@300;400;700;900&display=swap');
         
-        :root { --accent-gold: #fdfcf0; --accent-blue: #bae6fd; --accent-green: #86efac; --accent-purple: #d8b4fe; }
-
         body { 
-            background-color: #080807;
-            /* SLATE TEXTURE BACKGROUND */
-            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png'), radial-gradient(circle at 50% 0%, #1a1a18 0%, #080807 100%);
+            background-color: #0d0d0c;
+            /* SLATE TEXTURE */
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
             background-attachment: fixed;
             color: #f4f4f5; 
             font-family: 'Inter', sans-serif; 
             min-height: 100vh;
             margin: 0;
-            overflow-x: hidden;
         }
 
-        /* PINNED BOTANICAL GRAPHIC */
         .botanical-art { 
-            position: fixed; bottom: -20px; right: -20px; width: 250px; 
-            opacity: 0.15; pointer-events: none; filter: invert(1); z-index: 0;
+            position: fixed; bottom: -10px; right: -10px; width: 200px; 
+            opacity: 0.1; pointer-events: none; filter: invert(1); z-index: 0;
         }
-        
-        .flex-container { display: flex; flex-wrap: wrap; gap: 2rem; position: relative; z-index: 1; }
+
+        /* DESKTOP 50% SCALE REDUCTION */
+        @media (min-width: 1024px) {
+            .container-scale {
+                transform: scale(0.65);
+                transform-origin: top center;
+                width: 150%; /* Offset the scale shrink */
+                margin-left: -25%;
+            }
+            .flex-container { gap: 1rem; }
+        }
+
+        .flex-container { display: flex; flex-wrap: wrap; gap: 2rem; position: relative; z-index: 1; justify-content: center; }
         .column { flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 2rem; }
 
-        /* LUXURY SLATE CARDS */
         .note-box { 
-            background: rgba(20, 20, 19, 0.8);
-            backdrop-filter: blur(12px);
-            border-left: 3px solid #333;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(18, 18, 17, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid rgba(255,255,255,0.05);
             padding: 24px; 
-            box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border-radius: 4px;
         }
-        .note-box:hover { border-left-color: #666; transform: translateY(-5px); }
 
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
-            font-size: 1.6rem; 
-            letter-spacing: 0.05em; 
+            font-size: 1.8rem; 
+            letter-spacing: 0.02em; 
             margin-bottom: 20px;
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
         }
         
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.4rem; 
+            font-size: 1.5rem; 
             color: #ffffff; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* DESKTOP GLOBAL SCALE DOWN (The "Too Big" Fix) */
-        @media (min-width: 1024px) {
-            #root { zoom: 0.85; } /* Modern browser scale fix */
-            .flex-container { gap: 1.5rem; }
-        }
-
-        /* NAVIGATION DESIGN */
+        /* NAVIGATION DESIGN (Stays Normal Size) */
+        .room-nav { display: flex; justify-content: center; align-items: center; gap: 2rem; padding: 40px 20px; }
         .room-btn { 
-            font-size: 11px; font-weight: 900; letter-spacing: 0.2em; 
+            font-size: 12px; font-weight: 900; letter-spacing: 0.3em; 
             color: #52525b; text-transform: uppercase; transition: 0.3s;
-            padding: 8px 20px; border-radius: 2px;
+            border-bottom: 2px solid transparent;
         }
-        .room-btn.active { color: #fff; background: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .room-btn.active { color: #fff; border-bottom: 2px solid #fff; }
 
         /* PULSING ROSE GLOW */
         @keyframes rose-glow {
             0% { color: #fb7185; opacity: 1; }
-            50% { color: #4c0519; opacity: 0.5; }
+            50% { color: #4c0519; opacity: 0.4; }
             100% { color: #fb7185; opacity: 1; }
         }
-        .out-of-stock-text .handwritten { animation: rose-glow 2.5s infinite ease-in-out; }
+        .out-of-stock-text .handwritten { animation: rose-glow 3s infinite ease-in-out; }
+        .room-ShoppingList .out-of-stock-text .handwritten { animation: none !important; color: white !important; }
 
         input.edit-input { 
-            background: #000; border: 1px solid #444; color: #fff; padding: 8px; width: 100%; border-radius: 4px;
+            background: #000; border: 1px solid #444; color: #fff; padding: 8px; width: 100%; border-radius: 4px; font-family: inherit;
         }
     </style>
 </head>
-<body class="antialiased p-6 md:p-12">
+<body>
     <svg class="botanical-art" viewBox="0 0 100 100"><path d="M10,90 Q30,70 20,40 T50,20 T90,10" stroke="white" fill="none" stroke-width="0.3"/></svg>
     <div id="root"></div>
 
@@ -101,19 +101,9 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const CATEGORIES = {
-        "Produce": ["leaf", ["Fridge", "Dry Goods"], "#86efac"],
-        "Dairy": ["milk", ["Fridge"], "#bae6fd"],
-        "Protein": ["bone", ["Fridge", "Freezer"], "#fca5a5"],
-        "Drinks": ["droplets", ["Fridge", "Dry Goods"], "#93c5fd"],
-        "Snacks": ["zap", ["Dry Goods"], "#fdba74"],
-        "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"], "#d4d4d8"]
-    };
-
-    const AUTO_MAP = {
-        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg"],
-        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg"],
-        "Protein": ["chicken", "beef", "steak", "pork", "turkey", "tofu"]
+    const CATEGORY_META = {
+        "Produce": ["leaf", "#86efac"], "Dairy": ["milk", "#bae6fd"], "Protein": ["bone", "#fca5a5"],
+        "Drinks": ["droplets", "#93c5fd"], "Snacks": ["zap", "#fdba74"], "Misc": ["more-horizontal", "#d4d4d8"]
     };
 
     function PantryApp() {
@@ -125,10 +115,9 @@
         const [editQty, setEditQty] = useState("");
         const [newName, setNewName] = useState("");
         const [newQty, setNewQty] = useState("");
-        const [modalCat, setModalCat] = useState("Misc");
 
         useEffect(() => { fetchItems(); }, []);
-        useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId]);
+        useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen]);
 
         async function fetchItems() {
             const { data } = await supabase.from('FancyPantry').select('*').order('name');
@@ -140,13 +129,6 @@
             setEditingId(null); fetchItems();
         };
 
-        const downloadInventory = () => {
-            const csv = items.map(i => `${i.name},${i.qty},${i.room}`).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'pantry.csv'; a.click();
-        };
-
         const grouped = useMemo(() => {
             const target = activeRoom.toLowerCase().replace(/\s/g, '');
             let filtered = items.filter(i => {
@@ -154,80 +136,84 @@
                 if (target === "shoppinglist") return parseFloat(i.qty || 0) === 0;
                 return dbRoom === target;
             });
-            return filtered.reduce((acc, i) => {
+
+            // FORCE 0 QTY TO BOTTOM
+            const sorted = [...filtered].sort((a, b) => {
+                const aQty = parseFloat(a.qty || 0), bQty = parseFloat(b.qty || 0);
+                if (aQty === 0 && bQty > 0) return 1;
+                if (aQty > 0 && bQty === 0) return -1;
+                return a.name.localeCompare(b.name);
+            });
+
+            return sorted.reduce((acc, i) => {
                 const cat = i.category || "Misc";
-                if (!acc[cat]) acc[cat] = [];
+                if (!acc[cat]) acc[acc.hasOwnProperty(cat) ? cat : "Misc"] = [];
                 acc[cat].push(i);
                 return acc;
             }, {});
         }, [items, activeRoom]);
 
         return (
-            <div className="max-w-7xl mx-auto">
-                {/* NAVIGATION */}
-                <nav className="flex justify-center items-center gap-8 mb-16">
+            <div className="pb-40">
+                <nav className="room-nav">
                     {["Fridge", "Freezer", "Dry Goods", "Shopping List"].map(r => (
                         <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn ${activeRoom === r ? 'active' : ''}`}>{r}</button>
                     ))}
-                    <button onClick={downloadInventory} className="opacity-30 hover:opacity-100 transition-opacity"><i data-lucide="download" className="w-5 h-5"></i></button>
                 </nav>
 
-                {/* ROOM CONTENT WITH TRANSITION EFFECT */}
-                <div key={activeRoom} className="flex-container">
-                    {Object.keys(grouped).map(cat => (
-                        <div key={cat} className="column">
-                            <div className="note-box">
-                                <h3 className="handwritten-header" style={{ color: CATEGORIES[cat]?.[2] || '#fff' }}>
-                                    <i data-lucide={CATEGORIES[cat]?.[0] || 'box'} className="w-5 h-5"></i>
-                                    {cat}
-                                </h3>
-                                <ul className="space-y-6">
-                                    {grouped[cat].map(item => (
-                                        <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
-                                            {editingId === item.id ? (
-                                                <div className="flex gap-2 bg-black/40 p-2 rounded">
-                                                    <input className="edit-input" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                    <input className="edit-input w-16" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                    <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-3 rounded font-bold">OK</button>
-                                                </div>
-                                            ) : (
-                                                <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
-                                                    <span className="handwritten">{item.name}</span>
-                                                    <div className="flex items-center gap-4">
-                                                        <span className="text-xs font-black opacity-40 group-hover:opacity-100">x{item.qty}</span>
-                                                        <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500">×</button>
+                <div className="container-scale">
+                    <div className="flex-container px-10">
+                        {Object.keys(grouped).map(cat => (
+                            <div key={cat} className="column">
+                                <div className="note-box">
+                                    <h3 className="handwritten-header" style={{ color: CATEGORY_META[cat]?.[1] || '#fff' }}>
+                                        <i data-lucide={CATEGORY_META[cat]?.[0] || 'box'} className="w-6 h-6"></i>
+                                        {cat}
+                                    </h3>
+                                    <ul className="space-y-6">
+                                        {grouped[cat].map(item => (
+                                            <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
+                                                {editingId === item.id ? (
+                                                    <div className="flex gap-2">
+                                                        <input className="edit-input handwritten" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                        <input className="edit-input w-20" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                        <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-4 rounded font-black">SAVE</button>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
+                                                ) : (
+                                                    <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                                        <span className="handwritten capitalize">{item.name}</span>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-[10px] font-black opacity-30">x{item.qty}</span>
+                                                            <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500">×</button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
-                {/* ADD BUTTON */}
-                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform"><i data-lucide="plus" className="w-8 h-8"></i></button>
+                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-[100] active:scale-90 transition-transform"><i data-lucide="plus" className="w-8 h-8"></i></button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
                         <div className="bg-[#111] w-full max-w-md p-10 border border-white/10 rounded-lg">
                             <form onSubmit={async e => {
                                 e.preventDefault();
-                                await supabase.from('FancyPantry').insert([{ name: newName, qty: newQty || "1", room: activeRoom, category: modalCat }]);
+                                await supabase.from('FancyPantry').insert([{ name: newName, qty: newQty || "1", room: activeRoom, category: "Misc" }]);
                                 setIsModalOpen(false); setNewName(""); fetchItems();
-                            }} className="space-y-8">
-                                <h2 className="handwritten-header">New Entry</h2>
-                                <input className="w-full bg-transparent border-b border-white/20 py-4 text-2xl outline-none focus:border-white transition-colors" placeholder="Name..." value={newName} onChange={e => {
-                                    setNewName(e.target.value);
-                                    for(let c in AUTO_MAP) if(AUTO_MAP[c].some(k => e.target.value.toLowerCase().includes(k))) setModalCat(c);
-                                }} autoFocus />
-                                <div className="flex gap-4">
-                                    <input className="w-20 bg-transparent border-b border-white/20 py-4 text-xl outline-none" placeholder="Qty" value={newQty} onChange={e => setNewQty(e.target.value)} />
-                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-16 rounded">Save</button>
+                            }} className="space-y-10">
+                                <h2 className="handwritten-header !text-white/40">New Entry</h2>
+                                <input className="w-full bg-transparent border-b-2 border-white/10 py-4 text-3xl outline-none focus:border-white transition-colors text-white" placeholder="Item Name..." value={newName} onChange={e => setNewName(e.target.value)} autoFocus />
+                                <div className="flex gap-6">
+                                    <input className="w-24 bg-transparent border-b-2 border-white/10 py-4 text-2xl outline-none" placeholder="1" value={newQty} onChange={e => setNewQty(e.target.value)} />
+                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-16 rounded">Save Entry</button>
                                 </div>
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-xs opacity-40 uppercase tracking-widest">Cancel</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-xs opacity-40 uppercase tracking-widest">Nevermind</button>
                             </form>
                         </div>
                     </div>
