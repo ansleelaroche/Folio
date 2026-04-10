@@ -47,9 +47,10 @@
             border-radius: 2px;
         }
 
+        /* MOBILE FONT SIZES (Bumped up by ~3px) */
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
-            font-size: 0.95rem; 
+            font-size: 1.2rem; /* Increased */
             letter-spacing: 0.05em; 
             display: flex; align-items: center; gap: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -60,17 +61,34 @@
         
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 0.85rem; 
+            font-size: 1.15rem; /* Increased */
             color: #ffffff; 
-            line-height: 1;
+            line-height: 1.2;
         }
 
-        .room-nav { display: flex; justify-content: center; align-items: center; gap: 3rem; padding: 50px 10px; }
+        /* MOBILE NAVIGATION (Wrapped so they don't fall off) */
+        .room-nav { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 1.5rem; 
+            padding: 30px 15px; 
+            flex-wrap: wrap; /* Allows stacking on small screens */
+        }
+        
         .room-btn { 
             font-size: 11px; font-weight: 900; letter-spacing: 0.4em; 
             color: #4b5563; text-transform: uppercase; transition: 0.4s ease;
+            white-space: nowrap;
         }
         .room-btn.active { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+
+        /* DESKTOP OVERRIDES (Kept exactly as you liked them) */
+        @media (min-width: 1024px) {
+            .handwritten-header { font-size: 0.95rem; }
+            .handwritten { font-size: 0.85rem; }
+            .room-nav { gap: 3rem; padding: 50px 10px; }
+        }
 
         .export-btn {
             font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
@@ -93,7 +111,7 @@
             font-size: 10px !important; outline: none; flex: 1; min-width: 0;
         }
 
-        .qty-label { font-size: 8px; font-weight: 900; opacity: 0.3; }
+        .qty-label { font-size: 9px; font-weight: 900; opacity: 0.3; }
 
         .add-btn-main {
             position: fixed; bottom: 40px; right: 40px; width: 50px; height: 50px;
@@ -237,7 +255,7 @@
                                 return (
                                     <div key={cat} className="note-box">
                                         <h3 className="handwritten-header" style={{ color: meta[1] }}>
-                                            <i data-lucide={meta[0]} className="w-3.5 h-3.5"></i>
+                                            <i data-lucide={meta[0]} className="w-4 h-4"></i>
                                             <span className="capitalize">{cat}</span>
                                         </h3>
                                         <ul className="space-y-3">
