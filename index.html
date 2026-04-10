@@ -30,7 +30,6 @@
             opacity: 0.15; pointer-events: none; filter: invert(1); z-index: 0;
         }
 
-        /* Balanced Layout Container */
         .flex-container { 
             display: flex; flex-wrap: wrap; gap: 1.5rem; 
             position: relative; z-index: 1; justify-content: center; 
@@ -48,27 +47,23 @@
             border-radius: 2px;
         }
 
-        /* HEADER FONT - CUT BY HALF */
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
-            font-size: 0.95rem !important; /* Shrunk */
+            font-size: 0.95rem !important; 
             letter-spacing: 0.05em; 
             display: flex; align-items: center; gap: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 6px;
             margin-bottom: 12px;
-            text-transform: capitalize;
         }
         
-        /* CHALKBOARD FONT - CUT BY HALF */
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 0.85rem !important; /* Shrunk */
+            font-size: 0.85rem !important; 
             color: #ffffff; 
             line-height: 1;
         }
 
-        /* ROOM NAVIGATION (Kept Awesome) */
         .room-nav { display: flex; justify-content: center; align-items: center; gap: 3rem; padding: 50px 10px; }
         .room-btn { 
             font-size: 11px; font-weight: 900; letter-spacing: 0.4em; 
@@ -110,11 +105,35 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+    // COMPREHENSIVE META MAP - Every category fixed
     const META = {
-        "Produce": ["leaf", "#86efac"], "Dairy": ["milk", "#bae6fd"], "Protein": ["bone", "#fca5a5"],
-        "Drinks": ["droplets", "#93c5fd"], "Condiments": ["utensils", "#fcd34d"], "Snacks": ["zap", "#fdba74"],
-        "Meats & Seafood": ["anchor", "#f87171"], "Prepared Meals": ["package", "#cbd5e1"], 
-        "Frozen Veg & Fruit": ["wind", "#4ade80"], "Desserts": ["ice-cream", "#f9a8d4"], "Misc": ["more-horizontal", "#d4d4d8"]
+        "Produce": ["leaf", "#86efac"],
+        "Dairy": ["milk", "#bae6fd"],
+        "Protein": ["bone", "#fca5a5"],
+        "Drinks": ["droplets", "#93c5fd"],
+        "Condiments": ["utensils", "#fcd34d"],
+        "Meats & Seafood": ["anchor", "#f87171"],
+        "Prepared Meals": ["package", "#cbd5e1"],
+        "Frozen Veg & Fruit": ["wind", "#4ade80"],
+        "Desserts": ["ice-cream", "#f9a8d4"],
+        "Bakery & Breads": ["wheat", "#fde68a"],
+        "Snacks": ["zap", "#fdba74"],
+        "Pasta & Grains": ["shrub", "#d9f99d"],
+        "Cereal": ["box-select", "#bfdbfe"],
+        "Cans & Jars": ["container", "#e5e7eb"],
+        "Baking Essentials": ["cookie", "#fbcfe8"],
+        "Spreads & Jars": ["cup-soda", "#ddd6fe"],
+        "Sides": ["list-todo", "#a7f3d0"],
+        "Supplies": ["cog", "#d4d4d8"],
+        "Dishware": ["utensils-2", "#d4d4d8"],
+        "Misc": ["more-horizontal", "#d4d4d8"]
+    };
+
+    // Helper to normalize category names for matching
+    const getMeta = (catName) => {
+        const keys = Object.keys(META);
+        const match = keys.find(k => k.toLowerCase() === catName.toLowerCase().trim());
+        return META[match] || META["Misc"];
     };
 
     function PantryApp() {
@@ -186,14 +205,12 @@
                     {columnedCategories.map((col, i) => (
                         <div key={i} className="column">
                             {col.map(cat => {
-                                const normalizedCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
-                                const meta = META[normalizedCat] || META["Misc"];
-                                
+                                const meta = getMeta(cat);
                                 return (
                                     <div key={cat} className="note-box">
                                         <h3 className="handwritten-header" style={{ color: meta[1] }}>
                                             <i data-lucide={meta[0]} className="w-3 h-3"></i>
-                                            {cat}
+                                            <span className="capitalize">{cat}</span>
                                         </h3>
                                         <ul className="space-y-3">
                                             {grouped[cat].map(item => (
