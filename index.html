@@ -76,6 +76,20 @@
     
     input.inline-edit { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); outline: none; color: white; font-family: inherit; padding: 2px 6px; border-radius: 4px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* Floating Add Button Sizing */
+    .add-btn {
+        width: 3.5rem; height: 3.5rem; /* Mobile Size */
+    }
+    .add-btn i { width: 2rem; height: 2rem; }
+
+    @media (min-width: 768px) {
+        .add-btn {
+            width: 2rem; height: 2rem; /* Desktop Size (Half) */
+            bottom: 2rem; right: 2rem;
+        }
+        .add-btn i { width: 1.2rem; height: 1.2rem; }
+    }
 </style>
 </head>
 <body class="antialiased p-4 md:p-6">
