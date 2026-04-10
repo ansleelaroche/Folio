@@ -15,10 +15,8 @@
         
         body { 
             background-color: #0d0d0c;
-            /* High-end slate grain pattern */
-            background-image: 
-                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
-            background-size: 40px 40px;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 32px 32px;
             background-attachment: fixed;
             color: #f4f4f5; 
             font-family: 'Inter', sans-serif; 
@@ -27,72 +25,80 @@
         }
 
         .botanical-art { 
-            position: fixed; bottom: 10px; right: 10px; width: 180px; 
+            position: fixed; bottom: 10px; right: 10px; width: 140px; 
             opacity: 0.1; pointer-events: none; filter: invert(1); z-index: 0;
         }
 
-        /* FLEX CONTAINER FOR CARDS */
+        /* 3-COLUMN GRID LOGIC */
         .flex-container { 
-            display: flex; flex-wrap: wrap; gap: 2rem; 
-            position: relative; z-index: 1; justify-content: center; 
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
             padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 2rem; }
 
-        /* DESKTOP 50% SCALE (The "Not Giant" Fix) */
-        @media (min-width: 1024px) {
-            .flex-container { gap: 1rem; padding: 40px; }
-            .column { min-width: 240px; gap: 1rem; }
-            .note-box { padding: 12px !important; }
-            .handwritten { font-size: 1rem !important; }
-            .handwritten-header { font-size: 1.1rem !important; margin-bottom: 10px !important; }
+        @media (min-width: 768px) { .flex-container { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { 
+            .flex-container { grid-template-columns: 1fr 1fr 1fr; gap: 1rem; padding: 20px 40px; }
+            .note-box { padding: 14px !important; }
+            .handwritten { font-size: 0.95rem !important; }
+            .handwritten-header { font-size: 1.1rem !important; }
         }
 
         .note-box { 
-            background: rgba(18, 18, 17, 0.9);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(18, 18, 17, 0.95);
+            border: 1px solid rgba(255,255,255,0.08);
             padding: 24px; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            border-radius: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-radius: 2px;
+            height: fit-content;
         }
 
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
-            font-size: 1.6rem; 
+            font-size: 1.4rem; 
             letter-spacing: 0.02em; 
-            margin-bottom: 20px;
             display: flex; align-items: center; gap: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
         }
         
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 1.4rem; 
+            font-size: 1.3rem; 
             color: #ffffff; 
         }
 
-        /* NAVIGATION (Maintains size for accessibility) */
-        .room-nav { display: flex; justify-content: center; align-items: center; gap: 2rem; padding: 40px 20px; flex-wrap: wrap; }
+        /* NAVIGATION */
+        .room-nav { display: flex; justify-content: center; align-items: center; gap: 2rem; padding: 30px 10px; flex-wrap: wrap; }
         .room-btn { 
-            font-size: 11px; font-weight: 900; letter-spacing: 0.3em; 
+            font-size: 10px; font-weight: 900; letter-spacing: 0.25em; 
             color: #52525b; text-transform: uppercase; transition: 0.3s;
             border-bottom: 2px solid transparent;
         }
         .room-btn.active { color: #fff; border-bottom: 2px solid #fff; }
 
-        /* PULSING ROSE GLOW FOR 0 QTY */
+        /* PULSING ROSE GLOW */
         @keyframes rose-glow {
             0% { color: #fb7185; opacity: 1; }
-            50% { color: #4c0519; opacity: 0.4; }
+            50% { color: #4c0519; opacity: 0.5; }
             100% { color: #fb7185; opacity: 1; }
         }
-        .out-of-stock-text .handwritten { animation: rose-glow 3.5s infinite ease-in-out; }
-        .room-ShoppingList .out-of-stock-text .handwritten { animation: none !important; color: white !important; }
+        .out-of-stock-text .handwritten { animation: rose-glow 3s infinite ease-in-out; }
 
+        /* MICRO-EDIT INPUTS */
+        .edit-row { display: flex; gap: 4px; width: 100%; background: #000; padding: 4px; border-radius: 4px; }
         input.edit-input { 
-            background: #000; border: 1px solid #444; color: #fff; padding: 4px 8px; width: 100%; border-radius: 4px; font-family: inherit;
+            background: transparent; border: none; color: #fff; padding: 2px 6px; 
+            font-size: 11px !important; outline: none; flex: 1; min-width: 0;
         }
+        .save-btn { background: #fff; color: #000; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 2px; }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -106,7 +112,6 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Added all missing categories to prevent the crash
     const CATEGORY_META = {
         "Produce": ["leaf", "#86efac"], "Dairy": ["milk", "#bae6fd"], "Protein": ["bone", "#fca5a5"],
         "Drinks": ["droplets", "#93c5fd"], "Condiments": ["utensils", "#fcd34d"], "Snacks": ["zap", "#fdba74"],
@@ -148,7 +153,6 @@
                 return dbRoom === target;
             });
 
-            // Sort logic: Qty 0 to bottom
             const sorted = [...filtered].sort((a, b) => {
                 const aQty = parseFloat(a.qty || 0), bQty = parseFloat(b.qty || 0);
                 if (aQty === 0 && bQty > 0) return 1;
@@ -173,60 +177,54 @@
                 </nav>
 
                 <div className="flex-container">
-                    {Object.keys(grouped).length === 0 ? (
-                        <p className="text-white/10 text-[11px] uppercase tracking-widest text-center w-full py-24 italic">Inventory Empty</p>
-                    ) : (
-                        Object.keys(grouped).map(cat => (
-                            <div key={cat} className="column">
-                                <div className="note-box">
-                                    <h3 className="handwritten-header" style={{ color: CATEGORY_META[cat]?.[1] || '#fff' }}>
-                                        <i data-lucide={CATEGORY_META[cat]?.[0] || 'box'} className="w-5 h-5"></i>
-                                        {cat}
-                                    </h3>
-                                    <ul className="space-y-4">
-                                        {grouped[cat].map(item => (
-                                            <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
-                                                {editingId === item.id ? (
-                                                    <div className="flex gap-2">
-                                                        <input className="edit-input handwritten" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                        <input className="edit-input w-20" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                        <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-4 rounded font-black text-[10px]">SAVE</button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
-                                                        <span className="handwritten capitalize">{item.name}</span>
-                                                        <div className="flex items-center gap-4">
-                                                            <span className="text-[10px] font-black opacity-30">x{item.qty}</span>
-                                                            <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500 text-[14px]">×</button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        ))
-                    )}
+                    {Object.keys(grouped).map(cat => (
+                        <div key={cat} className="note-box">
+                            <h3 className="handwritten-header" style={{ color: CATEGORY_META[cat]?.[1] || '#fff' }}>
+                                <i data-lucide={CATEGORY_META[cat]?.[0] || 'box'} className="w-5 h-5"></i>
+                                {cat}
+                            </h3>
+                            <ul className="space-y-4">
+                                {grouped[cat].map(item => (
+                                    <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
+                                        {editingId === item.id ? (
+                                            <div className="edit-row">
+                                                <input className="edit-input" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                <input className="edit-input !w-10 text-center" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                <button onClick={() => handleUpdate(item.id)} className="save-btn">SAVE</button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                                <span className="handwritten capitalize">{item.name}</span>
+                                                <div className="flex items-center gap-3">
+                                                    <span className="text-[9px] font-black opacity-30">x{item.qty}</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500 text-[12px]">×</button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
 
-                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-[100] active:scale-90 transition-transform"><i data-lucide="plus" className="w-8 h-8"></i></button>
+                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-12 h-12 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-[100] active:scale-90 transition-transform"><i data-lucide="plus" className="w-6 h-6"></i></button>
 
                 {isModalOpen && (
                     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-                        <div className="bg-[#111] w-full max-w-md p-10 border border-white/10 rounded-lg">
+                        <div className="bg-[#111] w-full max-w-sm p-10 border border-white/10 rounded-lg shadow-2xl">
                             <form onSubmit={async e => {
                                 e.preventDefault();
                                 await supabase.from('FancyPantry').insert([{ name: newName, qty: newQty || "1", room: activeRoom, category: "Misc" }]);
                                 setIsModalOpen(false); setNewName(""); fetchItems();
-                            }} className="space-y-10">
-                                <h2 className="handwritten-header !text-white/40">New Entry</h2>
-                                <input className="w-full bg-transparent border-b-2 border-white/10 py-4 text-3xl outline-none focus:border-white transition-colors text-white" placeholder="Item Name..." value={newName} onChange={e => setNewName(e.target.value)} autoFocus />
-                                <div className="flex gap-6">
-                                    <input className="w-24 bg-transparent border-b-2 border-white/10 py-4 text-2xl outline-none" placeholder="1" value={newQty} onChange={e => setNewQty(e.target.value)} />
-                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-16 rounded">Save Entry</button>
+                            }} className="space-y-8">
+                                <h2 className="handwritten-header !text-white/30">New Entry</h2>
+                                <input className="w-full bg-transparent border-b border-white/10 py-4 text-xl outline-none focus:border-white transition-colors text-white" placeholder="Name..." value={newName} onChange={e => setNewName(e.target.value)} autoFocus />
+                                <div className="flex gap-4">
+                                    <input className="w-20 bg-transparent border-b border-white/10 py-4 text-lg outline-none" placeholder="Qty" value={newQty} onChange={e => setNewQty(e.target.value)} />
+                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-14 rounded text-[10px]">Save</button>
                                 </div>
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-xs opacity-40 uppercase tracking-widest">Nevermind</button>
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-[8px] opacity-40 uppercase tracking-widest">Nevermind</button>
                             </form>
                         </div>
                     </div>
