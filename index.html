@@ -39,12 +39,10 @@
         .room-DryGoods .handwritten-header { color: #4ade80; }
         .room-ShoppingList .handwritten-header { color: #d8b4fe; }
 
-        /* BRIGHTER NAVIGATION */
         .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; color: #a1a1aa; font-weight: 700; }
         .room-btn:hover { color: #e2e8f0; }
         .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
         
-        /* PULSING 0 QTY ITEMS */
         @keyframes pulse-red {
             0% { opacity: 1; color: #fb7185; }
             50% { opacity: 0.5; color: #991b1b; }
@@ -66,11 +64,6 @@
         
         input.inline-edit { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); outline: none; color: white; font-family: inherit; padding: 2px 6px; border-radius: 4px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* BRIGHTER MODAL STYLES */
-        .modal-label { color: #e2e8f0 !important; font-weight: 800; letter-spacing: 0.05em; }
-        .modal-input { border-bottom: 1px solid #4b5563 !important; color: #ffffff !important; }
-        .modal-input::placeholder { color: #6b7280; }
     </style>
 </head>
 <body class="antialiased p-4 md:p-6">
@@ -93,6 +86,19 @@
         "Pasta & Grains": ["shrub", ["Dry Goods"]], "Cereal": ["box-select", ["Dry Goods"]], "Cans & Jars": ["container", ["Dry Goods"]],
         "Baking Essentials": ["cookie", ["Dry Goods"]], "Spreads & Jars": ["cup-soda", ["Dry Goods"]], "Sides": ["list-todo", ["Dry Goods"]],
         "Supplies": ["cog", ["Dry Goods"]], "Dishware": ["utensils-2", ["Dry Goods"]], "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"]]
+    };
+
+    const AUTO_MAP = {
+        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "spinach", "kale", "pepper", "carrot"],
+        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream"],
+        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs"],
+        "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "milk", "seltz"],
+        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup"],
+        "Snacks": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy"],
+        "Bakery & Breads": ["bread", "bagel", "tortilla", "muffin", "bun", "pita", "toast"],
+        "Pasta & Grains": ["pasta", "rice", "noodle", "quinoa", "couscous", "spaghetti", "penne"],
+        "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"],
+        "Meats & Seafood": ["fish", "shrimp", "salmon", "shrimp", "cod", "tuna"]
     };
 
     const titleCase = (str) => str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -121,6 +127,17 @@
             if (data) setItems(data);
         }
 
+        const handleNameChange = (val) => {
+            setNewName(val);
+            const lowerVal = val.toLowerCase();
+            for (const [cat, keywords] of Object.entries(AUTO_MAP)) {
+                if (keywords.some(k => lowerVal.includes(k))) {
+                    setModalCat(cat);
+                    break;
+                }
+            }
+        };
+
         const startEdit = (item) => {
             setEditingId(item.id);
             setEditValue(item.name);
@@ -139,7 +156,7 @@
             if (!newName) return;
             const formattedName = titleCase(newName.trim());
             await supabase.from('FancyPantry').insert([{ name: formattedName, qty: newQty || "1", room: modalRoom, category: modalCat }]);
-            setIsModalOpen(false); setNewName(""); setNewQty("");
+            setIsModalOpen(false); setNewName(""); setNewQty(""); setModalCat("Misc");
             fetchItems();
         };
 
@@ -199,7 +216,7 @@
         
         const renderBox = (cat) => (
             <div key={cat} className="note-box">
-                <div className="flex items-center gap-2 mb-4 opacity-100">
+                <div className="flex items-center gap-2 mb-4">
                     <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/50"></i>
                     <h3 className="handwritten-header">{cat}</h3>
                 </div>
@@ -287,7 +304,7 @@
                                     </div>
                                 </div>
                                 <div className="space-y-4">
-                                    <input autoFocus type="text" placeholder="What are we adding?" value={newName} onChange={(e) => setNewName(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-3 text-2xl font-light outline-none focus:border-white transition-colors text-white placeholder:text-white/10" />
+                                    <input autoFocus type="text" placeholder="What are we adding?" value={newName} onChange={(e) => handleNameChange(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-3 text-2xl font-light outline-none focus:border-white transition-colors text-white placeholder:text-white/10" />
                                     <div className="flex gap-6 items-end pt-4">
                                         <div className="flex-1">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Quantity</p>
