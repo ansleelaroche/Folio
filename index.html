@@ -10,200 +10,141 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/framer-motion/10.16.4/framer-motion.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@300;400;700;900&display=swap');
         
+        :root { --accent-gold: #fdfcf0; --accent-blue: #bae6fd; --accent-green: #86efac; --accent-purple: #d8b4fe; }
+
         body { 
-            background-color: #0a0a0a; 
-            color: #e4e4e7; 
+            background-color: #080807;
+            /* SLATE TEXTURE BACKGROUND */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png'), radial-gradient(circle at 50% 0%, #1a1a18 0%, #080807 100%);
+            background-attachment: fixed;
+            color: #f4f4f5; 
             font-family: 'Inter', sans-serif; 
             min-height: 100vh;
             margin: 0;
-            background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #0a0a0a 100%);
-            background-attachment: fixed;
+            overflow-x: hidden;
         }
 
-        /* FIXED: Art stays in the corner of the screen, not the page */
+        /* PINNED BOTANICAL GRAPHIC */
         .botanical-art { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            width: 180px; 
-            opacity: 0.12; 
-            pointer-events: none; 
-            filter: invert(1); 
-            z-index: 0;
+            position: fixed; bottom: -20px; right: -20px; width: 250px; 
+            opacity: 0.15; pointer-events: none; filter: invert(1); z-index: 0;
         }
         
-        .flex-container { display: flex; flex-wrap: wrap; gap: 1.5rem; position: relative; z-index: 1; }
-        .column { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 1.5rem; }
+        .flex-container { display: flex; flex-wrap: wrap; gap: 2rem; position: relative; z-index: 1; }
+        .column { flex: 1; min-width: 320px; display: flex; flex-direction: column; gap: 2rem; }
 
-        /* LUXURY CHALKBOARD CARDS */
+        /* LUXURY SLATE CARDS */
         .note-box { 
-            background: #111110; 
-            border: 1px solid #2a2a2a; 
+            background: rgba(20, 20, 19, 0.8);
+            backdrop-filter: blur(12px);
+            border-left: 3px solid #333;
+            border-top: 1px solid rgba(255,255,255,0.05);
             padding: 24px; 
-            border-radius: 4px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            transition: border 0.3s ease;
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .note-box:hover { border-color: #444; }
+        .note-box:hover { border-left-color: #666; transform: translateY(-5px); }
 
-        /* EDITORIAL SERIF HEADERS */
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
             font-size: 1.6rem; 
-            letter-spacing: 0.02em; 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-            display: block;
-            margin-bottom: 16px;
+            letter-spacing: 0.05em; 
+            margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
         }
         
-        /* CHALKBOARD LIST FONT */
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
             font-size: 1.4rem; 
-            line-height: 1.2; 
             color: #ffffff; 
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* ROOM COLORS */
-        .room-Fridge .handwritten-header { color: #fdfcf0; }
-        .room-Freezer .handwritten-header { color: #e0e7ff; }
-        .room-DryGoods .handwritten-header { color: #dcfce7; }
-        .room-ShoppingList .handwritten-header { color: #f5f3ff; }
+        /* DESKTOP GLOBAL SCALE DOWN (The "Too Big" Fix) */
+        @media (min-width: 1024px) {
+            #root { zoom: 0.85; } /* Modern browser scale fix */
+            .flex-container { gap: 1.5rem; }
+        }
 
-        /* NAVIGATION */
-        .room-btn { transition: all 0.2s; border-bottom: 2px solid transparent; font-size: 11px; font-weight: 800; color: #52525b; letter-spacing: 0.15em; text-transform: uppercase; }
-        .room-btn.active { color: #ffffff !important; border-bottom: 2px solid #ffffff; }
-        
-        /* ROSE GLOW PULSE */
+        /* NAVIGATION DESIGN */
+        .room-btn { 
+            font-size: 11px; font-weight: 900; letter-spacing: 0.2em; 
+            color: #52525b; text-transform: uppercase; transition: 0.3s;
+            padding: 8px 20px; border-radius: 2px;
+        }
+        .room-btn.active { color: #fff; background: rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* PULSING ROSE GLOW */
         @keyframes rose-glow {
-            0% { color: #fda4af; opacity: 1; transform: scale(1); }
-            50% { color: #fb7185; opacity: 0.6; transform: scale(0.98); }
-            100% { color: #fda4af; opacity: 1; transform: scale(1); }
+            0% { color: #fb7185; opacity: 1; }
+            50% { color: #4c0519; opacity: 0.5; }
+            100% { color: #fb7185; opacity: 1; }
         }
+        .out-of-stock-text .handwritten { animation: rose-glow 2.5s infinite ease-in-out; }
 
-        .out-of-stock-text .handwritten { 
-            animation: rose-glow 3s infinite ease-in-out;
-            display: inline-block;
-        } 
-        
-        .room-ShoppingList .out-of-stock-text .handwritten { 
-            animation: none !important;
-            color: #ffffff !important; 
-            opacity: 1 !important;
+        input.edit-input { 
+            background: #000; border: 1px solid #444; color: #fff; padding: 8px; width: 100%; border-radius: 4px;
         }
-
-        @media (min-width: 768px) {
-            .handwritten { font-size: 1.1rem; }
-            .handwritten-header { font-size: 1.3rem; }
-            .note-box { padding: 16px; }
-            .flex-container { gap: 1rem; }
-        }
-
-        input.inline-edit { background: #000; border: 1px solid #444; color: white; padding: 6px; border-radius: 4px; font-family: inherit; width: 100%; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .add-btn { width: 3.5rem; height: 3.5rem; transition: transform 0.2s; }
-        @media (min-width: 768px) { .add-btn { width: 2.5rem; height: 2.5rem; } }
     </style>
 </head>
-<body class="antialiased p-4 md:p-10">
+<body class="antialiased p-6 md:p-12">
     <svg class="botanical-art" viewBox="0 0 100 100"><path d="M10,90 Q30,70 20,40 T50,20 T90,10" stroke="white" fill="none" stroke-width="0.3"/></svg>
     <div id="root"></div>
 
     <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
+    const { useState, useEffect, useMemo } = React;
     const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const ROOM_ICONS = { "Fridge": "refrigerator", "Freezer": "snowflake", "Dry Goods": "layout-dashboard", "Shopping List": "shopping-cart" };
     const CATEGORIES = {
-        "Produce": ["leaf", ["Fridge", "Dry Goods"]], "Dairy": ["milk", ["Fridge"]], "Protein": ["bone", ["Fridge", "Freezer"]],
-        "Drinks": ["droplets", ["Fridge", "Dry Goods"]], "Condiments": ["utensils", ["Fridge", "Dry Goods"]],
-        "Meats & Seafood": ["anchor", ["Freezer"]], "Prepared Meals": ["box", ["Freezer"]], "Frozen Veg & Fruit": ["leaf", ["Freezer"]],
-        "Desserts": ["ice-cream", ["Freezer"]], "Bakery & Breads": ["wheat", ["Dry Goods"]], "Snacks": ["zap", ["Dry Goods"]],
-        "Pasta & Grains": ["shrub", ["Dry Goods"]], "Cereal": ["box-select", ["Dry Goods"]], "Cans & Jars": ["container", ["Dry Goods"]],
-        "Baking Essentials": ["cookie", ["Dry Goods"]], "Spreads & Jars": ["cup-soda", ["Dry Goods"]], "Sides": ["list-todo", ["Dry Goods"]],
-        "Supplies": ["cog", ["Dry Goods"]], "Dishware": ["utensils-2", ["Dry Goods"]], "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"]]
+        "Produce": ["leaf", ["Fridge", "Dry Goods"], "#86efac"],
+        "Dairy": ["milk", ["Fridge"], "#bae6fd"],
+        "Protein": ["bone", ["Fridge", "Freezer"], "#fca5a5"],
+        "Drinks": ["droplets", ["Fridge", "Dry Goods"], "#93c5fd"],
+        "Snacks": ["zap", ["Dry Goods"], "#fdba74"],
+        "Misc": ["more-horizontal", ["Fridge", "Freezer", "Dry Goods"], "#d4d4d8"]
     };
 
     const AUTO_MAP = {
-        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "spinach", "kale", "pepper", "carrot"],
-        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream"],
-        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs"],
-        "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "seltz"],
-        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup"],
-        "Snacks": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy"],
-        "Bakery & Breads": ["bread", "bagel", "tortilla", "muffin", "bun", "pita", "toast"],
-        "Pasta & Grains": ["pasta", "rice", "noodle", "quinoa", "couscous", "spaghetti", "penne"],
-        "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"],
-        "Meats & Seafood": ["fish", "shrimp", "salmon", "cod", "tuna"]
+        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg"],
+        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg"],
+        "Protein": ["chicken", "beef", "steak", "pork", "turkey", "tofu"]
     };
-
-    const titleCase = (str) => str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    const isDogFood = (name) => ["ground turkey", "veggies", "berries", "kidney beans", "white rice", "sweet potato"].some(k => name.toLowerCase().includes(k));
 
     function PantryApp() {
         const [activeRoom, setActiveRoom] = useState("Fridge");
         const [items, setItems] = useState([]);
         const [isModalOpen, setIsModalOpen] = useState(false);
-        const [modalRoom, setModalRoom] = useState("Fridge");
-        const [modalCat, setModalCat] = useState("Misc");
-        const [newName, setNewName] = useState("");
-        const [newQty, setNewQty] = useState("");
         const [editingId, setEditingId] = useState(null);
         const [editValue, setEditValue] = useState("");
         const [editQty, setEditQty] = useState("");
+        const [newName, setNewName] = useState("");
+        const [newQty, setNewQty] = useState("");
+        const [modalCat, setModalCat] = useState("Misc");
 
         useEffect(() => { fetchItems(); }, []);
-        useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen]);
+        useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId]);
 
         async function fetchItems() {
             const { data } = await supabase.from('FancyPantry').select('*').order('name');
             if (data) setItems(data);
         }
 
-        const handleNameChange = (val) => {
-            setNewName(val);
-            const lowerVal = val.toLowerCase();
-            for (const [cat, keywords] of Object.entries(AUTO_MAP)) {
-                if (keywords.some(k => lowerVal.includes(k))) { setModalCat(cat); break; }
-            }
-        };
-
-        const saveInlineEdit = async (id) => {
-            await supabase.from('FancyPantry').update({ name: titleCase(editValue), qty: editQty }).eq('id', id);
+        const handleUpdate = async (id) => {
+            await supabase.from('FancyPantry').update({ name: editValue, qty: editQty }).eq('id', id);
             setEditingId(null); fetchItems();
         };
 
-        const handleAddItem = async (e) => {
-            e.preventDefault();
-            if (!newName) return;
-            await supabase.from('FancyPantry').insert([{ name: titleCase(newName), qty: newQty || "1", room: modalRoom, category: modalCat }]);
-            setIsModalOpen(false); setNewName(""); setNewQty(""); setModalCat("Misc"); fetchItems();
-        };
-
-        const removeItem = async (id) => {
-            if(confirm("Permanently delete?")) {
-                await supabase.from('FancyPantry').delete().eq('id', id);
-                setItems(prev => prev.filter(i => i.id !== id));
-            }
-        };
-
         const downloadInventory = () => {
-            const headers = ["Name", "Quantity", "Room", "Category"];
-            const csvRows = items.map(i => [`"${i.name}"`, `"${i.qty}"`, `"${i.room}"`, `"${i.category || 'Misc'}"`].join(","));
-            const csvContent = [headers.join(","), ...csvRows].join("\n");
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `FancyPantry_Inventory.csv`;
-            link.click();
+            const csv = items.map(i => `${i.name},${i.qty},${i.room}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'pantry.csv'; a.click();
         };
 
         const grouped = useMemo(() => {
@@ -211,121 +152,82 @@
             let filtered = items.filter(i => {
                 const dbRoom = (i.room || "").toLowerCase().replace(/\s/g, '');
                 if (target === "shoppinglist") return parseFloat(i.qty || 0) === 0;
-                if (target === "drygoods") return ["drygoods", "pantry", "counter", "cabinets"].includes(dbRoom);
                 return dbRoom === target;
             });
-            return [...filtered].sort((a, b) => {
-                const aQty = parseFloat(a.qty || 0), bQty = parseFloat(b.qty || 0);
-                if (aQty === 0 && bQty > 0) return 1;
-                if (aQty > 0 && bQty === 0) return -1;
-                return a.name.localeCompare(b.name);
-            }).reduce((acc, i) => {
-                const matchedKey = Object.keys(CATEGORIES).find(k => k.toLowerCase() === (i.category || "Misc").toLowerCase().trim()) || "Misc";
-                if (!acc[matchedKey]) acc[matchedKey] = [];
-                acc[matchedKey].push(i);
+            return filtered.reduce((acc, i) => {
+                const cat = i.category || "Misc";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(i);
                 return acc;
             }, {});
         }, [items, activeRoom]);
 
-        const columnedCategories = useMemo(() => {
-            const cols = [[], [], []], colHeights = [0, 0, 0];
-            const activeCats = Object.keys(CATEGORIES).filter(cat => grouped[cat]).sort((a, b) => grouped[b].length - grouped[a].length);
-            activeCats.forEach(cat => {
-                const idx = colHeights.indexOf(Math.min(...colHeights));
-                cols[idx].push(cat); colHeights[idx] += (grouped[cat].length + 5);
-            });
-            return cols;
-        }, [grouped]);
-        
-        const renderBox = (cat) => (
-            <div key={cat} className="note-box">
-                <div className="flex items-center gap-2 mb-4">
-                    <i data-lucide={CATEGORIES[cat]?.[0] || 'dot'} className="w-4 h-4 text-white/20"></i>
-                    <h3 className="handwritten-header">{cat}</h3>
-                </div>
-                <ul className="space-y-4">
-                    {grouped[cat].map(item => (
-                        <li key={item.id} className={`flex justify-between items-center group min-h-[1.5rem] ${parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}`}>
-                            {editingId === item.id ? (
-                                <div className="flex items-center gap-2 w-full">
-                                    <input className="inline-edit handwritten" value={editValue} onChange={(e) => setEditValue(e.target.value)} autoFocus />
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <input className="w-10 inline-edit text-[11px] font-bold text-center" value={editQty} onChange={(e) => setEditQty(e.target.value)} />
-                                        <button onClick={() => saveInlineEdit(item.id)} className="bg-white text-black rounded p-1"><i data-lucide="check" className="w-4 h-4"></i></button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="flex items-start gap-2 cursor-pointer flex-1" onClick={() => startEdit(item)}>
-                                        <span className="handwritten capitalize">{titleCase(item.name)}</span>
-                                        {isDogFood(item.name) && <i data-lucide="paw-print" className="w-4 h-4 text-amber-200/40 mt-1"></i>}
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0">
-                                        <span className="text-[11px] font-black tracking-tighter text-white/60">x{item.qty}</span>
-                                        <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="opacity-0 group-hover:opacity-100 text-red-500/40 hover:text-red-500 text-[14px]">×</button>
-                                    </div>
-                                </>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-
         return (
-            <div className={`max-w-7xl mx-auto pb-32 room-${activeRoom.replace(/\s/g, '')}`}>
-                <nav className="flex justify-center items-center gap-4 md:gap-8 mb-12 overflow-x-auto no-scrollbar py-2">
-                    {Object.keys(ROOM_ICONS).map(r => (
-                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn flex items-center gap-2 px-4 py-2 rounded-full ${activeRoom === r ? 'active bg-white/5' : ''}`}>
-                            <i data-lucide={ROOM_ICONS[r]} className="w-4 h-4"></i><span>{r}</span>
-                        </button>
+            <div className="max-w-7xl mx-auto">
+                {/* NAVIGATION */}
+                <nav className="flex justify-center items-center gap-8 mb-16">
+                    {["Fridge", "Freezer", "Dry Goods", "Shopping List"].map(r => (
+                        <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn ${activeRoom === r ? 'active' : ''}`}>{r}</button>
                     ))}
-                    <button onClick={downloadInventory} className="flex items-center gap-2 px-3 py-2 rounded-full text-[10px] font-bold uppercase text-white/20 hover:text-white border border-dashed border-white/10 ml-4 transition-all">
-                        <i data-lucide="download" className="w-3 h-3"></i><span>Export</span>
-                    </button>
+                    <button onClick={downloadInventory} className="opacity-30 hover:opacity-100 transition-opacity"><i data-lucide="download" className="w-5 h-5"></i></button>
                 </nav>
 
-                <div className="flex-container px-2">
-                    {Object.keys(grouped).length === 0 ? (
-                        <p className="text-white/10 text-[11px] uppercase tracking-widest text-center w-full py-24 italic">Inventory Empty</p>
-                    ) : (
-                        columnedCategories.map((col, i) => (
-                            <div key={i} className="column">
-                                {col.map(cat => renderBox(cat))}
+                {/* ROOM CONTENT WITH TRANSITION EFFECT */}
+                <div key={activeRoom} className="flex-container">
+                    {Object.keys(grouped).map(cat => (
+                        <div key={cat} className="column">
+                            <div className="note-box">
+                                <h3 className="handwritten-header" style={{ color: CATEGORIES[cat]?.[2] || '#fff' }}>
+                                    <i data-lucide={CATEGORIES[cat]?.[0] || 'box'} className="w-5 h-5"></i>
+                                    {cat}
+                                </h3>
+                                <ul className="space-y-6">
+                                    {grouped[cat].map(item => (
+                                        <li key={item.id} className={parseFloat(item.qty) === 0 && activeRoom !== "Shopping List" ? 'out-of-stock-text' : ''}>
+                                            {editingId === item.id ? (
+                                                <div className="flex gap-2 bg-black/40 p-2 rounded">
+                                                    <input className="edit-input" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                    <input className="edit-input w-16" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                    <button onClick={() => handleUpdate(item.id)} className="bg-white text-black px-3 rounded font-bold">OK</button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
+                                                    <span className="handwritten">{item.name}</span>
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-xs font-black opacity-40 group-hover:opacity-100">x{item.qty}</span>
+                                                        <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500">×</button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        ))
-                    )}
+                        </div>
+                    ))}
                 </div>
 
-                <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="add-btn fixed bottom-10 right-10 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform">
-                    <i data-lucide="plus" className="w-6 h-6 md:w-4 md:h-4"></i>
-                </button>
+                {/* ADD BUTTON */}
+                <button onClick={() => setIsModalOpen(true)} className="fixed bottom-10 right-10 w-16 h-16 bg-white text-black rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform"><i data-lucide="plus" className="w-8 h-8"></i></button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-                        <div className="bg-[#111] w-full max-w-md p-8 border border-white/10 rounded-2xl shadow-2xl">
-                            <div className="flex justify-between items-center mb-8">
-                                <p className="handwritten-header !text-white/80 !border-white/10 text-lg">Add To Pantry</p>
-                                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/5 rounded-full"><i data-lucide="x" className="w-6 h-6 text-white/40"></i></button>
-                            </div>
-                            <form onSubmit={handleAddItem} className="space-y-8">
-                                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                                    {Object.keys(ROOM_ICONS).filter(k => k !== "Shopping List").map(r => (
-                                        <button type="button" key={r} onClick={() => setModalRoom(r)} className={`px-4 py-2 text-[10px] font-black border rounded-lg transition-all ${modalRoom === r ? 'bg-white text-black border-white' : 'text-white/20 border-white/5'}`}>{r.toUpperCase()}</button>
-                                    ))}
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+                        <div className="bg-[#111] w-full max-w-md p-10 border border-white/10 rounded-lg">
+                            <form onSubmit={async e => {
+                                e.preventDefault();
+                                await supabase.from('FancyPantry').insert([{ name: newName, qty: newQty || "1", room: activeRoom, category: modalCat }]);
+                                setIsModalOpen(false); setNewName(""); fetchItems();
+                            }} className="space-y-8">
+                                <h2 className="handwritten-header">New Entry</h2>
+                                <input className="w-full bg-transparent border-b border-white/20 py-4 text-2xl outline-none focus:border-white transition-colors" placeholder="Name..." value={newName} onChange={e => {
+                                    setNewName(e.target.value);
+                                    for(let c in AUTO_MAP) if(AUTO_MAP[c].some(k => e.target.value.toLowerCase().includes(k))) setModalCat(c);
+                                }} autoFocus />
+                                <div className="flex gap-4">
+                                    <input className="w-20 bg-transparent border-b border-white/20 py-4 text-xl outline-none" placeholder="Qty" value={newQty} onChange={e => setNewQty(e.target.value)} />
+                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-16 rounded">Save</button>
                                 </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {Object.keys(CATEGORIES).filter(c => CATEGORIES[c][1].includes(modalRoom)).map(c => (
-                                        <button type="button" key={c} onClick={() => setModalCat(c)} className={`px-3 py-2 text-[9px] font-bold border rounded-lg transition-all ${modalCat === c ? 'bg-white/80 text-black border-white' : 'text-white/20 border-white/5'}`}>{c}</button>
-                                    ))}
-                                </div>
-                                <div className="space-y-6">
-                                    <input autoFocus type="text" placeholder="Item Name..." value={newName} onChange={(e) => handleNameChange(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-3 text-2xl font-light outline-none focus:border-white transition-colors text-white placeholder:text-white/10" />
-                                    <div className="flex gap-4 items-end">
-                                        <div className="flex-1"><input type="text" placeholder="1" value={newQty} onChange={(e) => setNewQty(e.target.value)} className="w-full bg-transparent border-b-2 border-white/10 py-2 outline-none text-white text-xl focus:border-white" /></div>
-                                        <button type="submit" className="flex-[2] bg-white h-12 text-black text-[10px] font-black tracking-widest uppercase rounded-xl hover:bg-gray-200">Save Entry</button>
-                                    </div>
-                                </div>
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-xs opacity-40 uppercase tracking-widest">Cancel</button>
                             </form>
                         </div>
                     </div>
@@ -333,7 +235,6 @@
             </div>
         );
     }
-
     ReactDOM.createRoot(document.getElementById('root')).render(<PantryApp />);
     </script>
 </body>
