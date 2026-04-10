@@ -55,6 +55,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 6px;
             margin-bottom: 12px;
+            text-transform: capitalize;
         }
         
         .handwritten { 
@@ -129,21 +130,19 @@
     };
 
     const AUTO_MAP = {
-        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "spinach", "kale", "pepper", "carrot"],
-        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream"],
-        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs"],
+        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "spinach", "kale", "pepper", "carrot", "cucumber"],
+        "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream", "parmesan", "provalone"],
+        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs", "ham"],
         "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "seltz"],
-        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup"],
+        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup", "relish", "ranch", "soy"],
         "Snacks": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy"],
         "Bakery & Breads": ["bread", "bagel", "tortilla", "muffin", "bun", "pita", "toast"],
         "Pasta & Grains": ["pasta", "rice", "noodle", "quinoa", "couscous", "spaghetti", "penne"],
-        "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"],
-        "Meats & Seafood": ["fish", "shrimp", "salmon", "cod", "tuna"]
+        "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"]
     };
 
     const getMeta = (catName) => {
-        const keys = Object.keys(META);
-        const match = keys.find(k => k.toLowerCase() === catName.toLowerCase().trim());
+        const match = Object.keys(META).find(k => k.toLowerCase() === catName.toLowerCase().trim());
         return META[match] || META["Misc"];
     };
 
@@ -190,16 +189,20 @@
                 if (target === "shoppinglist") return parseFloat(i.qty || 0) === 0;
                 return dbRoom === target;
             });
+            
             const sorted = [...filtered].sort((a, b) => {
                 const aQty = parseFloat(a.qty || 0), bQty = parseFloat(b.qty || 0);
                 if (aQty === 0 && bQty > 0) return 1;
                 if (aQty > 0 && bQty === 0) return -1;
                 return a.name.localeCompare(b.name);
             });
+
+            // UNIFY CATEGORY NAMES BY CASE SENSITIVITY
             return sorted.reduce((acc, i) => {
-                const cat = i.category || "Misc";
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push(i);
+                const rawCat = i.category || "Misc";
+                const matchKey = Object.keys(META).find(k => k.toLowerCase() === rawCat.toLowerCase().trim()) || "Misc";
+                if (!acc[matchKey]) acc[matchKey] = [];
+                acc[matchKey].push(i);
                 return acc;
             }, {});
         }, [items, activeRoom]);
@@ -266,7 +269,7 @@
                 <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="add-btn-main active:scale-90 transition-all"><i data-lucide="plus" className="w-6 h-6"></i></button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
                         <div className="bg-[#111] w-full max-w-sm p-10 border border-white/10 rounded-lg shadow-2xl">
                             <form onSubmit={async e => {
                                 e.preventDefault();
@@ -291,7 +294,7 @@
                                 
                                 <div className="flex gap-4">
                                     <input className="w-16 bg-transparent border-b border-white/10 py-3 text-lg outline-none" placeholder="1" value={newQty} onChange={e => setNewQty(e.target.value)} />
-                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-12 rounded text-[9px]">Save</button>
+                                    <button type="submit" className="flex-1 bg-white text-black font-black uppercase tracking-widest h-12 rounded text-[10px]">Save</button>
                                 </div>
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="w-full text-[8px] opacity-40 uppercase tracking-widest">Cancel</button>
                             </form>
