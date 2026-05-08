@@ -29,7 +29,7 @@
         ::-webkit-scrollbar-track { background: #1e293b; }
     </style>
 </head>
-<body class="bg-slate-950 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
+<body class="bg-slate-950 text-[10px] font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
     <!-- LOGIN SCREEN OVERLAY -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950 flex flex-col justify-center items-center z-[100]">
@@ -39,7 +39,7 @@
             
             <div class="text-left mb-6">
                 <label class="block text-xs font-bold text-slate-400 mb-2">Select Advisor</label>
-                <select id="user-select" class="w-full bg-slate-950 border border-slate-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold cursor-pointer">
+                <select id="user-select" class="w-full bg-slate-950 border border-slate-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold cursor-pointer text-xs">
                     <option value="" disabled selected>-- Select your name --</option>
                     <option value="Frank LaRoche">Frank LaRoche</option>
                     <option value="Matt Cannoy">Matt Cannoy</option>
@@ -55,14 +55,14 @@
     </div>
 
     <!-- MAIN APPLICATION CONTAINER -->
-    <div id="app-container" class="hidden w-full max-w-[1600px] mx-auto flex flex-col h-full p-2">
+    <div id="app-container" class="hidden w-full max-w-[1800px] mx-auto flex flex-col h-full p-2">
         
         <!-- Header -->
         <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
             <div class="flex items-center space-x-4">
                 <div>
                     <h1 class="text-base font-bold text-white tracking-tight leading-none">Kaiser GMC</h1>
-                    <p class="text-slate-500 text-[10px] font-medium uppercase tracking-wide">Live Dispatch</p>
+                    <p class="text-slate-500 text-[9px] font-bold uppercase tracking-wide">Live Dispatch</p>
                 </div>
                 
                 <!-- View Switcher -->
@@ -73,7 +73,7 @@
                 <!-- Show Completed Toggle -->
                 <label class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:bg-slate-700 transition">
                     <input type="checkbox" id="toggle-completed" onchange="toggleCompleted()" class="h-3 w-3 rounded bg-slate-900 border-slate-600 focus:ring-blue-500 cursor-pointer">
-                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wide">Show Completed</span>
+                    <span class="text-slate-400 text-[9px] font-bold uppercase tracking-wide">Show Completed</span>
                 </label>
             </div>
 
@@ -81,7 +81,7 @@
                 <span class="text-slate-500 text-[10px] font-bold uppercase tracking-wide">Logged in: <span id="display-user" class="text-white"></span></span>
                 <button onclick="logoutUser()" class="text-[10px] font-bold text-red-400 hover:text-red-300 transition mr-2">Logout</button>
                 <span id="save-toast" class="text-green-400 text-[10px] font-bold opacity-0 transition-opacity duration-300">✓ Saved</span>
-                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-3 rounded text-xs shadow transition border border-blue-500">
+                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-3 rounded shadow transition border border-blue-500">
                     + New RO
                 </button>
             </div>
@@ -89,21 +89,23 @@
 
         <!-- Task List -->
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
-            <table class="w-full text-left min-w-max border-collapse">
+            <!-- Removed min-w-max to prevent forcing a horizontal scroll -->
+            <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Type</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Intake</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">Advisor</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">Tech</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28">Customer</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Phone</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-36">Vehicle</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24 text-red-400">Est. Date</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24 text-right">Status</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Completed</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
+                        <th class="advisor-col px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Advisor</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Customer</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Phone</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Vehicle</th>
+                        <!-- Issue description has no strict width so it expands to fill space -->
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-red-400">Est. Date</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Completed</th>
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
@@ -122,11 +124,11 @@
                 <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
-                        <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Tech</label>
-                        <select id="new_tech" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[11px] rounded focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer">
+                        <select id="new_tech" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer">
                             <option value="" selected>None</option>
                             <option value="1166">1166</option>
                             <option value="1197">1197</option>
@@ -138,18 +140,18 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Vehicle</label>
-                        <input id="new_vehicle" type="text" placeholder="24 Sierra 1500" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        <input id="new_vehicle" type="text" placeholder="24 Sierra 1500" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Intake Date</label>
-                        <input id="new_intake" type="date" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[11px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        <input id="new_intake" type="date" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Intake Type</label>
-                        <select id="new_waiting" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[11px] rounded focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer">
+                        <select id="new_waiting" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer">
                             <option value="Drop Off" selected>Drop Off</option>
                             <option value="Waiting">Waiting</option>
                             <option value="Tow In">Tow In</option>
@@ -163,17 +165,17 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer</label>
-                        <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone</label>
-                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Primary Issue</label>
-                    <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
+                    <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
                 </div>
             </div>
 
@@ -279,7 +281,6 @@
             let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
-                // Keep the filter strict to catch both existing lowercase matches and exact new matches
                 query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
             }
 
@@ -329,8 +330,6 @@
                 const safeIntake = formatSafeDate(task.intake_date);
                 const safeCompletion = formatSafeDate(task.completion_time);
                 const safeCompleted = formatSafeDate(task.completed_date);
-
-                // This still cleans up ALL CAPS behind the scenes so the dropdown knows which one to show
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
 
                 const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
@@ -339,11 +338,23 @@
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
                     
-                    <td class="px-2 py-1 align-middle">
-                        <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-xs font-bold rounded">
+                    <!-- 1. RO # -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
 
-                    <td class="px-2 py-1 align-middle">
+                    <!-- 2. STATUS (Moved up!) -->
+                    <td class="px-1 py-1 align-middle text-center">
+                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
+                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
+                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
+                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+
+                    <!-- 3. TYPE -->
+                    <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
                             <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
                             <option value="Waiting" ${task.is_waiting === 'Waiting' ? 'selected' : ''}>Waiting</option>
@@ -357,13 +368,18 @@
                         </select>
                     </td>
 
-                    <td class="px-2 py-1 align-middle">
-                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
+                    <!-- 4. INTAKE -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
-                    <td class="px-2 py-1 align-middle text-[10px] font-bold text-blue-400">
+                    
+                    <!-- 5. ADVISOR (Conditionally Hidden) -->
+                    <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
                         ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
                     </td>
-                    <td class="px-2 py-1 align-middle">
+                    
+                    <!-- 6. TECH -->
+                    <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'tech_number', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!task.tech_number ? 'selected' : ''}>Assign...</option>
                             <option value="1166" ${task.tech_number === '1166' ? 'selected' : ''}>1166</option>
@@ -374,35 +390,46 @@
                             <option value="2116" ${task.tech_number === '2116' ? 'selected' : ''}>2116</option>
                         </select>
                     </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-semibold rounded">
+
+                    <!-- 7. CUSTOMER -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
                     </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
+                    
+                    <!-- 8. PHONE -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-bold rounded">
+                    
+                    <!-- 9. VEHICLE -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
                     </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
+                    
+                    <!-- 10. ISSUE DESCRIPTION -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
+                    
+                    <!-- 11. EST DATE -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
-                    <td class="px-2 py-1 align-middle text-right">
-                        <!-- PERFECT TITLE CASE OPTIONS -->
-                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[11px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition">
-                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
-                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
-                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
-                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
-                        </select>
-                    </td>
-                    <td class="px-2 py-1 align-middle">
-                        <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
+                    
+                    <!-- 12. COMPLETED DATE -->
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
                 </tr>
             `}).join('');
+
+            // NEW: Hide the advisor column if Frank or Matt are in their personal view
+            const advisorCols = document.querySelectorAll('.advisor-col');
+            if (viewFilter !== 'ALL') {
+                advisorCols.forEach(col => col.style.display = 'none');
+            } else {
+                advisorCols.forEach(col => col.style.display = '');
+            }
         }
 
         async function addTask() {
