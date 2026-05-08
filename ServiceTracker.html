@@ -7,55 +7,79 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Dark Mode Editable Cells */
         .editable-cell {
             background-color: transparent;
             border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
             color: #e2e8f0; 
         }
-        .editable-cell:hover {
-            border-color: #475569; 
-            background-color: #334155; 
-        }
-        .editable-cell:focus {
-            border-color: #3b82f6; 
-            background-color: #0f172a; 
-            color: #f8fafc; 
-            outline: none;
-        }
+        .editable-cell:hover { border-color: #475569; background-color: #334155; }
+        .editable-cell:focus { border-color: #3b82f6; background-color: #0f172a; color: #f8fafc; outline: none; }
         
-        /* Custom Blinking Animation for Past Due Dates */
         @keyframes urgentBlink {
-            0%, 100% { background-color: rgba(220, 38, 38, 0.3) !important; color: #fca5a5 !important; }
-            50% { background-color: transparent !important; color: #e2e8f0 !important; }
+            0%, 100% { background-color: rgba(220, 38, 38, 0.3); color: #fca5a5; border-color: rgba(239, 68, 68, 1); }
+            50% { background-color: transparent; color: #e2e8f0; border-color: transparent; }
         }
-        .past-due-blink {
-            animation: urgentBlink 1.5s ease-in-out infinite;
-            border: 1px solid #ef4444 !important;
-            font-weight: bold !important;
-        }
+        .past-due-blink { animation: urgentBlink 1.5s ease-in-out infinite !important; font-weight: bold !important; border-style: solid !important; border-width: 1px !important; }
 
         input[type="date"]::-webkit-inner-spin-button,
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            opacity: 0.5;
-            cursor: pointer;
-        }
+        input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
     </style>
 </head>
-<body class="bg-slate-950 p-2 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
+<body class="bg-slate-950 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
-    <div class="w-full max-w-[1600px] mx-auto flex flex-col h-full">
-        <!-- Ultra-Compact Header (Dark) -->
-        <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
-            <div class="flex items-baseline space-x-2">
-                <h1 class="text-base font-bold text-white tracking-tight">Kaiser GMC</h1>
-                <p class="text-slate-500 text-[10px] font-medium uppercase tracking-wide">Live Dispatch</p>
+    <!-- LOGIN SCREEN OVERLAY -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 flex flex-col justify-center items-center z-[100]">
+        <div class="bg-slate-900 p-8 rounded-xl shadow-2xl border border-slate-800 w-full max-w-sm text-center">
+            <h1 class="text-2xl font-bold text-white mb-1">Kaiser GMC</h1>
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-8">Service Dispatch Login</p>
+            
+            <div class="text-left mb-6">
+                <label class="block text-xs font-bold text-slate-400 mb-2">Select Advisor</label>
+                <select id="user-select" class="w-full bg-slate-950 border border-slate-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold cursor-pointer">
+                    <option value="" disabled selected>-- Select your name --</option>
+                    <option value="Frank LaRoche">Frank LaRoche</option>
+                    <option value="Matt Cannoy">Matt Cannoy</option>
+                    <option value="Michael Macmillian">Michael Macmillian</option>
+                    <option value="Michael Burch">Michael Burch</option>
+                </select>
             </div>
+            
+            <button onclick="loginUser()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg shadow-md transition text-sm">
+                Access Board
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION CONTAINER (Hidden until login) -->
+    <div id="app-container" class="hidden w-full max-w-[1600px] mx-auto flex flex-col h-full p-2">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
+            <div class="flex items-center space-x-4">
+                <div>
+                    <h1 class="text-base font-bold text-white tracking-tight leading-none">Kaiser GMC</h1>
+                    <p class="text-slate-500 text-[10px] font-medium uppercase tracking-wide">Live Dispatch</p>
+                </div>
+                
+                <!-- View Switcher -->
+                <button id="switch-view-btn" onclick="toggleAdvisorView()" class="hidden text-[10px] font-bold bg-slate-800 text-blue-400 px-3 py-1.5 rounded border border-blue-900 hover:bg-slate-700 hover:text-blue-300 transition shadow-sm">
+                    Viewing: Frank's ROs (Swap)
+                </button>
+
+                <!-- Show Completed Toggle -->
+                <label class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:bg-slate-700 transition">
+                    <input type="checkbox" id="toggle-completed" onchange="toggleCompleted()" class="h-3 w-3 rounded bg-slate-900 border-slate-600 focus:ring-blue-500 cursor-pointer">
+                    <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wide">Show Completed</span>
+                </label>
+            </div>
+
             <div class="flex items-center space-x-3">
+                <span class="text-slate-500 text-[10px] font-bold uppercase tracking-wide">Logged in: <span id="display-user" class="text-white"></span></span>
+                <button onclick="logoutUser()" class="text-[10px] font-bold text-red-400 hover:text-red-300 transition mr-2">Logout</button>
                 <span id="save-toast" class="text-green-400 text-[10px] font-bold opacity-0 transition-opacity duration-300">✓ Saved</span>
                 <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-3 rounded text-xs shadow transition border border-blue-500">
                     + New RO
@@ -63,14 +87,15 @@
             </div>
         </header>
 
-        <!-- Ultra-Compact Editable Task List (Dark) -->
+        <!-- Task List -->
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
             <table class="w-full text-left min-w-max border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">RO #</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Intake</th>
-                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-32">Customer</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">Advisor</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28">Customer</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Phone</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-36">Vehicle</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
@@ -80,13 +105,13 @@
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
-                    <!-- Tasks will load here -->
+                    <!-- Tasks load here -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- COMPACT ADD NEW TASK MODAL (Dark) -->
+    <!-- ADD NEW TASK MODAL -->
     <div id="taskModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
         <div class="bg-slate-800 p-4 rounded shadow-2xl w-full max-w-md border border-slate-700">
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
@@ -95,11 +120,11 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
-                        <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
+                        <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Vehicle</label>
-                        <input id="new_vehicle" type="text" placeholder="24 Sierra 1500" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
+                        <input id="new_vehicle" type="text" placeholder="24 Sierra 1500" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
 
@@ -110,17 +135,17 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer</label>
-                        <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
+                        <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone</label>
-                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
+                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Primary Issue</label>
-                    <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none placeholder-slate-600"></textarea>
+                    <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
                 </div>
 
                 <label class="flex items-center space-x-2 p-1.5 border border-slate-700 rounded bg-slate-900/50 cursor-pointer hover:bg-red-900/20 hover:border-red-900/50 transition">
@@ -141,9 +166,66 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // Session Variables
+        let currentUser = '';
+        let viewFilter = ''; 
+        let showCompleted = false;
+
+        // --- AUTH & VIEW LOGIC ---
+
+        function loginUser() {
+            const select = document.getElementById('user-select');
+            currentUser = select.value;
+            
+            if (!currentUser) { alert("Please select your name."); return; }
+
+            // Hide login, show app
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            
+            // Set display name in header
+            document.getElementById('display-user').innerText = currentUser.split(' ')[0];
+
+            // Setup Role-Based Views
+            if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
+                viewFilter = currentUser; 
+                document.getElementById('switch-view-btn').classList.remove('hidden');
+                updateSwitchButtonText();
+            } else {
+                viewFilter = 'ALL'; 
+                document.getElementById('switch-view-btn').classList.add('hidden');
+            }
+
+            getTasks();
+        }
+
+        function logoutUser() {
+            currentUser = '';
+            document.getElementById('user-select').value = '';
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-container').classList.add('hidden');
+        }
+
+        function toggleAdvisorView() {
+            viewFilter = (viewFilter === 'Frank LaRoche') ? 'Matt Cannoy' : 'Frank LaRoche';
+            updateSwitchButtonText();
+            getTasks(); 
+        }
+
+        function updateSwitchButtonText() {
+            const firstName = viewFilter.split(' ')[0];
+            document.getElementById('switch-view-btn').innerText = `Viewing: ${firstName}'s ROs (Swap)`;
+        }
+
+        function toggleCompleted() {
+            showCompleted = document.getElementById('toggle-completed').checked;
+            getTasks();
+        }
+
+        // --- UI LOGIC ---
+
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
-            // Fix for local timezone string format
             const offset = new Date().getTimezoneOffset() * 60000;
             document.getElementById('new_intake').value = new Date(Date.now() - offset).toISOString().split('T')[0];
         }
@@ -160,13 +242,25 @@
             setTimeout(() => toast.classList.add('opacity-0'), 2000);
         }
 
-        async function getTasks() {
-            const { data: tasks, error } = await _supabase
-                .from('ServiceTracker') 
-                .select('*')
-                .order('is_waiting', { ascending: false })
-                .order('created_at', { ascending: false });
+        // --- DATABASE LOGIC ---
 
+        async function getTasks() {
+            if (!currentUser) return;
+
+            let query = _supabase.from('ServiceTracker').select('*');
+
+            if (!showCompleted) {
+                query = query.neq('status', 'Completed');
+            }
+
+            // Using assigned_user instead of advisor
+            if (viewFilter !== 'ALL') {
+                query = query.eq('assigned_user', viewFilter);
+            }
+
+            query = query.order('is_waiting', { ascending: false }).order('created_at', { ascending: false });
+
+            const { data: tasks, error } = await query;
             if (error) console.error('Error fetching:', error.message);
             else renderTasks(tasks);
         }
@@ -176,7 +270,6 @@
             const payload = {};
             payload[column] = payloadValue;
 
-            // Auto-stamp completed date logic
             if (column === 'status') {
                 if (value === 'Completed') {
                     const offset = new Date().getTimezoneOffset() * 60000;
@@ -186,16 +279,11 @@
                 }
             }
 
-            const { error } = await _supabase
-                .from('ServiceTracker')
-                .update(payload)
-                .eq('id', taskId);
+            const { error } = await _supabase.from('ServiceTracker').update(payload).eq('id', taskId);
 
-            if (error) {
-                alert('Error saving data: ' + error.message);
-            } else {
+            if (error) alert('Error saving data: ' + error.message);
+            else {
                 flashSuccess();
-                // THIS IS THE FIX: Tell the board to refresh if Est. Date, Status, or Waiting changes
                 if (column === 'is_waiting' || column === 'status' || column === 'completion_time') {
                     getTasks();
                 }
@@ -204,18 +292,14 @@
 
         function renderTasks(tasks) {
             const list = document.getElementById('task-list');
-            
-            // Fix: Get today's local date reliably instead of UTC time to prevent timezone bugs
             const offset = new Date().getTimezoneOffset() * 60000;
             const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
 
             list.innerHTML = tasks.map(task => {
-                // Determine if the Estimated Date is past due
                 const isPastDue = task.completion_time && task.completion_time < todayStr && task.status !== 'Completed';
 
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${task.is_waiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
-                    
                     <td class="px-2 py-1 align-middle">
                         <div class="flex items-center space-x-1">
                             <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-14 px-1 py-0.5 font-mono text-xs font-bold rounded">
@@ -226,6 +310,10 @@
                     </td>
                     <td class="px-2 py-1 align-middle">
                         <input type="date" value="${task.intake_date || ''}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
+                    </td>
+                    <td class="px-2 py-1 align-middle text-[10px] font-bold text-blue-400">
+                        <!-- Reading from assigned_user -->
+                        ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
                     </td>
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-semibold rounded">
@@ -273,14 +361,14 @@
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
                     phone_number: phone, issue_description: issue, intake_date: intake, 
-                    status: 'Pending', is_waiting: waiting
+                    status: 'Pending', is_waiting: waiting, 
+                    assigned_user: currentUser // <-- Attaches the logged-in user to assigned_user
                 }]);
 
             if (error) alert('Database Error: ' + error.message);
             else { getTasks(); closeModal(); }
         }
 
-        getTasks();
         setInterval(getTasks, 60000);
     </script>
 </body>
