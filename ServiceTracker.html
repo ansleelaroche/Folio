@@ -12,25 +12,30 @@
             background-color: transparent;
             border: 1px solid transparent;
             transition: all 0.2s ease-in-out;
-            color: #e2e8f0; /* text-slate-200 */
+            color: #e2e8f0; 
         }
         .editable-cell:hover {
-            border-color: #475569; /* slate-600 */
-            background-color: #334155; /* slate-700 */
+            border-color: #475569; 
+            background-color: #334155; 
         }
         .editable-cell:focus {
-            border-color: #3b82f6; /* blue-500 */
-            background-color: #0f172a; /* slate-900 */
-            color: #f8fafc; /* white */
+            border-color: #3b82f6; 
+            background-color: #0f172a; 
+            color: #f8fafc; 
             outline: none;
         }
-        /* Custom scrollbar for dark mode */
+        /* Hide the default date icon in some browsers to save space, but keep it clickable */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 0.5;
+            cursor: pointer;
+        }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
         ::-webkit-scrollbar-track { background: #1e293b; }
     </style>
 </head>
-<body class="bg-slate-950 p-2 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300">
+<body class="bg-slate-950 p-2 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
     <div class="w-full max-w-[1600px] mx-auto flex flex-col h-full">
         <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
@@ -51,11 +56,13 @@
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">RO #</th>
+                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Intake</th>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-36">Customer</th>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28">Phone</th>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-40">Vehicle</th>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
                         <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28 text-right">Status</th>
+                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Completed</th>
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
@@ -69,24 +76,28 @@
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
             
             <div class="space-y-2">
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
                         <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
                     </div>
-                    <div>
+                    <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Vehicle</label>
                         <input id="new_vehicle" type="text" placeholder="24 Sierra 1500" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer Name</label>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Intake Date</label>
+                        <input id="new_intake" type="date" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[11px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer</label>
                         <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone Number</label>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone</label>
                         <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-600">
                     </div>
                 </div>
@@ -114,10 +125,15 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        function openModal() { document.getElementById('taskModal').classList.remove('hidden'); }
+        function openModal() { 
+            document.getElementById('taskModal').classList.remove('hidden'); 
+            // Automatically set the intake date to today when opening the modal
+            document.getElementById('new_intake').value = new Date().toISOString().split('T')[0];
+        }
+
         function closeModal() {
             document.getElementById('taskModal').classList.add('hidden');
-            ['new_ro', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue'].forEach(id => document.getElementById(id).value = '');
+            ['new_ro', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue', 'new_intake'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('new_waiting').checked = false;
         }
 
@@ -139,8 +155,10 @@
         }
 
         async function updateField(taskId, column, value) {
+            // If the user clears a date entirely, we should save it as null so it doesn't break the database
+            const payloadValue = value === "" ? null : value;
             const payload = {};
-            payload[column] = value;
+            payload[column] = payloadValue;
 
             const { error } = await _supabase
                 .from('ServiceTracker')
@@ -159,26 +177,36 @@
             const list = document.getElementById('task-list');
             list.innerHTML = tasks.map(task => `
                 <tr class="hover:bg-slate-800 transition duration-150 ${task.is_waiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
+                    
                     <td class="px-2 py-1 align-middle">
                         <div class="flex items-center space-x-1">
-                            <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-16 px-1 py-0.5 font-mono text-xs font-bold rounded">
+                            <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-14 px-1 py-0.5 font-mono text-xs font-bold rounded">
                             <button onclick="updateField(${task.id}, 'is_waiting', ${!task.is_waiting})" class="px-1 py-0.5 text-[9px] rounded uppercase tracking-wider font-bold transition ${task.is_waiting ? 'bg-red-600 text-white shadow-sm' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}">
                                 ${task.is_waiting ? 'Wait' : 'Drop'}
                             </button>
                         </div>
                     </td>
+
+                    <td class="px-2 py-1 align-middle">
+                        <input type="date" value="${task.intake_date || ''}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
+                    </td>
+
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-semibold rounded">
                     </td>
+
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
+
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-bold rounded">
                     </td>
+
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
+
                     <td class="px-2 py-1 align-middle text-right">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[11px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition">
                             <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
@@ -186,6 +214,10 @@
                             <option value="Parts Hold" ${task.status === 'Parts Hold' ? 'selected' : ''}>📦 Parts</option>
                             <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>✅ Done</option>
                         </select>
+                    </td>
+
+                    <td class="px-2 py-1 align-middle">
+                        <input type="date" value="${task.completed_date || ''}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
                 </tr>
             `).join('');
@@ -197,6 +229,7 @@
             const customer = document.getElementById('new_customer').value;
             const phone = document.getElementById('new_phone').value;
             const issue = document.getElementById('new_issue').value;
+            const intake = document.getElementById('new_intake').value || null;
             const waiting = document.getElementById('new_waiting').checked; 
 
             if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
@@ -205,7 +238,8 @@
                 .from('ServiceTracker')
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
-                    phone_number: phone, issue_description: issue, status: 'Pending', is_waiting: waiting
+                    phone_number: phone, issue_description: issue, intake_date: intake, 
+                    status: 'Pending', is_waiting: waiting
                 }]);
 
             if (error) alert('Database Error: ' + error.message);
