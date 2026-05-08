@@ -261,7 +261,7 @@
         async function getTasks() {
             if (!currentUser) return;
 
-            let query = _supabase.from('ServiceTracker').select('*');
+            let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
                 query = query.neq('status', 'Completed');
@@ -293,7 +293,7 @@
                 }
             }
 
-            const { error } = await _supabase.from('ServiceTracker').update(payload).eq('id', taskId);
+            const { error } = await _supabase.from('servicetracker').update(payload).eq('id', taskId);
 
             if (error) alert('Error saving data: ' + error.message);
             else {
@@ -399,7 +399,7 @@
             if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
 
             const { error } = await _supabase
-                .from('ServiceTracker')
+                .from('servicetracker')
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
                     phone_number: phone, issue_description: issue, intake_date: intake, 
