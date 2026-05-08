@@ -185,7 +185,6 @@
     </div>
 
     <script>
-        // UPDATE TO YOUR servicetracker table name based on previous instructions
         const supabaseUrl = 'https://bnnqzijvmsezjlpocpvz.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -193,6 +192,27 @@
         let currentUser = '';
         let viewFilter = ''; 
         let showCompleted = false;
+
+        // --- NEW HELPER FUNCTION: THE DATE CLEANER ---
+        // This converts messy dates like "9/8/25" into perfect "2025-09-08" for HTML
+        function formatSafeDate(dateStr) {
+            if (!dateStr) return '';
+            
+            // If it already looks like a clean YYYY-MM-DD, just pass it through
+            if (dateStr.includes('-') && dateStr.length >= 10) {
+                return dateStr.split('T')[0]; 
+            }
+
+            // Otherwise, let JavaScript figure out the messy date
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return ''; // If it's complete gibberish, return blank
+            
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            
+            return `${yyyy}-${mm}-${dd}`;
+        }
 
         function loginUser() {
             const select = document.getElementById('user-select');
@@ -261,7 +281,6 @@
         async function getTasks() {
             if (!currentUser) return;
 
-            // Updated to lowercase servicetracker table
             let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
@@ -293,7 +312,6 @@
                 }
             }
 
-            // Updated to lowercase servicetracker table
             const { error } = await _supabase.from('servicetracker').update(payload).eq('id', taskId);
 
             if (error) alert('Error saving data: ' + error.message);
@@ -311,10 +329,11 @@
             const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
 
             list.innerHTML = tasks.map(task => {
-                // THE DATE FIX: This splits off the ugly time signature "T00:00:00Z" so the HTML accepts it
-                const safeIntake = task.intake_date ? task.intake_date.split('T')[0] : '';
-                const safeCompletion = task.completion_time ? task.completion_time.split('T')[0] : '';
-                const safeCompleted = task.completed_date ? task.completed_date.split('T')[0] : '';
+                
+                // USING THE NEW DATE CLEANER HERE
+                const safeIntake = formatSafeDate(task.intake_date);
+                const safeCompletion = formatSafeDate(task.completion_time);
+                const safeCompleted = formatSafeDate(task.completed_date);
 
                 const isPastDue = safeCompletion && safeCompletion < todayStr && task.status !== 'Completed';
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
@@ -341,7 +360,6 @@
                     </td>
 
                     <td class="px-2 py-1 align-middle">
-                        <!-- THE DATE FIX APPLIED HERE -->
                         <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
                     <td class="px-2 py-1 align-middle text-[10px] font-bold text-blue-400">
@@ -371,7 +389,6 @@
                         <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
                     <td class="px-2 py-1 align-middle">
-                        <!-- THE DATE FIX APPLIED HERE -->
                         <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     <td class="px-2 py-1 align-middle text-right">
@@ -383,7 +400,6 @@
                         </select>
                     </td>
                     <td class="px-2 py-1 align-middle">
-                        <!-- THE DATE FIX APPLIED HERE -->
                         <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
                 </tr>
@@ -402,7 +418,6 @@
 
             if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
 
-            // Updated to lowercase servicetracker table
             const { error } = await _supabase
                 .from('servicetracker')
                 .insert([{ 
