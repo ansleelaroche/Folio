@@ -24,7 +24,6 @@
             color: #f8fafc; 
             outline: none;
         }
-        /* Hide the default date icon in some browsers to save space, but keep it clickable */
         input[type="date"]::-webkit-inner-spin-button,
         input[type="date"]::-webkit-calendar-picker-indicator {
             opacity: 0.5;
@@ -38,6 +37,7 @@
 <body class="bg-slate-950 p-2 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
     <div class="w-full max-w-[1600px] mx-auto flex flex-col h-full">
+        <!-- Ultra-Compact Header (Dark) -->
         <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
             <div class="flex items-baseline space-x-2">
                 <h1 class="text-base font-bold text-white tracking-tight">Kaiser GMC</h1>
@@ -51,26 +51,30 @@
             </div>
         </header>
 
+        <!-- Ultra-Compact Editable Task List (Dark) -->
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
             <table class="w-full text-left min-w-max border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
+                    <!-- Adjusted header padding (px-3) to perfectly align with the inner padding of the input boxes below -->
                     <tr>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">RO #</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Intake</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-36">Customer</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28">Phone</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-40">Vehicle</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28 text-right">Status</th>
-                        <th class="px-2 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Completed</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">RO #</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Intake</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vehicle</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Status</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Completed</th>
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
-                    </tbody>
+                    <!-- Tasks will load here -->
+                </tbody>
             </table>
         </div>
     </div>
 
+    <!-- COMPACT ADD NEW TASK MODAL (Dark) -->
     <div id="taskModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
         <div class="bg-slate-800 p-4 rounded shadow-2xl w-full max-w-md border border-slate-700">
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
@@ -127,7 +131,6 @@
 
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
-            // Automatically set the intake date to today when opening the modal
             document.getElementById('new_intake').value = new Date().toISOString().split('T')[0];
         }
 
@@ -155,10 +158,20 @@
         }
 
         async function updateField(taskId, column, value) {
-            // If the user clears a date entirely, we should save it as null so it doesn't break the database
             const payloadValue = value === "" ? null : value;
             const payload = {};
             payload[column] = payloadValue;
+
+            // --- AUTO-STAMP LOGIC ---
+            if (column === 'status') {
+                if (value === 'Completed') {
+                    // Set to today's date
+                    payload['completed_date'] = new Date().toISOString().split('T')[0];
+                } else {
+                    // Clear the date if it's moved back to pending/in-shop
+                    payload['completed_date'] = null; 
+                }
+            }
 
             const { error } = await _supabase
                 .from('ServiceTracker')
@@ -169,7 +182,8 @@
                 alert('Error saving data: ' + error.message);
             } else {
                 flashSuccess();
-                if (column === 'is_waiting') getTasks();
+                // Refresh board if status changes so the new completed_date shows up instantly
+                if (column === 'is_waiting' || column === 'status') getTasks();
             }
         }
 
@@ -186,27 +200,21 @@
                             </button>
                         </div>
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="date" value="${task.intake_date || ''}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-semibold rounded">
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-bold rounded">
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
-
                     <td class="px-2 py-1 align-middle text-right">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[11px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition">
                             <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
@@ -215,7 +223,6 @@
                             <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>✅ Done</option>
                         </select>
                     </td>
-
                     <td class="px-2 py-1 align-middle">
                         <input type="date" value="${task.completed_date || ''}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
