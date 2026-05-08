@@ -89,7 +89,6 @@
 
         <!-- Task List -->
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
-            <!-- Removed min-w-max to prevent forcing a horizontal scroll -->
             <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
@@ -102,7 +101,6 @@
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Customer</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Phone</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Vehicle</th>
-                        <!-- Issue description has no strict width so it expands to fill space -->
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-red-400">Est. Date</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Completed</th>
@@ -331,6 +329,9 @@
                 const safeCompletion = formatSafeDate(task.completion_time);
                 const safeCompleted = formatSafeDate(task.completed_date);
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
+                
+                // NEW: Clean up the tech number so it matches correctly regardless of formatting
+                const safeTech = task.tech_number ? String(task.tech_number).trim() : '';
 
                 const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
@@ -338,12 +339,10 @@
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
                     
-                    <!-- 1. RO # -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
 
-                    <!-- 2. STATUS (Moved up!) -->
                     <td class="px-1 py-1 align-middle text-center">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
@@ -353,7 +352,6 @@
                         </select>
                     </td>
 
-                    <!-- 3. TYPE -->
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
                             <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
@@ -368,62 +366,53 @@
                         </select>
                     </td>
 
-                    <!-- 4. INTAKE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
                     
-                    <!-- 5. ADVISOR (Conditionally Hidden) -->
                     <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
                         ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
                     </td>
                     
-                    <!-- 6. TECH -->
+                    <!-- USING THE CLEANED UP TECH NUMBER HERE -->
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'tech_number', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
-                            <option value="" ${!task.tech_number ? 'selected' : ''}>Assign...</option>
-                            <option value="1166" ${task.tech_number === '1166' ? 'selected' : ''}>1166</option>
-                            <option value="1197" ${task.tech_number === '1197' ? 'selected' : ''}>1197</option>
-                            <option value="1915" ${task.tech_number === '1915' ? 'selected' : ''}>1915</option>
-                            <option value="1956" ${task.tech_number === '1956' ? 'selected' : ''}>1956</option>
-                            <option value="2107" ${task.tech_number === '2107' ? 'selected' : ''}>2107</option>
-                            <option value="2116" ${task.tech_number === '2116' ? 'selected' : ''}>2116</option>
+                            <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
+                            <option value="1166" ${safeTech === '1166' ? 'selected' : ''}>1166</option>
+                            <option value="1197" ${safeTech === '1197' ? 'selected' : ''}>1197</option>
+                            <option value="1915" ${safeTech === '1915' ? 'selected' : ''}>1915</option>
+                            <option value="1956" ${safeTech === '1956' ? 'selected' : ''}>1956</option>
+                            <option value="2107" ${safeTech === '2107' ? 'selected' : ''}>2107</option>
+                            <option value="2116" ${safeTech === '2116' ? 'selected' : ''}>2116</option>
                         </select>
                     </td>
 
-                    <!-- 7. CUSTOMER -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
                     </td>
                     
-                    <!-- 8. PHONE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
                     
-                    <!-- 9. VEHICLE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
                     </td>
                     
-                    <!-- 10. ISSUE DESCRIPTION -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
                     
-                    <!-- 11. EST DATE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     
-                    <!-- 12. COMPLETED DATE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
                 </tr>
             `}).join('');
 
-            // NEW: Hide the advisor column if Frank or Matt are in their personal view
             const advisorCols = document.querySelectorAll('.advisor-col');
             if (viewFilter !== 'ALL') {
                 advisorCols.forEach(col => col.style.display = 'none');
