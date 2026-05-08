@@ -193,19 +193,14 @@
         let viewFilter = ''; 
         let showCompleted = false;
 
-        // --- NEW HELPER FUNCTION: THE DATE CLEANER ---
-        // This converts messy dates like "9/8/25" into perfect "2025-09-08" for HTML
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
-            
-            // If it already looks like a clean YYYY-MM-DD, just pass it through
             if (dateStr.includes('-') && dateStr.length >= 10) {
                 return dateStr.split('T')[0]; 
             }
 
-            // Otherwise, let JavaScript figure out the messy date
             const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return ''; // If it's complete gibberish, return blank
+            if (isNaN(d.getTime())) return ''; 
             
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -284,7 +279,8 @@
             let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
-                query = query.neq('status', 'Completed');
+                // Keep the filter strict to catch both existing lowercase matches and exact new matches
+                query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
             }
 
             if (viewFilter !== 'ALL') {
@@ -330,12 +326,14 @@
 
             list.innerHTML = tasks.map(task => {
                 
-                // USING THE NEW DATE CLEANER HERE
                 const safeIntake = formatSafeDate(task.intake_date);
                 const safeCompletion = formatSafeDate(task.completion_time);
                 const safeCompleted = formatSafeDate(task.completed_date);
 
-                const isPastDue = safeCompletion && safeCompletion < todayStr && task.status !== 'Completed';
+                // This still cleans up ALL CAPS behind the scenes so the dropdown knows which one to show
+                const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
+
+                const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
 
                 return `
@@ -392,11 +390,12 @@
                         <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     <td class="px-2 py-1 align-middle text-right">
+                        <!-- PERFECT TITLE CASE OPTIONS -->
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[11px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition">
-                            <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
-                            <option value="In Shop" ${task.status === 'In Shop' ? 'selected' : ''}>🔧 In Shop</option>
-                            <option value="Parts Hold" ${task.status === 'Parts Hold' ? 'selected' : ''}>📦 Parts</option>
-                            <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>✅ Done</option>
+                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
+                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
+                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
+                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
                         </select>
                     </td>
                     <td class="px-2 py-1 align-middle">
