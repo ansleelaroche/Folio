@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kaiser GMC | Task Manager</title>
+    <title>Kaiser GMC | Service Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -18,14 +18,18 @@
         <!-- Task Form -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-8">
             <h2 class="text-xl font-semibold mb-4">Add New Service Task</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                 <input id="ro_number" type="text" placeholder="RO #" class="border p-2 rounded">
                 <input id="vehicle" type="text" placeholder="Vehicle (Year/Model)" class="border p-2 rounded">
                 <select id="dept" class="border p-2 rounded">
                     <option value="Service">Service</option>
                     <option value="Sales">Sales</option>
                 </select>
-                <button onclick="addTask()" class="md:col-span-3 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition">
+                <label class="flex items-center space-x-2 p-2 border rounded bg-gray-50 cursor-pointer">
+                    <input id="is_waiting" type="checkbox" class="h-5 w-5 text-red-600 rounded">
+                    <span class="text-sm font-medium text-gray-700">Customer Waiting</span>
+                </label>
+                <button onclick="addTask()" class="md:col-span-4 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition font-bold">
                     Add Task to Board
                 </button>
             </div>
@@ -51,55 +55,97 @@
 
     <script>
         // Initialize Supabase
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        const supabaseUrl = 'https://bnnqzijvmsezjlpocpvz.supabase.co/rest/v1/';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Fetch Tasks on Load
+        // FETCH FUNCTION: Updated to use ServiceTracker
         async function getTasks() {
             const { data: tasks, error } = await _supabase
-                .from('tasks')
+                .from('ServiceTracker') // Corrected table name
                 .select('*')
+                .order('is_waiting', { ascending: false }) // Puts waiting customers at the top
                 .order('created_at', { ascending: false });
 
-            if (error) console.error('Error:', error);
+            if (error) console.error('Error:', error.message);
             else renderTasks(tasks);
         }
 
+        // RENDER FUNCTION: Now with a Status Dropdown
         function renderTasks(tasks) {
             const list = document.getElementById('task-list');
             list.innerHTML = tasks.map(task => `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-4 font-mono">${task.ro_number}</td>
+                <tr class="border-b hover:bg-gray-50 ${task.is_waiting ? 'bg-red-50' : ''}">
+                    <td class="p-4 font-mono font-bold">
+                        ${task.ro_number}
+                        ${task.is_waiting ? '<span class="ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded-full">WAITING</span>' : ''}
+                    </td>
                     <td class="p-4">${task.vehicle_desc}</td>
                     <td class="p-4">
-                        <span class="px-2 py-1 rounded text-xs ${task.department === 'Sales' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
-                            ${task.department}
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${task.dept_origin === 'Sales' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                            ${task.dept_origin}
                         </span>
                     </td>
-                    <td class="p-4 text-sm text-gray-600">${task.task_status}</td>
+                    <td class="p-4">
+                        <select onchange="updateStatus(${task.id}, this.value)" class="border p-1 rounded text-sm font-semibold bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Shop" ${task.status === 'In Shop' ? 'selected' : ''}>In Shop</option>
+                            <option value="Parts Hold" ${task.status === 'Parts Hold' ? 'selected' : ''}>Parts Hold</option>
+                            <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
                 </tr>
             `).join('');
         }
 
+        // UPDATE FUNCTION: Saves the new status to the database
+        async function updateStatus(taskId, newStatus) {
+            const { error } = await _supabase
+                .from('ServiceTracker')
+                .update({ status: newStatus })
+                .eq('id', taskId);
+
+            if (error) {
+                console.error('Update Error:', error);
+                alert('Error updating status. Check console for details.');
+            }
+        }
+
+        // ADD FUNCTION: Updated to match new column names and include the waiting checkbox
         async function addTask() {
             const ro = document.getElementById('ro_number').value;
             const vehicle = document.getElementById('vehicle').value;
             const dept = document.getElementById('dept').value;
+            const waiting = document.getElementById('is_waiting').checked;
+
+            if (!ro || !vehicle) {
+                alert("Please enter an RO number and Vehicle description.");
+                return;
+            }
 
             const { error } = await _supabase
-                .from('tasks')
-                .insert([{ ro_number: ro, vehicle_desc: vehicle, department: dept, task_status: 'Pending' }]);
+                .from('ServiceTracker') // Corrected table name
+                .insert([{ 
+                    ro_number: ro, 
+                    vehicle_desc: vehicle, 
+                    dept_origin: dept, 
+                    status: 'Pending',
+                    is_waiting: waiting
+                }]);
 
-            if (error) alert('Error adding task');
-            else {
-                getTasks(); // Refresh list
+            if (error) {
+                console.error('Insert Error:', error);
+                alert('Error adding task. Check console for details.');
+            } else {
+                getTasks(); // Refresh list automatically
+                // Clear the form
                 document.getElementById('ro_number').value = '';
                 document.getElementById('vehicle').value = '';
+                document.getElementById('is_waiting').checked = false;
             }
         }
 
-        // Initial Load
+        // Initial Load when the page opens
         getTasks();
     </script>
 </body>
