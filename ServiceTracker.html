@@ -7,9 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="bg-gray-100 p-4 md:p-8">
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-full mx-auto">
         <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Kaiser GMC Service Board</h1>
@@ -21,13 +21,16 @@
         </header>
 
         <!-- Task List -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full text-left">
+        <div class="bg-white rounded-lg shadow-md overflow-x-auto">
+            <table class="w-full text-left min-w-max">
                 <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="p-4 w-1/4">RO & Customer</th>
-                        <th class="p-4 w-2/4">Vehicle & Issue</th>
-                        <th class="p-4 w-1/4">Status</th>
+                        <th class="p-4 text-sm text-gray-600">RO #</th>
+                        <th class="p-4 text-sm text-gray-600">Customer Name</th>
+                        <th class="p-4 text-sm text-gray-600">Phone</th>
+                        <th class="p-4 text-sm text-gray-600">Vehicle</th>
+                        <th class="p-4 text-sm text-gray-600">Issue Description</th>
+                        <th class="p-4 text-sm text-gray-600">Status</th>
                     </tr>
                 </thead>
                 <tbody id="task-list">
@@ -37,7 +40,7 @@
         </div>
     </div>
 
-    <!-- ADD NEW TASK MODAL (Hidden by default) -->
+    <!-- ADD NEW TASK MODAL -->
     <div id="taskModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex justify-center items-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-lg">
             <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Write Up New Vehicle</h2>
@@ -61,7 +64,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                        <input id="phone_number" type="text" placeholder="(555) 555-5555" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input id="phone_number" type="tel" placeholder="(555) 555-5555" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                 </div>
 
@@ -77,16 +80,16 @@
             </div>
 
             <div class="mt-8 flex justify-end space-x-3">
-                <button onclick="closeModal()" class="px-5 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition">Cancel</button>
-                <button onclick="addTask()" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow transition">Save to Board</button>
+                <button type="button" onclick="closeModal()" class="px-5 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition">Cancel</button>
+                <button type="button" onclick="addTask()" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow transition">Save to Board</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize Supabase
-        const supabaseUrl = 'YOUR_SUPABASE_URL';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        // Initialize Supabase with your specific credentials
+        const supabaseUrl = 'https://bnnqzijvmsezjlpocpvz.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         // Modal Controls
@@ -96,7 +99,6 @@
 
         function closeModal() {
             document.getElementById('taskModal').classList.add('hidden');
-            // Clear inputs on close
             document.getElementById('ro_number').value = '';
             document.getElementById('vehicle').value = '';
             document.getElementById('customer_name').value = '';
@@ -113,28 +115,32 @@
                 .order('is_waiting', { ascending: false })
                 .order('created_at', { ascending: false });
 
-            if (error) console.error('Error:', error.message);
+            if (error) console.error('Error fetching:', error.message);
             else renderTasks(tasks);
         }
 
-        // Render Tasks (Updated to combine columns for a cleaner look)
+        // Render Tasks
         function renderTasks(tasks) {
             const list = document.getElementById('task-list');
             list.innerHTML = tasks.map(task => `
                 <tr class="border-b hover:bg-gray-50 ${task.is_waiting ? 'bg-red-50' : ''}">
-                    <td class="p-4 align-top">
-                        <div class="font-mono text-lg font-bold text-blue-800">
-                            ${task.ro_number}
-                            ${task.is_waiting ? '<span class="ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded-full align-middle">WAITING</span>' : ''}
-                        </div>
-                        <div class="text-sm font-semibold text-gray-800 mt-1">${task.customer_name || 'N/A'}</div>
-                        <div class="text-xs text-gray-500">${task.phone_number || ''}</div>
+                    <td class="p-4 align-middle font-mono text-lg font-bold text-blue-800 whitespace-nowrap">
+                        ${task.ro_number}
+                        ${task.is_waiting ? '<br><span class="inline-block mt-1 px-2 py-1 bg-red-600 text-white text-[10px] rounded-full uppercase tracking-wider">Waiting</span>' : ''}
                     </td>
-                    <td class="p-4 align-top">
-                        <div class="font-bold text-gray-800">${task.vehicle_desc}</div>
-                        <div class="text-sm text-gray-600 mt-1 italic w-full max-w-lg break-words">"${task.issue_description || 'No description provided'}"</div>
+                    <td class="p-4 align-middle font-semibold text-gray-800 whitespace-nowrap">
+                        ${task.customer_name || 'N/A'}
                     </td>
-                    <td class="p-4 align-top">
+                    <td class="p-4 align-middle text-gray-600 whitespace-nowrap">
+                        ${task.phone_number || 'N/A'}
+                    </td>
+                    <td class="p-4 align-middle font-bold text-gray-800 whitespace-nowrap">
+                        ${task.vehicle_desc}
+                    </td>
+                    <td class="p-4 align-middle text-sm text-gray-600 italic max-w-xs truncate" title="${task.issue_description || ''}">
+                        "${task.issue_description || 'No description'}"
+                    </td>
+                    <td class="p-4 align-middle whitespace-nowrap">
                         <select onchange="updateStatus(${task.id}, this.value)" class="border p-2 rounded text-sm font-bold bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
                             <option value="Pending" ${task.status === 'Pending' ? 'selected' : ''}>⏳ Pending</option>
                             <option value="In Shop" ${task.status === 'In Shop' ? 'selected' : ''}>🔧 In Shop</option>
@@ -153,13 +159,10 @@
                 .update({ status: newStatus })
                 .eq('id', taskId);
 
-            if (error) {
-                console.error('Update Error:', error);
-                alert('Error updating status.');
-            }
+            if (error) alert('Error updating status: ' + error.message);
         }
 
-        // Add a new task using the modal
+        // Add a new task
         async function addTask() {
             const ro = document.getElementById('ro_number').value;
             const vehicle = document.getElementById('vehicle').value;
@@ -187,7 +190,7 @@
 
             if (error) {
                 console.error('Insert Error:', error);
-                alert('Error adding task.');
+                alert('Database Error: ' + error.message);
             } else {
                 getTasks(); // Refresh board
                 closeModal(); // Close and clear the popup
