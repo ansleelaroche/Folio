@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <!-- MAIN APPLICATION CONTAINER (Hidden until login) -->
+    <!-- MAIN APPLICATION CONTAINER -->
     <div id="app-container" class="hidden w-full max-w-[1600px] mx-auto flex flex-col h-full p-2">
         
         <!-- Header -->
@@ -95,6 +95,7 @@
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">RO #</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Intake</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">Advisor</th>
+                        <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-20">Tech</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-28">Customer</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Phone</th>
                         <th class="px-3 py-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-36">Vehicle</th>
@@ -117,10 +118,22 @@
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
             
             <div class="space-y-2">
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
                         <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-xs rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Tech</label>
+                        <select id="new_tech" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[11px] rounded focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer">
+                            <option value="" selected>None</option>
+                            <option value="1166">1166</option>
+                            <option value="1197">1197</option>
+                            <option value="1915">1915</option>
+                            <option value="1956">1956</option>
+                            <option value="2107">2107</option>
+                            <option value="2116">2116</option>
+                        </select>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Vehicle</label>
@@ -179,14 +192,11 @@
             
             if (!currentUser) { alert("Please select your name."); return; }
 
-            // Hide login, show app
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             
-            // Set display name in header
             document.getElementById('display-user').innerText = currentUser.split(' ')[0];
 
-            // Setup Role-Based Views
             if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
                 viewFilter = currentUser; 
                 document.getElementById('switch-view-btn').classList.remove('hidden');
@@ -232,7 +242,7 @@
 
         function closeModal() {
             document.getElementById('taskModal').classList.add('hidden');
-            ['new_ro', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue', 'new_intake'].forEach(id => document.getElementById(id).value = '');
+            ['new_ro', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue', 'new_intake', 'new_tech'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('new_waiting').checked = false;
         }
 
@@ -253,7 +263,6 @@
                 query = query.neq('status', 'Completed');
             }
 
-            // Using assigned_user instead of advisor
             if (viewFilter !== 'ALL') {
                 query = query.eq('assigned_user', viewFilter);
             }
@@ -312,8 +321,18 @@
                         <input type="date" value="${task.intake_date || ''}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 rounded">
                     </td>
                     <td class="px-2 py-1 align-middle text-[10px] font-bold text-blue-400">
-                        <!-- Reading from assigned_user -->
                         ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
+                    </td>
+                    <td class="px-2 py-1 align-middle">
+                        <select onchange="updateField(${task.id}, 'tech_number', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                            <option value="" ${!task.tech_number ? 'selected' : ''}>Assign...</option>
+                            <option value="1166" ${task.tech_number === '1166' ? 'selected' : ''}>1166</option>
+                            <option value="1197" ${task.tech_number === '1197' ? 'selected' : ''}>1197</option>
+                            <option value="1915" ${task.tech_number === '1915' ? 'selected' : ''}>1915</option>
+                            <option value="1956" ${task.tech_number === '1956' ? 'selected' : ''}>1956</option>
+                            <option value="2107" ${task.tech_number === '2107' ? 'selected' : ''}>2107</option>
+                            <option value="2116" ${task.tech_number === '2116' ? 'selected' : ''}>2116</option>
+                        </select>
                     </td>
                     <td class="px-2 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-xs font-semibold rounded">
@@ -352,6 +371,7 @@
             const phone = document.getElementById('new_phone').value;
             const issue = document.getElementById('new_issue').value;
             const intake = document.getElementById('new_intake').value || null;
+            const tech = document.getElementById('new_tech').value || null;
             const waiting = document.getElementById('new_waiting').checked; 
 
             if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
@@ -361,8 +381,8 @@
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
                     phone_number: phone, issue_description: issue, intake_date: intake, 
-                    status: 'Pending', is_waiting: waiting, 
-                    assigned_user: currentUser // <-- Attaches the logged-in user to assigned_user
+                    tech_number: tech, status: 'Pending', is_waiting: waiting, 
+                    assigned_user: currentUser
                 }]);
 
             if (error) alert('Database Error: ' + error.message);
