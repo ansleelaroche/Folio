@@ -27,8 +27,8 @@
         
         /* Custom Blinking Animation for Past Due Dates */
         @keyframes urgentBlink {
-            0%, 100% { background-color: rgba(220, 38, 38, 0.25); color: #fca5a5; }
-            50% { background-color: transparent; color: #e2e8f0; }
+            0%, 100% { background-color: rgba(220, 38, 38, 0.3) !important; color: #fca5a5 !important; }
+            50% { background-color: transparent !important; color: #e2e8f0 !important; }
         }
         .past-due-blink {
             animation: urgentBlink 1.5s ease-in-out infinite;
@@ -49,6 +49,7 @@
 <body class="bg-slate-950 p-2 text-xs font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
     <div class="w-full max-w-[1600px] mx-auto flex flex-col h-full">
+        <!-- Ultra-Compact Header (Dark) -->
         <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
             <div class="flex items-baseline space-x-2">
                 <h1 class="text-base font-bold text-white tracking-tight">Kaiser GMC</h1>
@@ -62,6 +63,7 @@
             </div>
         </header>
 
+        <!-- Ultra-Compact Editable Task List (Dark) -->
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
             <table class="w-full text-left min-w-max border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
@@ -78,11 +80,13 @@
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
-                    </tbody>
+                    <!-- Tasks will load here -->
+                </tbody>
             </table>
         </div>
     </div>
 
+    <!-- COMPACT ADD NEW TASK MODAL (Dark) -->
     <div id="taskModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
         <div class="bg-slate-800 p-4 rounded shadow-2xl w-full max-w-md border border-slate-700">
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
@@ -139,7 +143,9 @@
 
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
-            document.getElementById('new_intake').value = new Date().toISOString().split('T')[0];
+            // Fix for local timezone string format
+            const offset = new Date().getTimezoneOffset() * 60000;
+            document.getElementById('new_intake').value = new Date(Date.now() - offset).toISOString().split('T')[0];
         }
 
         function closeModal() {
@@ -170,9 +176,11 @@
             const payload = {};
             payload[column] = payloadValue;
 
+            // Auto-stamp completed date logic
             if (column === 'status') {
                 if (value === 'Completed') {
-                    payload['completed_date'] = new Date().toISOString().split('T')[0];
+                    const offset = new Date().getTimezoneOffset() * 60000;
+                    payload['completed_date'] = new Date(Date.now() - offset).toISOString().split('T')[0];
                 } else {
                     payload['completed_date'] = null; 
                 }
@@ -187,16 +195,19 @@
                 alert('Error saving data: ' + error.message);
             } else {
                 flashSuccess();
-                // Refresh if status changes or waiting status changes to resort/re-color
-                if (column === 'is_waiting' || column === 'status') getTasks();
+                // THIS IS THE FIX: Tell the board to refresh if Est. Date, Status, or Waiting changes
+                if (column === 'is_waiting' || column === 'status' || column === 'completion_time') {
+                    getTasks();
+                }
             }
         }
 
         function renderTasks(tasks) {
             const list = document.getElementById('task-list');
             
-            // Get today's date formatted as YYYY-MM-DD for comparison
-            const todayStr = new Date().toISOString().split('T')[0];
+            // Fix: Get today's local date reliably instead of UTC time to prevent timezone bugs
+            const offset = new Date().getTimezoneOffset() * 60000;
+            const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
 
             list.innerHTML = tasks.map(task => {
                 // Determine if the Estimated Date is past due
@@ -229,7 +240,7 @@
                         <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
                     <td class="px-2 py-1 align-middle">
-                        <input type="date" value="${task.completion_time || ''}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] rounded ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
+                        <input type="date" value="${task.completion_time || ''}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[11px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     <td class="px-2 py-1 align-middle text-right">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[11px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition">
@@ -269,8 +280,6 @@
             else { getTasks(); closeModal(); }
         }
 
-        // Run the fetch on load, and then refresh it automatically every 60 seconds 
-        // to ensure the "Past Due" blinker kicks in even if nobody refreshes the screen!
         getTasks();
         setInterval(getTasks, 60000);
     </script>
