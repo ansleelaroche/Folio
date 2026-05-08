@@ -185,7 +185,7 @@
     </div>
 
     <script>
-        // UPDATE TO YOUR service_tracker table name based on previous instructions
+        // UPDATE TO YOUR servicetracker table name based on previous instructions
         const supabaseUrl = 'https://bnnqzijvmsezjlpocpvz.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -261,8 +261,8 @@
         async function getTasks() {
             if (!currentUser) return;
 
-            // Updated to lowercase service_tracker table
-            let query = _supabase.from('service_tracker').select('*');
+            // Updated to lowercase servicetracker table
+            let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
                 query = query.neq('status', 'Completed');
@@ -293,8 +293,8 @@
                 }
             }
 
-            // Updated to lowercase service_tracker table
-            const { error } = await _supabase.from('service_tracker').update(payload).eq('id', taskId);
+            // Updated to lowercase servicetracker table
+            const { error } = await _supabase.from('servicetracker').update(payload).eq('id', taskId);
 
             if (error) alert('Error saving data: ' + error.message);
             else {
@@ -402,9 +402,9 @@
 
             if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
 
-            // Updated to lowercase service_tracker table
+            // Updated to lowercase servicetracker table
             const { error } = await _supabase
-                .from('service_tracker')
+                .from('servicetracker')
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
                     phone_number: phone, issue_description: issue, intake_date: intake, 
