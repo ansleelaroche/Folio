@@ -458,7 +458,7 @@
                     </td>
 
                     <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
+                        <textarea onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded resize-y min-h-[24px]" placeholder="Issue..." rows="2">${task.issue_description || ''}</textarea>
                     </td>
 
                     <td class="px-1 py-1 align-middle">
