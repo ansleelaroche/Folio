@@ -90,6 +90,7 @@
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-12 text-center">Hat #</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
@@ -177,10 +178,14 @@
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
             
             <div class="space-y-3">
-                <div class="grid grid-cols-4 gap-2">
+                <div class="grid grid-cols-5 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
                         <input id="new_ro" type="text" placeholder="12345" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Hat #</label>
+                        <input id="new_hat" type="text" placeholder="-- " class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none text-center font-mono">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Tech</label>
@@ -251,8 +256,6 @@
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
-        
-        // NEW: Global cache for the drill-down modal so it's instant
         let cachedReportTasks = [];
 
         function formatSafeDate(dateStr) {
@@ -357,7 +360,7 @@
 
         function closeModal() {
             document.getElementById('taskModal').classList.add('hidden');
-            ['new_ro', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue', 'new_intake', 'new_tech'].forEach(id => document.getElementById(id).value = '');
+            ['new_ro', 'new_hat', 'new_vehicle', 'new_customer', 'new_phone', 'new_issue', 'new_intake', 'new_tech'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('new_waiting').value = 'Drop Off';
         }
 
@@ -432,6 +435,11 @@
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
+                    
+                    <td class="px-1 py-1 align-middle text-center">
+                        <input type="text" value="${task.hat || ''}" onchange="updateField(${task.id}, 'hat', this.value)" placeholder="--" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded text-center">
+                    </td>
+
                     <td class="px-1 py-1 align-middle text-center">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
@@ -501,6 +509,7 @@
 
         async function addTask() {
             const ro = document.getElementById('new_ro').value;
+            const hat = document.getElementById('new_hat').value || null;
             const vehicle = document.getElementById('new_vehicle').value;
             const customer = document.getElementById('new_customer').value;
             const phone = document.getElementById('new_phone').value;
@@ -514,8 +523,13 @@
             const { error } = await _supabase
                 .from('servicetracker')
                 .insert([{ 
-                    ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
-                    phone_number: phone, issue_description: issue, intake_date: intake, 
+                    ro_number: ro, 
+                    hat: hat,
+                    vehicle_desc: vehicle, 
+                    customer_name: customer,
+                    phone_number: phone, 
+                    issue_description: issue, 
+                    intake_date: intake, 
                     tech: tech, 
                     status: 'Pending', 
                     is_waiting: waitingType, 
@@ -526,12 +540,10 @@
             else { getTasks(); closeModal(); }
         }
 
-        // --- NEW: DRILL-DOWN LOGIC ---
         function openReportDetails(type, id) {
             const list = document.getElementById('report-details-list');
             const title = document.getElementById('report-details-title');
             
-            // Filter the cached data for active jobs only matching this tech/advisor
             let filteredTasks = cachedReportTasks.filter(task => {
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
                 if (cleanStatus === 'completed') return false; 
@@ -570,14 +582,12 @@
             document.getElementById('reportDetailsModal').classList.add('hidden');
         }
 
-        // --- REPORTS ENGINE ---
         async function generateReports() {
             let allTasks = [];
             let fetchMore = true;
             let startRow = 0;
             const limit = 1000;
 
-            // Pagination Loop
             while (fetchMore) {
                 const { data, error } = await _supabase
                     .from('servicetracker')
@@ -598,10 +608,8 @@
                 }
             }
             
-            // Cache the data globally so the modal opens instantly
             cachedReportTasks = allTasks;
 
-            // Data Buckets
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
             const advisors = ['Frank LaRoche', 'Matt Cannoy'];
             
@@ -611,7 +619,6 @@
             let globalActive = 0;
             let globalCompleted = 0;
 
-            // Crunch the Numbers
             allTasks.forEach(task => {
                 const isCompleted = task.status && task.status.trim().toLowerCase() === 'completed';
                 const tNum = task.tech ? String(task.tech).trim() : null;
@@ -664,7 +671,6 @@
                 let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
                 if (percent === 100 && stats.completed < total) percent = 99;
                 
-                // ADDED: Clickable styling and onclick event
                 techProgBox.innerHTML += `
                     <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('tech', '${t}')">
                         <div class="flex justify-between items-end mb-1">
@@ -686,7 +692,6 @@
                 let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
                 if (percent === 100 && stats.completed < total) percent = 99;
                 
-                // ADDED: Clickable styling and onclick event
                 advProgBox.innerHTML += `
                     <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('advisor', '${a}')">
                         <div class="flex justify-between items-end mb-1">
