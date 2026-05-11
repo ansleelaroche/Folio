@@ -597,7 +597,10 @@
             techs.forEach(t => {
                 const stats = techStats[t];
                 const total = stats.active + stats.completed;
-                const percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                
+                // MATH FIX: Round the number, but cap it at 99% unless fully complete
+                let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                if (percent === 100 && stats.completed < total) percent = 99;
                 
                 techProgBox.innerHTML += `
                     <div class="mb-2">
@@ -618,7 +621,10 @@
             advisors.forEach(a => {
                 const stats = advStats[a];
                 const total = stats.active + stats.completed;
-                const percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                
+                // MATH FIX: Round the number, but cap it at 99% unless fully complete
+                let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                if (percent === 100 && stats.completed < total) percent = 99;
                 
                 advProgBox.innerHTML += `
                     <div class="mb-3">
