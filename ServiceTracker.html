@@ -146,6 +146,32 @@
         </div>
     </div>
 
+    <div id="reportDetailsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950 rounded-t-xl">
+                <div>
+                    <h2 id="report-details-title" class="text-sm font-bold text-white">Active Jobs</h2>
+                    <p class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">Live Drill-Down</p>
+                </div>
+                <button onclick="closeReportDetails()" class="text-slate-500 hover:text-white font-bold px-3 py-1 bg-slate-800 rounded hover:bg-slate-700 transition">&times; Close</button>
+            </div>
+            <div class="flex-1 overflow-auto p-2">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-900 sticky top-0 z-10 shadow">
+                        <tr>
+                            <th class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">RO #</th>
+                            <th class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-24">Status</th>
+                            <th class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Vehicle</th>
+                            <th class="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider w-48">Customer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-details-list" class="divide-y divide-slate-800/50">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <div id="taskModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
         <div class="bg-slate-800 p-4 rounded shadow-2xl w-full max-w-lg border border-slate-700">
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
@@ -225,32 +251,30 @@
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
+        
+        // NEW: Global cache for the drill-down modal so it's instant
+        let cachedReportTasks = [];
 
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
             if (dateStr.includes('-') && dateStr.length >= 10) {
                 return dateStr.split('T')[0]; 
             }
-
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return ''; 
-            
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
-            
             return `${yyyy}-${mm}-${dd}`;
         }
 
         function loginUser() {
             const select = document.getElementById('user-select');
             currentUser = select.value;
-            
             if (!currentUser) { alert("Please select your name."); return; }
 
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('board-container').classList.remove('hidden');
-            
             document.getElementById('display-user').innerText = currentUser.split(' ')[0];
 
             if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
@@ -261,7 +285,6 @@
                 viewFilter = 'ALL'; 
                 document.getElementById('switch-view-btn').classList.add('hidden');
             }
-
             getTasks();
         }
 
@@ -503,7 +526,51 @@
             else { getTasks(); closeModal(); }
         }
 
-        // --- NEW REPORTS ENGINE WITH PROGRESS BARS ---
+        // --- NEW: DRILL-DOWN LOGIC ---
+        function openReportDetails(type, id) {
+            const list = document.getElementById('report-details-list');
+            const title = document.getElementById('report-details-title');
+            
+            // Filter the cached data for active jobs only matching this tech/advisor
+            let filteredTasks = cachedReportTasks.filter(task => {
+                const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
+                if (cleanStatus === 'completed') return false; 
+                
+                if (type === 'tech') {
+                    const tNum = task.tech ? String(task.tech).trim() : '';
+                    return tNum === String(id);
+                } else if (type === 'advisor') {
+                    const rawName = task.assigned_user ? task.assigned_user.trim().toLowerCase() : '';
+                    if (id === 'Frank LaRoche' && rawName.includes('frank')) return true;
+                    if (id === 'Matt Cannoy' && rawName.includes('matt')) return true;
+                    return false;
+                }
+                return false;
+            });
+
+            title.innerText = `${type === 'tech' ? 'Tech ' + id : id} (${filteredTasks.length})`;
+            
+            if (filteredTasks.length === 0) {
+                list.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-slate-500 text-xs italic">No active jobs found for this user.</td></tr>';
+            } else {
+                list.innerHTML = filteredTasks.map(task => `
+                    <tr class="hover:bg-slate-800/50 transition border-t border-slate-800/30">
+                        <td class="px-3 py-2 font-mono font-bold text-[10px] text-white">${task.ro_number}</td>
+                        <td class="px-3 py-2 text-[10px] text-blue-400 font-bold">${task.status || 'Pending'}</td>
+                        <td class="px-3 py-2 text-[10px] font-bold text-slate-300 truncate max-w-[200px]">${task.vehicle_desc || ''}</td>
+                        <td class="px-3 py-2 text-[10px] text-slate-400 truncate max-w-[200px]">${task.customer_name || ''}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            document.getElementById('reportDetailsModal').classList.remove('hidden');
+        }
+
+        function closeReportDetails() {
+            document.getElementById('reportDetailsModal').classList.add('hidden');
+        }
+
+        // --- REPORTS ENGINE ---
         async function generateReports() {
             let allTasks = [];
             let fetchMore = true;
@@ -530,6 +597,9 @@
                     startRow += limit;
                 }
             }
+            
+            // Cache the data globally so the modal opens instantly
+            cachedReportTasks = allTasks;
 
             // Data Buckets
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
@@ -552,28 +622,23 @@
                 if (rawName.includes('frank')) aName = 'Frank LaRoche';
                 if (rawName.includes('matt')) aName = 'Matt Cannoy';
 
-                // Globals
                 if (isCompleted) globalCompleted++;
                 else globalActive++;
 
-                // Tech Routing
                 if (tNum && techStats[tNum] !== undefined) {
                     if (isCompleted) techStats[tNum].completed++;
                     else techStats[tNum].active++;
                 }
 
-                // Advisor Routing
                 if (aName && advStats[aName] !== undefined) {
                     if (isCompleted) advStats[aName].completed++;
                     else advStats[aName].active++;
                 }
             });
 
-            // Update Summary Cards
             document.getElementById('rep-total-active').innerText = globalActive;
             document.getElementById('rep-total-completed').innerText = globalCompleted;
 
-            // Render Workload % Table
             const wlBox = document.getElementById('workload-list');
             wlBox.innerHTML = '';
             techs.forEach(t => {
@@ -581,7 +646,7 @@
                 const percent = globalActive > 0 ? Math.round((tActive / globalActive) * 100) : 0;
                 
                 wlBox.innerHTML += `
-                    <div class="bg-slate-950 p-3 rounded border border-slate-800 flex justify-between items-center">
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800 flex justify-between items-center cursor-pointer hover:border-slate-600 transition-colors" onclick="openReportDetails('tech', '${t}')">
                         <span class="text-blue-400 font-bold">Tech ${t}</span>
                         <div class="text-right">
                             <div class="text-sm font-bold text-white">${percent}%</div>
@@ -591,19 +656,17 @@
                 `;
             });
 
-            // Render Tech Progress Bars
             const techProgBox = document.getElementById('tech-progress-list');
             techProgBox.innerHTML = '';
             techs.forEach(t => {
                 const stats = techStats[t];
                 const total = stats.active + stats.completed;
-                
-                // MATH FIX: Round the number, but cap it at 99% unless fully complete
                 let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
                 if (percent === 100 && stats.completed < total) percent = 99;
                 
+                // ADDED: Clickable styling and onclick event
                 techProgBox.innerHTML += `
-                    <div class="mb-2">
+                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('tech', '${t}')">
                         <div class="flex justify-between items-end mb-1">
                             <span class="text-xs font-bold text-slate-300">Tech ${t}</span>
                             <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
@@ -615,19 +678,17 @@
                 `;
             });
 
-            // Render Advisor Progress Bars
             const advProgBox = document.getElementById('advisor-progress-list');
             advProgBox.innerHTML = '';
             advisors.forEach(a => {
                 const stats = advStats[a];
                 const total = stats.active + stats.completed;
-                
-                // MATH FIX: Round the number, but cap it at 99% unless fully complete
                 let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
                 if (percent === 100 && stats.completed < total) percent = 99;
                 
+                // ADDED: Clickable styling and onclick event
                 advProgBox.innerHTML += `
-                    <div class="mb-3">
+                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('advisor', '${a}')">
                         <div class="flex justify-between items-end mb-1">
                             <span class="text-xs font-bold text-slate-300">${a}</span>
                             <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
