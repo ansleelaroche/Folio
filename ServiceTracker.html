@@ -6,7 +6,6 @@
     <title>Kaiser GMC | Live Service Board</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .editable-cell {
             background-color: transparent;
@@ -133,18 +132,16 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 flex-1 min-h-[300px]">
-            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-lg flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Technician Metrics</h3>
-                <div class="relative flex-1 w-full h-full">
-                    <canvas id="techChart"></canvas>
-                </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Technician Completion Rate</h3>
+                <div id="tech-progress-list" class="space-y-4 overflow-y-auto pr-2">
+                    </div>
             </div>
 
-            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-lg flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Advisor Metrics</h3>
-                <div class="relative flex-1 w-full h-full">
-                    <canvas id="advisorChart"></canvas>
-                </div>
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Advisor Completion Rate</h3>
+                <div id="advisor-progress-list" class="space-y-4 overflow-y-auto pr-2">
+                    </div>
             </div>
         </div>
     </div>
@@ -228,32 +225,32 @@
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
-        
-        // Chart Instances
-        let tChart, aChart;
 
-        // --- UTILS ---
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
             if (dateStr.includes('-') && dateStr.length >= 10) {
                 return dateStr.split('T')[0]; 
             }
+
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return ''; 
+            
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
+            
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // --- AUTH & TOGGLES ---
         function loginUser() {
             const select = document.getElementById('user-select');
             currentUser = select.value;
+            
             if (!currentUser) { alert("Please select your name."); return; }
 
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('board-container').classList.remove('hidden');
+            
             document.getElementById('display-user').innerText = currentUser.split(' ')[0];
 
             if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
@@ -264,6 +261,7 @@
                 viewFilter = 'ALL'; 
                 document.getElementById('switch-view-btn').classList.add('hidden');
             }
+
             getTasks();
         }
 
@@ -302,28 +300,32 @@
                 document.getElementById('switch-view-btn').classList.add('hidden');
                 document.getElementById('btn-new-ro').classList.add('hidden');
                 document.getElementById('reports-container').classList.remove('hidden');
+                
                 btn.innerHTML = '🔙 Back to Board';
                 btn.classList.replace('bg-purple-900/30', 'bg-slate-700');
                 btn.classList.replace('text-purple-400', 'text-slate-300');
                 btn.classList.replace('border-purple-900', 'border-slate-500');
+                
                 generateReports();
             } else {
                 document.getElementById('reports-container').classList.add('hidden');
                 document.getElementById('board-container').classList.remove('hidden');
                 document.getElementById('completed-toggle-container').classList.remove('hidden');
                 document.getElementById('btn-new-ro').classList.remove('hidden');
+                
                 if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
                     document.getElementById('switch-view-btn').classList.remove('hidden');
                 }
+                
                 btn.innerHTML = '📊 Open Reports';
                 btn.classList.replace('bg-slate-700', 'bg-purple-900/30');
                 btn.classList.replace('text-slate-300', 'text-purple-400');
                 btn.classList.replace('border-slate-500', 'border-purple-900');
+                
                 getTasks();
             }
         }
 
-        // --- MODAL ---
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
             const offset = new Date().getTimezoneOffset() * 60000;
@@ -342,17 +344,19 @@
             setTimeout(() => toast.classList.add('opacity-0'), 2000);
         }
 
-        // --- DATABASE LOGIC ---
         async function getTasks() {
             if (!currentUser || isReportsView) return;
 
             let query = _supabase.from('servicetracker').select('*');
+
             if (!showCompleted) {
                 query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
             }
+
             if (viewFilter !== 'ALL') {
                 query = query.eq('assigned_user', viewFilter);
             }
+
             query = query.order('is_waiting', { ascending: false }).order('created_at', { ascending: false });
 
             const { data: tasks, error } = await query;
@@ -383,33 +387,6 @@
                     getTasks();
                 }
             }
-        }
-
-        async function addTask() {
-            const ro = document.getElementById('new_ro').value;
-            const vehicle = document.getElementById('new_vehicle').value;
-            const customer = document.getElementById('new_customer').value;
-            const phone = document.getElementById('new_phone').value;
-            const issue = document.getElementById('new_issue').value;
-            const intake = document.getElementById('new_intake').value || null;
-            const tech = document.getElementById('new_tech').value || null;
-            const waitingType = document.getElementById('new_waiting').value; 
-
-            if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
-
-            const { error } = await _supabase
-                .from('servicetracker')
-                .insert([{ 
-                    ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
-                    phone_number: phone, issue_description: issue, intake_date: intake, 
-                    tech: tech, 
-                    status: 'Pending', 
-                    is_waiting: waitingType, 
-                    assigned_user: currentUser
-                }]);
-
-            if (error) alert('Database Error: ' + error.message);
-            else { getTasks(); closeModal(); }
         }
 
         function renderTasks(tasks) {
@@ -499,14 +476,41 @@
             }
         }
 
-        // --- REPORTS ENGINE ---
+        async function addTask() {
+            const ro = document.getElementById('new_ro').value;
+            const vehicle = document.getElementById('new_vehicle').value;
+            const customer = document.getElementById('new_customer').value;
+            const phone = document.getElementById('new_phone').value;
+            const issue = document.getElementById('new_issue').value;
+            const intake = document.getElementById('new_intake').value || null;
+            const tech = document.getElementById('new_tech').value || null;
+            const waitingType = document.getElementById('new_waiting').value; 
+
+            if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
+
+            const { error } = await _supabase
+                .from('servicetracker')
+                .insert([{ 
+                    ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
+                    phone_number: phone, issue_description: issue, intake_date: intake, 
+                    tech: tech, 
+                    status: 'Pending', 
+                    is_waiting: waitingType, 
+                    assigned_user: currentUser
+                }]);
+
+            if (error) alert('Database Error: ' + error.message);
+            else { getTasks(); closeModal(); }
+        }
+
+        // --- NEW REPORTS ENGINE WITH PROGRESS BARS ---
         async function generateReports() {
             let allTasks = [];
             let fetchMore = true;
             let startRow = 0;
             const limit = 1000;
 
-            // NEW: The Pagination Loop! This keeps asking Supabase for data until it gets it all.
+            // Pagination Loop
             while (fetchMore) {
                 const { data, error } = await _supabase
                     .from('servicetracker')
@@ -520,7 +524,6 @@
 
                 allTasks = allTasks.concat(data);
 
-                // If Supabase gave us less than 1,000 rows, we know we've hit the end of the database!
                 if (data.length < limit) {
                     fetchMore = false;
                 } else {
@@ -588,58 +591,46 @@
                 `;
             });
 
-            // Destroy old charts to prevent hover glitching
-            if (tChart) tChart.destroy();
-            if (aChart) aChart.destroy();
-
-            // Setup Chart Defaults
-            Chart.defaults.color = '#94a3b8'; 
-            Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
-
-            // Draw Tech Chart
-            const ctxTech = document.getElementById('techChart').getContext('2d');
-            tChart = new Chart(ctxTech, {
-                type: 'bar',
-                data: {
-                    labels: techs.map(t => 'Tech ' + t),
-                    datasets: [
-                        { label: 'Active', data: techs.map(t => techStats[t].active), backgroundColor: '#3b82f6', borderRadius: 4 },
-                        { label: 'Completed', data: techs.map(t => techStats[t].completed), backgroundColor: '#10b981', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y', 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { stacked: true, grid: { color: '#334155' } },
-                        y: { stacked: true, grid: { display: false } }
-                    },
-                    plugins: { legend: { position: 'top', align: 'end' } }
-                }
+            // Render Tech Progress Bars
+            const techProgBox = document.getElementById('tech-progress-list');
+            techProgBox.innerHTML = '';
+            techs.forEach(t => {
+                const stats = techStats[t];
+                const total = stats.active + stats.completed;
+                const percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                
+                techProgBox.innerHTML += `
+                    <div class="mb-2">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-xs font-bold text-slate-300">Tech ${t}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800">
+                            <div class="bg-blue-500 h-1.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
             });
 
-            // Draw Advisor Chart
-            const ctxAdv = document.getElementById('advisorChart').getContext('2d');
-            aChart = new Chart(ctxAdv, {
-                type: 'bar',
-                data: {
-                    labels: advisors,
-                    datasets: [
-                        { label: 'Active', data: advisors.map(a => advStats[a].active), backgroundColor: '#8b5cf6', borderRadius: 4 },
-                        { label: 'Completed', data: advisors.map(a => advStats[a].completed), backgroundColor: '#10b981', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    indexAxis: 'y', 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { stacked: true, grid: { color: '#334155' } },
-                        y: { stacked: true, grid: { display: false } }
-                    },
-                    plugins: { legend: { position: 'top', align: 'end' } }
-                }
+            // Render Advisor Progress Bars
+            const advProgBox = document.getElementById('advisor-progress-list');
+            advProgBox.innerHTML = '';
+            advisors.forEach(a => {
+                const stats = advStats[a];
+                const total = stats.active + stats.completed;
+                const percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
+                
+                advProgBox.innerHTML += `
+                    <div class="mb-3">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-xs font-bold text-slate-300">${a}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800">
+                            <div class="bg-purple-500 h-1.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
