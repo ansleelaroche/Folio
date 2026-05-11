@@ -89,17 +89,17 @@
             <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-12 text-center">Hat #</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
                         <th class="advisor-col px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Advisor</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Customer</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Phone</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Vehicle</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-12 text-center">Hat #</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-red-400">Est. Date</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Completed</th>
                     </tr>
@@ -433,25 +433,32 @@
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
                     
+                    <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
+                        ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
+                    </td>
+
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
                     
                     <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
+                    </td>
+
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                    </td>
+                    
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
                     </td>
 
                     <td class="px-1 py-1 align-middle text-center">
                         <input type="text" value="${task.hat || ''}" onchange="updateField(${task.id}, 'hat', this.value)" placeholder="--" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded text-center">
                     </td>
 
-                    <td class="px-1 py-1 align-middle text-center">
-                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
-                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
-                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
-                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
-                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
-                        </select>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
                     </td>
 
                     <td class="px-1 py-1 align-middle">
@@ -467,10 +474,11 @@
                             <option value="Body Shop" ${task.is_waiting === 'Body Shop' ? 'selected' : ''}>Body Shop</option>
                         </select>
                     </td>
-                    
-                    <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
-                        ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
+
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
+
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'tech', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
@@ -482,21 +490,20 @@
                             <option value="2116" ${safeTech === '2116' ? 'selected' : ''}>2116</option>
                         </select>
                     </td>
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
+
+                    <td class="px-1 py-1 align-middle text-center">
+                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
+                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
+                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
+                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
                     </td>
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
-                    </td>
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
-                    </td>
+
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
+                    
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
@@ -617,7 +624,6 @@
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
             const advisors = ['Frank LaRoche', 'Matt Cannoy'];
             
-            // NEW: Tracking every single status
             let techStats = {}; techs.forEach(t => techStats[t] = { pending: 0, inShop: 0, partsHold: 0, completed: 0, activeTotal: 0 });
             let advStats = {}; advisors.forEach(a => advStats[a] = { pending: 0, inShop: 0, partsHold: 0, completed: 0, activeTotal: 0 });
             
@@ -637,7 +643,6 @@
                 if (isCompleted) globalCompleted++;
                 else globalActive++;
 
-                // Bucket the Techs
                 if (tNum && techStats[tNum] !== undefined) {
                     if (cleanStatus === 'pending' || cleanStatus === '') techStats[tNum].pending++;
                     else if (cleanStatus === 'in shop') techStats[tNum].inShop++;
@@ -647,7 +652,6 @@
                     if (!isCompleted) techStats[tNum].activeTotal++;
                 }
 
-                // Bucket the Advisors
                 if (aName && advStats[aName] !== undefined) {
                     if (cleanStatus === 'pending' || cleanStatus === '') advStats[aName].pending++;
                     else if (cleanStatus === 'in shop') advStats[aName].inShop++;
@@ -678,7 +682,6 @@
                 `;
             });
 
-            // NEW: Render Tech Status Breakdown Badges
             const techProgBox = document.getElementById('tech-progress-list');
             techProgBox.innerHTML = '';
             techs.forEach(t => {
@@ -712,7 +715,6 @@
                 `;
             });
 
-            // NEW: Render Advisor Status Breakdown Badges
             const advProgBox = document.getElementById('advisor-progress-list');
             advProgBox.innerHTML = '';
             advisors.forEach(a => {
