@@ -6,6 +6,7 @@
     <title>Kaiser GMC | Live Service Board</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .editable-cell {
             background-color: transparent;
@@ -31,7 +32,6 @@
 </head>
 <body class="bg-slate-950 text-[10px] font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
-    <!-- LOGIN SCREEN OVERLAY -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950 flex flex-col justify-center items-center z-[100]">
         <div class="bg-slate-900 p-8 rounded-xl shadow-2xl border border-slate-800 w-full max-w-sm text-center">
             <h1 class="text-2xl font-bold text-white mb-1">Kaiser GMC</h1>
@@ -54,40 +54,38 @@
         </div>
     </div>
 
-    <!-- MAIN APPLICATION CONTAINER -->
-    <div id="app-container" class="hidden w-full max-w-[1800px] mx-auto flex flex-col h-full p-2">
-        
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-2 bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0">
-            <div class="flex items-center space-x-4">
-                <div>
-                    <h1 class="text-base font-bold text-white tracking-tight leading-none">Kaiser GMC</h1>
-                    <p class="text-slate-500 text-[9px] font-bold uppercase tracking-wide">Live Dispatch</p>
-                </div>
-                
-                <!-- View Switcher -->
-                <button id="switch-view-btn" onclick="toggleAdvisorView()" class="hidden text-[10px] font-bold bg-slate-800 text-blue-400 px-3 py-1.5 rounded border border-blue-900 hover:bg-slate-700 hover:text-blue-300 transition shadow-sm">
-                    Viewing: Frank's ROs (Swap)
-                </button>
-
-                <!-- Show Completed Toggle -->
-                <label class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:bg-slate-700 transition">
-                    <input type="checkbox" id="toggle-completed" onchange="toggleCompleted()" class="h-3 w-3 rounded bg-slate-900 border-slate-600 focus:ring-blue-500 cursor-pointer">
-                    <span class="text-slate-400 text-[9px] font-bold uppercase tracking-wide">Show Completed</span>
-                </label>
+    <header class="flex justify-between items-center bg-slate-900 p-2 rounded shadow-md border border-slate-800 shrink-0 m-2">
+        <div class="flex items-center space-x-4">
+            <div>
+                <h1 class="text-base font-bold text-white tracking-tight leading-none">Kaiser GMC</h1>
+                <p class="text-slate-500 text-[9px] font-bold uppercase tracking-wide">Live Dispatch</p>
             </div>
+            
+            <button id="switch-view-btn" onclick="toggleAdvisorView()" class="hidden text-[10px] font-bold bg-slate-800 text-blue-400 px-3 py-1.5 rounded border border-blue-900 hover:bg-slate-700 hover:text-blue-300 transition shadow-sm">
+                Viewing: Frank's ROs (Swap)
+            </button>
 
-            <div class="flex items-center space-x-3">
-                <span class="text-slate-500 text-[10px] font-bold uppercase tracking-wide">Logged in: <span id="display-user" class="text-white"></span></span>
-                <button onclick="logoutUser()" class="text-[10px] font-bold text-red-400 hover:text-red-300 transition mr-2">Logout</button>
-                <span id="save-toast" class="text-green-400 text-[10px] font-bold opacity-0 transition-opacity duration-300">✓ Saved</span>
-                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-3 rounded shadow transition border border-blue-500">
-                    + New RO
-                </button>
-            </div>
-        </header>
+            <label id="completed-toggle-container" class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:bg-slate-700 transition">
+                <input type="checkbox" id="toggle-completed" onchange="toggleCompleted()" class="h-3 w-3 rounded bg-slate-900 border-slate-600 focus:ring-blue-500 cursor-pointer">
+                <span class="text-slate-400 text-[9px] font-bold uppercase tracking-wide">Show Completed</span>
+            </label>
+            
+            <button onclick="toggleReportsView()" id="btn-toggle-reports" class="text-[10px] font-bold bg-purple-900/30 text-purple-400 px-3 py-1.5 rounded border border-purple-900 hover:bg-purple-900/50 hover:text-purple-300 transition shadow-sm">
+                📊 Open Reports
+            </button>
+        </div>
 
-        <!-- Task List -->
+        <div class="flex items-center space-x-3">
+            <span class="text-slate-500 text-[10px] font-bold uppercase tracking-wide">Logged in: <span id="display-user" class="text-white"></span></span>
+            <button onclick="logoutUser()" class="text-[10px] font-bold text-red-400 hover:text-red-300 transition mr-2">Logout</button>
+            <span id="save-toast" class="text-green-400 text-[10px] font-bold opacity-0 transition-opacity duration-300">✓ Saved</span>
+            <button id="btn-new-ro" onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-1 px-3 rounded shadow transition border border-blue-500">
+                + New RO
+            </button>
+        </div>
+    </header>
+
+    <div id="board-container" class="hidden w-full max-w-[1800px] mx-auto flex flex-col h-full px-2 pb-2">
         <div class="bg-slate-900 rounded shadow border border-slate-800 flex-1 overflow-auto">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
@@ -107,13 +105,50 @@
                     </tr>
                 </thead>
                 <tbody id="task-list" class="divide-y divide-slate-800/50">
-                    <!-- Tasks load here -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
 
-    <!-- ADD NEW TASK MODAL -->
+    <div id="reports-container" class="hidden w-full max-w-[1600px] mx-auto flex flex-col h-full px-2 pb-2 overflow-auto">
+        
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="col-span-1 bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg flex flex-col justify-center">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Shop Overview</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-semibold text-slate-300">Total Active Jobs:</span>
+                    <span id="rep-total-active" class="text-2xl font-bold text-blue-400">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-semibold text-slate-300">Completed to Date:</span>
+                    <span id="rep-total-completed" class="text-2xl font-bold text-green-400">0</span>
+                </div>
+            </div>
+
+            <div class="col-span-2 bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Active Workload Distribution</h3>
+                <div id="workload-list" class="grid grid-cols-3 gap-4">
+                    </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 flex-1 min-h-[300px]">
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-lg flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Technician Metrics</h3>
+                <div class="relative flex-1 w-full h-full">
+                    <canvas id="techChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-lg flex flex-col">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Advisor Metrics</h3>
+                <div class="relative flex-1 w-full h-full">
+                    <canvas id="advisorChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="taskModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
         <div class="bg-slate-800 p-4 rounded shadow-2xl w-full max-w-lg border border-slate-700">
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
@@ -192,32 +227,33 @@
         let currentUser = '';
         let viewFilter = ''; 
         let showCompleted = false;
+        let isReportsView = false;
+        
+        // Chart Instances
+        let tChart, aChart;
 
+        // --- UTILS ---
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
             if (dateStr.includes('-') && dateStr.length >= 10) {
                 return dateStr.split('T')[0]; 
             }
-
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return ''; 
-            
             const yyyy = d.getFullYear();
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
-            
             return `${yyyy}-${mm}-${dd}`;
         }
 
+        // --- AUTH & TOGGLES ---
         function loginUser() {
             const select = document.getElementById('user-select');
             currentUser = select.value;
-            
             if (!currentUser) { alert("Please select your name."); return; }
 
             document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('hidden');
-            
+            document.getElementById('board-container').classList.remove('hidden');
             document.getElementById('display-user').innerText = currentUser.split(' ')[0];
 
             if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
@@ -228,7 +264,6 @@
                 viewFilter = 'ALL'; 
                 document.getElementById('switch-view-btn').classList.add('hidden');
             }
-
             getTasks();
         }
 
@@ -236,7 +271,9 @@
             currentUser = '';
             document.getElementById('user-select').value = '';
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('board-container').classList.add('hidden');
+            document.getElementById('reports-container').classList.add('hidden');
+            isReportsView = false;
         }
 
         function toggleAdvisorView() {
@@ -255,6 +292,38 @@
             getTasks();
         }
 
+        function toggleReportsView() {
+            isReportsView = !isReportsView;
+            const btn = document.getElementById('btn-toggle-reports');
+            
+            if (isReportsView) {
+                document.getElementById('board-container').classList.add('hidden');
+                document.getElementById('completed-toggle-container').classList.add('hidden');
+                document.getElementById('switch-view-btn').classList.add('hidden');
+                document.getElementById('btn-new-ro').classList.add('hidden');
+                document.getElementById('reports-container').classList.remove('hidden');
+                btn.innerHTML = '🔙 Back to Board';
+                btn.classList.replace('bg-purple-900/30', 'bg-slate-700');
+                btn.classList.replace('text-purple-400', 'text-slate-300');
+                btn.classList.replace('border-purple-900', 'border-slate-500');
+                generateReports();
+            } else {
+                document.getElementById('reports-container').classList.add('hidden');
+                document.getElementById('board-container').classList.remove('hidden');
+                document.getElementById('completed-toggle-container').classList.remove('hidden');
+                document.getElementById('btn-new-ro').classList.remove('hidden');
+                if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
+                    document.getElementById('switch-view-btn').classList.remove('hidden');
+                }
+                btn.innerHTML = '📊 Open Reports';
+                btn.classList.replace('bg-slate-700', 'bg-purple-900/30');
+                btn.classList.replace('text-slate-300', 'text-purple-400');
+                btn.classList.replace('border-slate-500', 'border-purple-900');
+                getTasks();
+            }
+        }
+
+        // --- MODAL ---
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
             const offset = new Date().getTimezoneOffset() * 60000;
@@ -273,19 +342,17 @@
             setTimeout(() => toast.classList.add('opacity-0'), 2000);
         }
 
+        // --- DATABASE LOGIC ---
         async function getTasks() {
-            if (!currentUser) return;
+            if (!currentUser || isReportsView) return;
 
             let query = _supabase.from('servicetracker').select('*');
-
             if (!showCompleted) {
                 query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
             }
-
             if (viewFilter !== 'ALL') {
                 query = query.eq('assigned_user', viewFilter);
             }
-
             query = query.order('is_waiting', { ascending: false }).order('created_at', { ascending: false });
 
             const { data: tasks, error } = await query;
@@ -318,109 +385,6 @@
             }
         }
 
-        function renderTasks(tasks) {
-            const list = document.getElementById('task-list');
-            const offset = new Date().getTimezoneOffset() * 60000;
-            const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
-
-            list.innerHTML = tasks.map(task => {
-                
-                const safeIntake = formatSafeDate(task.intake_date);
-                const safeCompletion = formatSafeDate(task.completion_time);
-                const safeCompleted = formatSafeDate(task.completed_date);
-                const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
-                
-                // LOOKS FOR "task.tech" NOW INSTEAD OF "task.tech_number"
-                const safeTech = task.tech ? String(task.tech).trim() : '';
-
-                const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
-                const isCustomerWaiting = task.is_waiting === 'Waiting';
-
-                return `
-                <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
-                    </td>
-
-                    <td class="px-1 py-1 align-middle text-center">
-                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
-                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
-                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
-                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
-                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
-                        </select>
-                    </td>
-
-                    <td class="px-1 py-1 align-middle">
-                        <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
-                            <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
-                            <option value="Waiting" ${task.is_waiting === 'Waiting' ? 'selected' : ''}>Waiting</option>
-                            <option value="Tow In" ${task.is_waiting === 'Tow In' ? 'selected' : ''}>Tow In</option>
-                            <option value="Shuttle" ${task.is_waiting === 'Shuttle' ? 'selected' : ''}>Shuttle</option>
-                            <option value="Loaner" ${task.is_waiting === 'Loaner' ? 'selected' : ''}>Loaner</option>
-                            <option value="Off Site" ${task.is_waiting === 'Off Site' ? 'selected' : ''}>Off Site</option>
-                            <option value="Kaiser" ${task.is_waiting === 'Kaiser' ? 'selected' : ''}>Kaiser</option>
-                            <option value="Employee" ${task.is_waiting === 'Employee' ? 'selected' : ''}>Employee</option>
-                            <option value="Body Shop" ${task.is_waiting === 'Body Shop' ? 'selected' : ''}>Body Shop</option>
-                        </select>
-                    </td>
-
-                    <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
-                    </td>
-                    
-                    <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
-                        ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
-                    </td>
-                    
-                    <!-- UPDATED: Saves to 'tech' instead of 'tech_number' -->
-                    <td class="px-1 py-1 align-middle">
-                        <select onchange="updateField(${task.id}, 'tech', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
-                            <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
-                            <option value="1166" ${safeTech === '1166' ? 'selected' : ''}>1166</option>
-                            <option value="1197" ${safeTech === '1197' ? 'selected' : ''}>1197</option>
-                            <option value="1915" ${safeTech === '1915' ? 'selected' : ''}>1915</option>
-                            <option value="1956" ${safeTech === '1956' ? 'selected' : ''}>1956</option>
-                            <option value="2107" ${safeTech === '2107' ? 'selected' : ''}>2107</option>
-                            <option value="2116" ${safeTech === '2116' ? 'selected' : ''}>2116</option>
-                        </select>
-                    </td>
-
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
-                    </td>
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
-                    </td>
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
-                    </td>
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
-                    </td>
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
-                    </td>
-                    
-                    <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
-                    </td>
-                </tr>
-            `}).join('');
-
-            const advisorCols = document.querySelectorAll('.advisor-col');
-            if (viewFilter !== 'ALL') {
-                advisorCols.forEach(col => col.style.display = 'none');
-            } else {
-                advisorCols.forEach(col => col.style.display = '');
-            }
-        }
-
         async function addTask() {
             const ro = document.getElementById('new_ro').value;
             const vehicle = document.getElementById('new_vehicle').value;
@@ -438,7 +402,7 @@
                 .insert([{ 
                     ro_number: ro, vehicle_desc: vehicle, customer_name: customer,
                     phone_number: phone, issue_description: issue, intake_date: intake, 
-                    tech: tech, // UPDATED: Saves to 'tech' instead of 'tech_number'
+                    tech: tech, 
                     status: 'Pending', 
                     is_waiting: waitingType, 
                     assigned_user: currentUser
@@ -446,6 +410,210 @@
 
             if (error) alert('Database Error: ' + error.message);
             else { getTasks(); closeModal(); }
+        }
+
+        function renderTasks(tasks) {
+            const list = document.getElementById('task-list');
+            const offset = new Date().getTimezoneOffset() * 60000;
+            const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
+
+            list.innerHTML = tasks.map(task => {
+                const safeIntake = formatSafeDate(task.intake_date);
+                const safeCompletion = formatSafeDate(task.completion_time);
+                const safeCompleted = formatSafeDate(task.completed_date);
+                const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
+                const safeTech = task.tech ? String(task.tech).trim() : '';
+
+                const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
+                const isCustomerWaiting = task.is_waiting === 'Waiting';
+
+                return `
+                <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
+                    </td>
+                    <td class="px-1 py-1 align-middle text-center">
+                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                            <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
+                            <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
+                            <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
+                            <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
+                            <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
+                            <option value="Waiting" ${task.is_waiting === 'Waiting' ? 'selected' : ''}>Waiting</option>
+                            <option value="Tow In" ${task.is_waiting === 'Tow In' ? 'selected' : ''}>Tow In</option>
+                            <option value="Shuttle" ${task.is_waiting === 'Shuttle' ? 'selected' : ''}>Shuttle</option>
+                            <option value="Loaner" ${task.is_waiting === 'Loaner' ? 'selected' : ''}>Loaner</option>
+                            <option value="Off Site" ${task.is_waiting === 'Off Site' ? 'selected' : ''}>Off Site</option>
+                            <option value="Kaiser" ${task.is_waiting === 'Kaiser' ? 'selected' : ''}>Kaiser</option>
+                            <option value="Employee" ${task.is_waiting === 'Employee' ? 'selected' : ''}>Employee</option>
+                            <option value="Body Shop" ${task.is_waiting === 'Body Shop' ? 'selected' : ''}>Body Shop</option>
+                        </select>
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                    </td>
+                    <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
+                        ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <select onchange="updateField(${task.id}, 'tech', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                            <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
+                            <option value="1166" ${safeTech === '1166' ? 'selected' : ''}>1166</option>
+                            <option value="1197" ${safeTech === '1197' ? 'selected' : ''}>1197</option>
+                            <option value="1915" ${safeTech === '1915' ? 'selected' : ''}>1915</option>
+                            <option value="1956" ${safeTech === '1956' ? 'selected' : ''}>1956</option>
+                            <option value="2107" ${safeTech === '2107' ? 'selected' : ''}>2107</option>
+                            <option value="2116" ${safeTech === '2116' ? 'selected' : ''}>2116</option>
+                        </select>
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="text" value="${task.issue_description || ''}" onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded truncate" placeholder="Issue...">
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
+                    </td>
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                    </td>
+                </tr>
+            `}).join('');
+
+            const advisorCols = document.querySelectorAll('.advisor-col');
+            if (viewFilter !== 'ALL') {
+                advisorCols.forEach(col => col.style.display = 'none');
+            } else {
+                advisorCols.forEach(col => col.style.display = '');
+            }
+        }
+
+        // --- REPORTS ENGINE ---
+        async function generateReports() {
+            // Fetch absolutely all data (ignoring filters) so stats are accurate
+            const { data: allTasks, error } = await _supabase.from('servicetracker').select('*');
+            if (error) { console.error('Report Error:', error); return; }
+
+            // Data Buckets
+            const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
+            const advisors = ['Frank LaRoche', 'Matt Cannoy'];
+            
+            let techStats = {}; techs.forEach(t => techStats[t] = { active: 0, completed: 0 });
+            let advStats = {}; advisors.forEach(a => advStats[a] = { active: 0, completed: 0 });
+            
+            let globalActive = 0;
+            let globalCompleted = 0;
+
+            // Crunch the Numbers
+            allTasks.forEach(task => {
+                const isCompleted = task.status && task.status.trim().toLowerCase() === 'completed';
+                const tNum = task.tech ? String(task.tech).trim() : null;
+                const aName = task.assigned_user;
+
+                // Globals
+                if (isCompleted) globalCompleted++;
+                else globalActive++;
+
+                // Tech Routing
+                if (tNum && techStats[tNum] !== undefined) {
+                    if (isCompleted) techStats[tNum].completed++;
+                    else techStats[tNum].active++;
+                }
+
+                // Advisor Routing
+                if (aName && advStats[aName] !== undefined) {
+                    if (isCompleted) advStats[aName].completed++;
+                    else advStats[aName].active++;
+                }
+            });
+
+            // Update Summary Cards
+            document.getElementById('rep-total-active').innerText = globalActive;
+            document.getElementById('rep-total-completed').innerText = globalCompleted;
+
+            // Render Workload % Table
+            const wlBox = document.getElementById('workload-list');
+            wlBox.innerHTML = '';
+            techs.forEach(t => {
+                const tActive = techStats[t].active;
+                // Calculate percentage (avoiding divide by zero)
+                const percent = globalActive > 0 ? Math.round((tActive / globalActive) * 100) : 0;
+                
+                wlBox.innerHTML += `
+                    <div class="bg-slate-950 p-3 rounded border border-slate-800 flex justify-between items-center">
+                        <span class="text-blue-400 font-bold">Tech ${t}</span>
+                        <div class="text-right">
+                            <div class="text-sm font-bold text-white">${percent}%</div>
+                            <div class="text-[9px] text-slate-500">${tActive} active jobs</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Destroy old charts to prevent hover glitching
+            if (tChart) tChart.destroy();
+            if (aChart) aChart.destroy();
+
+            // Setup Chart Defaults (Dark Mode)
+            Chart.defaults.color = '#94a3b8'; // slate-400
+            Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
+
+            // Draw Tech Chart (Stacked Horizontal Bar)
+            const ctxTech = document.getElementById('techChart').getContext('2d');
+            tChart = new Chart(ctxTech, {
+                type: 'bar',
+                data: {
+                    labels: techs.map(t => 'Tech ' + t),
+                    datasets: [
+                        { label: 'Active', data: techs.map(t => techStats[t].active), backgroundColor: '#3b82f6', borderRadius: 4 },
+                        { label: 'Completed', data: techs.map(t => techStats[t].completed), backgroundColor: '#10b981', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // Makes it horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { color: '#334155' } },
+                        y: { stacked: true, grid: { display: false } }
+                    },
+                    plugins: { legend: { position: 'top', align: 'end' } }
+                }
+            });
+
+            // Draw Advisor Chart (Stacked Horizontal Bar)
+            const ctxAdv = document.getElementById('advisorChart').getContext('2d');
+            aChart = new Chart(ctxAdv, {
+                type: 'bar',
+                data: {
+                    labels: advisors,
+                    datasets: [
+                        { label: 'Active', data: advisors.map(a => advStats[a].active), backgroundColor: '#8b5cf6', borderRadius: 4 },
+                        { label: 'Completed', data: advisors.map(a => advStats[a].completed), backgroundColor: '#10b981', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // Makes it horizontal
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { color: '#334155' } },
+                        y: { stacked: true, grid: { display: false } }
+                    },
+                    plugins: { legend: { position: 'top', align: 'end' } }
+                }
+            });
         }
 
         setInterval(getTasks, 60000);
