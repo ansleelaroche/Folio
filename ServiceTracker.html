@@ -90,10 +90,10 @@
                 <thead class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
                     <tr>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">RO #</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-12 text-center">Hat #</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Intake</th>
                         <th class="advisor-col px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Advisor</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-32">Customer</th>
@@ -134,13 +134,13 @@
 
         <div class="grid grid-cols-2 gap-4 flex-1 min-h-[300px]">
             <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Technician Completion Rate</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Technician Status Breakdown</h3>
                 <div id="tech-progress-list" class="space-y-4 overflow-y-auto pr-2">
                     </div>
             </div>
 
             <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 shadow-lg flex flex-col">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Advisor Completion Rate</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">Advisor Status Breakdown</h3>
                 <div id="advisor-progress-list" class="space-y-4 overflow-y-auto pr-2">
                     </div>
             </div>
@@ -432,10 +432,15 @@
 
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
+                    
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
                     
+                    <td class="px-1 py-1 align-middle">
+                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                    </td>
+
                     <td class="px-1 py-1 align-middle text-center">
                         <input type="text" value="${task.hat || ''}" onchange="updateField(${task.id}, 'hat', this.value)" placeholder="--" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded text-center">
                     </td>
@@ -448,6 +453,7 @@
                             <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
                         </select>
                     </td>
+
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
                             <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
@@ -461,9 +467,7 @@
                             <option value="Body Shop" ${task.is_waiting === 'Body Shop' ? 'selected' : ''}>Body Shop</option>
                         </select>
                     </td>
-                    <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
-                    </td>
+                    
                     <td class="advisor-col px-1 py-1 align-middle text-[10px] font-bold text-blue-400">
                         ${task.assigned_user ? task.assigned_user.split(' ')[0] : 'None'}
                     </td>
@@ -613,33 +617,44 @@
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
             const advisors = ['Frank LaRoche', 'Matt Cannoy'];
             
-            let techStats = {}; techs.forEach(t => techStats[t] = { active: 0, completed: 0 });
-            let advStats = {}; advisors.forEach(a => advStats[a] = { active: 0, completed: 0 });
+            // NEW: Tracking every single status
+            let techStats = {}; techs.forEach(t => techStats[t] = { pending: 0, inShop: 0, partsHold: 0, completed: 0, activeTotal: 0 });
+            let advStats = {}; advisors.forEach(a => advStats[a] = { pending: 0, inShop: 0, partsHold: 0, completed: 0, activeTotal: 0 });
             
             let globalActive = 0;
             let globalCompleted = 0;
 
             allTasks.forEach(task => {
-                const isCompleted = task.status && task.status.trim().toLowerCase() === 'completed';
+                const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
+                const isCompleted = cleanStatus === 'completed';
                 const tNum = task.tech ? String(task.tech).trim() : null;
                 
                 const rawName = task.assigned_user ? task.assigned_user.trim().toLowerCase() : '';
                 let aName = null;
-                
                 if (rawName.includes('frank')) aName = 'Frank LaRoche';
                 if (rawName.includes('matt')) aName = 'Matt Cannoy';
 
                 if (isCompleted) globalCompleted++;
                 else globalActive++;
 
+                // Bucket the Techs
                 if (tNum && techStats[tNum] !== undefined) {
-                    if (isCompleted) techStats[tNum].completed++;
-                    else techStats[tNum].active++;
+                    if (cleanStatus === 'pending' || cleanStatus === '') techStats[tNum].pending++;
+                    else if (cleanStatus === 'in shop') techStats[tNum].inShop++;
+                    else if (cleanStatus === 'parts hold' || cleanStatus === 'partshold') techStats[tNum].partsHold++;
+                    else if (cleanStatus === 'completed') techStats[tNum].completed++;
+                    
+                    if (!isCompleted) techStats[tNum].activeTotal++;
                 }
 
+                // Bucket the Advisors
                 if (aName && advStats[aName] !== undefined) {
-                    if (isCompleted) advStats[aName].completed++;
-                    else advStats[aName].active++;
+                    if (cleanStatus === 'pending' || cleanStatus === '') advStats[aName].pending++;
+                    else if (cleanStatus === 'in shop') advStats[aName].inShop++;
+                    else if (cleanStatus === 'parts hold' || cleanStatus === 'partshold') advStats[aName].partsHold++;
+                    else if (cleanStatus === 'completed') advStats[aName].completed++;
+                    
+                    if (!isCompleted) advStats[aName].activeTotal++;
                 }
             });
 
@@ -649,7 +664,7 @@
             const wlBox = document.getElementById('workload-list');
             wlBox.innerHTML = '';
             techs.forEach(t => {
-                const tActive = techStats[t].active;
+                const tActive = techStats[t].activeTotal;
                 const percent = globalActive > 0 ? Math.round((tActive / globalActive) * 100) : 0;
                 
                 wlBox.innerHTML += `
@@ -663,43 +678,69 @@
                 `;
             });
 
+            // NEW: Render Tech Status Breakdown Badges
             const techProgBox = document.getElementById('tech-progress-list');
             techProgBox.innerHTML = '';
             techs.forEach(t => {
                 const stats = techStats[t];
-                const total = stats.active + stats.completed;
-                let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
-                if (percent === 100 && stats.completed < total) percent = 99;
                 
                 techProgBox.innerHTML += `
                     <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('tech', '${t}')">
-                        <div class="flex justify-between items-end mb-1">
+                        <div class="flex justify-between items-end mb-2">
                             <span class="text-xs font-bold text-slate-300">Tech ${t}</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
+                            <span class="text-[10px] text-slate-500 font-mono">Active Workload: <span class="text-blue-400 font-bold ml-1">${stats.activeTotal}</span></span>
                         </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800">
-                            <div class="bg-blue-500 h-1.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-slate-500 uppercase tracking-wide">Pending</div>
+                                <div class="text-xs font-bold text-slate-300">${stats.pending}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-blue-500 uppercase tracking-wide">In Shop</div>
+                                <div class="text-xs font-bold text-blue-400">${stats.inShop}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-orange-500 uppercase tracking-wide">Parts</div>
+                                <div class="text-xs font-bold text-orange-400">${stats.partsHold}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-green-500 uppercase tracking-wide">Done</div>
+                                <div class="text-xs font-bold text-green-400">${stats.completed}</div>
+                            </div>
                         </div>
                     </div>
                 `;
             });
 
+            // NEW: Render Advisor Status Breakdown Badges
             const advProgBox = document.getElementById('advisor-progress-list');
             advProgBox.innerHTML = '';
             advisors.forEach(a => {
                 const stats = advStats[a];
-                const total = stats.active + stats.completed;
-                let percent = total > 0 ? Math.round((stats.completed / total) * 100) : 0;
-                if (percent === 100 && stats.completed < total) percent = 99;
                 
                 advProgBox.innerHTML += `
                     <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('advisor', '${a}')">
-                        <div class="flex justify-between items-end mb-1">
+                        <div class="flex justify-between items-end mb-2">
                             <span class="text-xs font-bold text-slate-300">${a}</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${stats.completed} / ${total} <span class="text-green-400 ml-1 font-bold">(${percent}%)</span></span>
+                            <span class="text-[10px] text-slate-500 font-mono">Active Workload: <span class="text-purple-400 font-bold ml-1">${stats.activeTotal}</span></span>
                         </div>
-                        <div class="w-full bg-slate-950 rounded-full h-2 border border-slate-800">
-                            <div class="bg-purple-500 h-1.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-slate-500 uppercase tracking-wide">Pending</div>
+                                <div class="text-xs font-bold text-slate-300">${stats.pending}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-blue-500 uppercase tracking-wide">In Shop</div>
+                                <div class="text-xs font-bold text-blue-400">${stats.inShop}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-orange-500 uppercase tracking-wide">Parts</div>
+                                <div class="text-xs font-bold text-orange-400">${stats.partsHold}</div>
+                            </div>
+                            <div class="bg-slate-950 rounded border border-slate-800 p-1">
+                                <div class="text-[9px] text-green-500 uppercase tracking-wide">Done</div>
+                                <div class="text-xs font-bold text-green-400">${stats.completed}</div>
+                            </div>
                         </div>
                     </div>
                 `;
