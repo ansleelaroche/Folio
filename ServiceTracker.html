@@ -519,7 +519,13 @@
             allTasks.forEach(task => {
                 const isCompleted = task.status && task.status.trim().toLowerCase() === 'completed';
                 const tNum = task.tech ? String(task.tech).trim() : null;
-                const aName = task.assigned_user;
+                
+                // NEW: Name Cleaner! Forces everything to lowercase to catch "MATT CANNOY" or "MATT"
+                const rawName = task.assigned_user ? task.assigned_user.trim().toLowerCase() : '';
+                let aName = null;
+                
+                if (rawName.includes('frank')) aName = 'Frank LaRoche';
+                if (rawName.includes('matt')) aName = 'Matt Cannoy';
 
                 // Globals
                 if (isCompleted) globalCompleted++;
@@ -531,7 +537,7 @@
                     else techStats[tNum].active++;
                 }
 
-                // Advisor Routing
+                // Advisor Routing (Now uses the cleaned 'aName')
                 if (aName && advStats[aName] !== undefined) {
                     if (isCompleted) advStats[aName].completed++;
                     else advStats[aName].active++;
@@ -547,7 +553,6 @@
             wlBox.innerHTML = '';
             techs.forEach(t => {
                 const tActive = techStats[t].active;
-                // Calculate percentage (avoiding divide by zero)
                 const percent = globalActive > 0 ? Math.round((tActive / globalActive) * 100) : 0;
                 
                 wlBox.innerHTML += `
@@ -565,11 +570,11 @@
             if (tChart) tChart.destroy();
             if (aChart) aChart.destroy();
 
-            // Setup Chart Defaults (Dark Mode)
-            Chart.defaults.color = '#94a3b8'; // slate-400
+            // Setup Chart Defaults
+            Chart.defaults.color = '#94a3b8'; 
             Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
 
-            // Draw Tech Chart (Stacked Horizontal Bar)
+            // Draw Tech Chart
             const ctxTech = document.getElementById('techChart').getContext('2d');
             tChart = new Chart(ctxTech, {
                 type: 'bar',
@@ -581,7 +586,7 @@
                     ]
                 },
                 options: {
-                    indexAxis: 'y', // Makes it horizontal
+                    indexAxis: 'y', 
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -592,7 +597,7 @@
                 }
             });
 
-            // Draw Advisor Chart (Stacked Horizontal Bar)
+            // Draw Advisor Chart
             const ctxAdv = document.getElementById('advisorChart').getContext('2d');
             aChart = new Chart(ctxAdv, {
                 type: 'bar',
@@ -604,7 +609,7 @@
                     ]
                 },
                 options: {
-                    indexAxis: 'y', // Makes it horizontal
+                    indexAxis: 'y', 
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
