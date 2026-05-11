@@ -501,9 +501,32 @@
 
         // --- REPORTS ENGINE ---
         async function generateReports() {
-            // Fetch absolutely all data (ignoring filters) so stats are accurate
-            const { data: allTasks, error } = await _supabase.from('servicetracker').select('*');
-            if (error) { console.error('Report Error:', error); return; }
+            let allTasks = [];
+            let fetchMore = true;
+            let startRow = 0;
+            const limit = 1000;
+
+            // NEW: The Pagination Loop! This keeps asking Supabase for data until it gets it all.
+            while (fetchMore) {
+                const { data, error } = await _supabase
+                    .from('servicetracker')
+                    .select('*')
+                    .range(startRow, startRow + limit - 1);
+
+                if (error) { 
+                    console.error('Report Error:', error); 
+                    return; 
+                }
+
+                allTasks = allTasks.concat(data);
+
+                // If Supabase gave us less than 1,000 rows, we know we've hit the end of the database!
+                if (data.length < limit) {
+                    fetchMore = false;
+                } else {
+                    startRow += limit;
+                }
+            }
 
             // Data Buckets
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
@@ -520,7 +543,6 @@
                 const isCompleted = task.status && task.status.trim().toLowerCase() === 'completed';
                 const tNum = task.tech ? String(task.tech).trim() : null;
                 
-                // NEW: Name Cleaner! Forces everything to lowercase to catch "MATT CANNOY" or "MATT"
                 const rawName = task.assigned_user ? task.assigned_user.trim().toLowerCase() : '';
                 let aName = null;
                 
@@ -537,7 +559,7 @@
                     else techStats[tNum].active++;
                 }
 
-                // Advisor Routing (Now uses the cleaned 'aName')
+                // Advisor Routing
                 if (aName && advStats[aName] !== undefined) {
                     if (isCompleted) advStats[aName].completed++;
                     else advStats[aName].active++;
