@@ -404,7 +404,8 @@
                 query = query.eq('assigned_user', viewFilter);
             }
 
-            query = query.order('is_waiting', { ascending: false }).order('created_at', { ascending: false });
+            // MATH FIX: Now sorting ONLY by intake_date (descending) so rows don't jump around
+            query = query.order('intake_date', { ascending: false, nullsLast: true }).order('created_at', { ascending: false });
 
             const { data: tasks, error } = await query;
             if (error) console.error('Error fetching:', error.message);
@@ -430,14 +431,12 @@
             if (error) alert('Error saving data: ' + error.message);
             else {
                 flashSuccess();
-                // If we change the advisor and it no longer matches our current view filter, refresh to remove it
                 if (column === 'is_waiting' || column === 'status' || column === 'completion_time' || column === 'assigned_user') {
                     getTasks();
                 }
             }
         }
 
-        // --- NEW DELETE FUNCTION ---
         async function deleteTask(taskId) {
             if (!confirm("Are you sure you want to completely delete this RO? This cannot be undone.")) return;
 
@@ -468,7 +467,6 @@
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
                     
-                    <!-- COLUMN 1: ADVISOR (NOW A DROPDOWN) -->
                     <td class="advisor-col px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'assigned_user', this.value)" class="bg-slate-800 border border-slate-700 text-blue-400 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!task.assigned_user ? 'selected' : ''}>None</option>
@@ -479,37 +477,30 @@
                         </select>
                     </td>
 
-                    <!-- COLUMN 2: RO # -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.ro_number}" onchange="updateField(${task.id}, 'ro_number', this.value)" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded">
                     </td>
                     
-                    <!-- COLUMN 3: CUSTOMER -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.customer_name || ''}" placeholder="Name..." onchange="updateField(${task.id}, 'customer_name', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-semibold rounded">
                     </td>
 
-                    <!-- COLUMN 4: PHONE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.phone_number || ''}" placeholder="Phone..." onchange="updateField(${task.id}, 'phone_number', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
                     
-                    <!-- COLUMN 5: VEHICLE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="text" value="${task.vehicle_desc}" onchange="updateField(${task.id}, 'vehicle_desc', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] font-bold rounded">
                     </td>
 
-                    <!-- COLUMN 6: HAT # -->
                     <td class="px-1 py-1 align-middle text-center">
                         <input type="text" value="${task.hat || ''}" onchange="updateField(${task.id}, 'hat', this.value)" placeholder="--" class="editable-cell w-full px-1 py-0.5 font-mono text-[10px] font-bold rounded text-center">
                     </td>
 
-                    <!-- COLUMN 7: ISSUE DESCRIPTION -->
                     <td class="px-1 py-1 align-middle">
                         <textarea onchange="updateField(${task.id}, 'issue_description', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 italic rounded resize-y min-h-[24px]" placeholder="Issue..." rows="2">${task.issue_description || ''}</textarea>
                     </td>
 
-                    <!-- COLUMN 8: TYPE -->
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
                             <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
@@ -524,12 +515,10 @@
                         </select>
                     </td>
 
-                    <!-- COLUMN 9: INTAKE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeIntake}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
 
-                    <!-- COLUMN 10: TECH -->
                     <td class="px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'tech', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
@@ -542,7 +531,6 @@
                         </select>
                     </td>
 
-                    <!-- COLUMN 11: STATUS -->
                     <td class="px-1 py-1 align-middle text-center">
                         <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
@@ -552,17 +540,14 @@
                         </select>
                     </td>
 
-                    <!-- COLUMN 12: EST DATE -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     
-                    <!-- COLUMN 13: COMPLETED -->
                     <td class="px-1 py-1 align-middle">
                         <input type="date" value="${safeCompleted}" onchange="updateField(${task.id}, 'completed_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
 
-                    <!-- COLUMN 14: DELETE -->
                     <td class="px-1 py-1 align-middle text-center">
                         <button onclick="deleteTask(${task.id})" class="text-slate-600 hover:text-red-500 transition font-bold text-xs" title="Delete Record">✕</button>
                     </td>
