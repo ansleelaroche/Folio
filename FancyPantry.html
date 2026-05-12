@@ -13,12 +13,19 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Covered+By+Your+Grace&family=DM+Serif+Display&family=Inter:wght@300;400;700;900&display=swap');
         
+        html, body { 
+            overscroll-behavior-x: none; /* Prevents "bounce" sliding */
+            overflow-x: hidden; 
+            width: 100%;
+            position: relative;
+        }
+
         body { 
             background-color: #080807;
             background-image: 
                 radial-gradient(circle at 50% -20%, rgba(30, 58, 138, 0.45) 0%, rgba(8, 8, 7, 1) 85%),
                 url('https://www.transparenttextures.com/patterns/stardust.png');
-            background-attachment: fixed;
+            background-attachment: fixed; /* Background stays static */
             color: #f4f4f5; 
             font-family: 'Inter', sans-serif; 
             min-height: 100vh;
@@ -30,10 +37,37 @@
             opacity: 0.15; pointer-events: none; filter: invert(1); z-index: 0;
         }
 
+        /* TABS SCROLL ZONE */
+        .room-nav-container {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center; /* Centers on desktop */
+            padding: 30px 10px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+        }
+        .room-nav-container::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+
+        /* Force left-align on mobile so you can actually scroll them */
+        @media (max-width: 768px) {
+            .room-nav-container { justify-content: flex-start; padding: 25px 20px; }
+        }
+
+        .room-btn { 
+            display: inline-block;
+            font-size: 11px; font-weight: 900; letter-spacing: 0.4em; 
+            color: #4b5563; text-transform: uppercase; transition: 0.4s ease;
+            padding: 10px 15px;
+            flex-shrink: 0;
+        }
+        .room-btn.active { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); border-bottom: 2px solid #fff; }
+
         .flex-container { 
             display: flex; flex-wrap: wrap; gap: 1.5rem; 
             position: relative; z-index: 1; justify-content: center; 
-            padding: 20px; max-width: 1600px; margin: 0 auto;
+            padding: 0 20px 100px; max-width: 1600px; margin: 0 auto;
         }
 
         .column { flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 1rem; }
@@ -49,7 +83,7 @@
 
         .handwritten-header { 
             font-family: 'DM Serif Display', serif; 
-            font-size: 0.95rem; 
+            font-size: 1.2rem;
             letter-spacing: 0.05em; 
             display: flex; align-items: center; gap: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -60,25 +94,22 @@
         
         .handwritten { 
             font-family: 'Covered By Your Grace', cursive; 
-            font-size: 0.85rem; 
+            font-size: 1.15rem; 
             color: #ffffff; 
-            line-height: 1;
+            line-height: 1.2;
         }
 
-        .room-nav { display: flex; justify-content: center; align-items: center; gap: 3rem; padding: 50px 10px; }
-        .room-btn { 
-            font-size: 11px; font-weight: 900; letter-spacing: 0.4em; 
-            color: #4b5563; text-transform: uppercase; transition: 0.4s ease;
+        @media (min-width: 1024px) {
+            .handwritten-header { font-size: 0.95rem; }
+            .handwritten { font-size: 0.85rem; }
         }
-        .room-btn.active { color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.5); }
 
         .export-btn {
             font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
             color: rgba(255,255,255,0.3); text-transform: uppercase;
             border: 1px dashed rgba(255,255,255,0.1); padding: 6px 15px;
-            border-radius: 50px; transition: 0.3s;
+            border-radius: 50px; margin-left: 20px;
         }
-        .export-btn:hover { color: #fff; border-color: rgba(255,255,255,0.5); }
 
         @keyframes rose-glow {
             0% { color: #fb7185; opacity: 1; }
@@ -93,16 +124,12 @@
             font-size: 10px !important; outline: none; flex: 1; min-width: 0;
         }
 
-        .qty-label { font-size: 8px; font-weight: 900; opacity: 0.3; }
-
         .add-btn-main {
-            position: fixed; bottom: 40px; right: 40px; width: 50px; height: 50px;
+            position: fixed; bottom: 30px; right: 30px; width: 55px; height: 50px;
             background: #fff; color: #000; border-radius: 50%; display: flex;
             align-items: center; justify-content: center; z-index: 100;
             box-shadow: 0 30px 60px rgba(0,0,0,0.8);
         }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -129,14 +156,16 @@
     const AUTO_MAP = {
         "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "cucumber"],
         "Dairy": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream", "parmesan", "provalone"],
-        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs", "ham"],
+        "Protein": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs", "ham", "fish", "shrimp", "salmon", "cod", "tuna", "meat", "seafood"],
         "Drinks": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "seltz"],
-        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "relish", "ranch", "soy"],
+        "Condiments": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup", "relish", "ranch", "soy"],
         "Frozen Veg & Fruit": ["frozen veg", "frozen fruit", "mixed veg", "peas", "corn"]
     };
 
     const getMeta = (catName) => {
-        const match = Object.keys(META).find(k => k.toLowerCase() === catName.toLowerCase().trim());
+        let searchName = catName.toLowerCase().trim();
+        if (searchName.includes("meats") || searchName.includes("seafood")) searchName = "protein";
+        const match = Object.keys(META).find(k => k.toLowerCase() === searchName);
         return META[match] || META["Misc"];
     };
 
@@ -151,13 +180,20 @@
         const [newQty, setNewQty] = useState("");
         const [modalRoom, setModalRoom] = useState("Fridge");
         const [modalCat, setModalCat] = useState("Misc");
+        const [error, setError] = useState(null);
 
         useEffect(() => { fetchItems(); }, []);
         useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen]);
 
         async function fetchItems() {
-            const { data } = await supabase.from('FancyPantry').select('*').order('name');
-            if (data) setItems(data);
+            try {
+                const { data, error } = await supabase.from('FancyPantry').select('*').order('name');
+                if (error) throw error;
+                setItems(data || []);
+                setError(null);
+            } catch (err) {
+                setError("Connection issue. Check project status.");
+            }
         }
 
         const handleNameChange = (val) => {
@@ -180,7 +216,7 @@
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `Pantry_Inventory_${new Date().toLocaleDateString()}.csv`;
+            link.download = `Inventory.csv`;
             link.click();
         };
 
@@ -198,7 +234,8 @@
                 return a.name.localeCompare(b.name);
             });
             return sorted.reduce((acc, i) => {
-                const rawCat = i.category || "Misc";
+                let rawCat = i.category || "Misc";
+                if (rawCat.toLowerCase().includes("meats") || rawCat.toLowerCase().includes("seafood")) rawCat = "Protein";
                 const matchKey = Object.keys(META).find(k => k.toLowerCase() === rawCat.toLowerCase().trim()) || "Misc";
                 if (!acc[matchKey]) acc[matchKey] = [];
                 acc[matchKey].push(i);
@@ -219,15 +256,16 @@
         }, [grouped]);
 
         return (
-            <div className="pb-40">
-                <nav className="room-nav">
+            <div>
+                {/* HORIZONTAL SCROLL FOR ROOMS */}
+                <div className="room-nav-container">
                     {["Fridge", "Freezer", "Dry Goods", "Shopping List"].map(r => (
                         <button key={r} onClick={() => setActiveRoom(r)} className={`room-btn ${activeRoom === r ? 'active' : ''}`}>{r}</button>
                     ))}
                     <button onClick={downloadInventory} className="export-btn flex items-center gap-2">
-                        <i data-lucide="download" className="w-3 h-3"></i><span>Export</span>
+                        <i data-lucide="download" className="w-3 h-3"></i><span>CSV</span>
                     </button>
-                </nav>
+                </div>
 
                 <div className="flex-container">
                     {columnedCategories.map((col, i) => (
@@ -253,7 +291,7 @@
                                                         <div className="flex justify-between items-center cursor-pointer group" onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}>
                                                             <span className="handwritten capitalize">{item.name}</span>
                                                             <div className="flex items-center gap-3">
-                                                                <span className="qty-label">x{item.qty}</span>
+                                                                <span className="text-[9px] font-black opacity-30">x{item.qty}</span>
                                                                 <button onClick={(e) => { e.stopPropagation(); if(confirm("Delete?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }} className="opacity-0 group-hover:opacity-100 text-red-500 text-[12px]">×</button>
                                                             </div>
                                                         </div>
@@ -271,13 +309,13 @@
                 <button onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}} className="add-btn-main active:scale-90 transition-all"><i data-lucide="plus" className="w-6 h-6"></i></button>
 
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
                         <div className="bg-[#111] w-full max-w-sm p-10 border border-white/10 rounded-lg shadow-2xl">
                             <form onSubmit={async e => {
                                 e.preventDefault();
                                 await supabase.from('FancyPantry').insert([{ name: newName, qty: newQty || "1", room: modalRoom, category: modalCat }]);
                                 setIsModalOpen(false); setNewName(""); fetchItems();
-                            }} className="space-y-8">
+                            }} className="space-y-6">
                                 <h2 className="handwritten-header !text-white/20">New Entry</h2>
                                 <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">
                                     {["Fridge", "Freezer", "Dry Goods"].map(r => (
