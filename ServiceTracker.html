@@ -24,6 +24,14 @@
         }
         .past-due-blink { animation: urgentBlink 1.5s ease-in-out infinite !important; font-weight: bold !important; border-style: solid !important; border-width: 1px !important; }
 
+        /* IN SHOP GREEN HIGHLIGHT */
+        .in-shop-row input, 
+        .in-shop-row select, 
+        .in-shop-row textarea,
+        .in-shop-row td { 
+            color: #4ade80 !important; 
+        }
+
         input[type="date"]::-webkit-inner-spin-button,
         input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -404,7 +412,6 @@
                 query = query.eq('assigned_user', viewFilter);
             }
 
-            // MATH FIX: Now sorting ONLY by intake_date (descending) so rows don't jump around
             query = query.order('intake_date', { ascending: false, nullsLast: true }).order('created_at', { ascending: false });
 
             const { data: tasks, error } = await query;
@@ -463,9 +470,12 @@
 
                 const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
+                
+                // NEW: Check if the vehicle is currently IN SHOP
+                const isInShop = cleanStatus === 'in shop';
 
                 return `
-                <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'}">
+                <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'} ${isInShop ? 'in-shop-row bg-green-900/5 border-l-2 border-green-500' : ''}">
                     
                     <td class="advisor-col px-1 py-1 align-middle">
                         <select onchange="updateField(${task.id}, 'assigned_user', this.value)" class="bg-slate-800 border border-slate-700 text-blue-400 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
@@ -573,14 +583,8 @@
             const tech = document.getElementById('new_tech').value || null;
             const waitingType = document.getElementById('new_waiting').value; 
 
-            // Basic check for empty fields
-            if (!ro || !vehicle) { 
-                alert("RO Number and Vehicle are required."); 
-                return; 
-            }
+            if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
 
-            // ANTI-STUBBORN ADVISOR VALIDATION
-            // Looks for at least 2 numbers (Year) and at least 2 letters (Make)
             const hasYear = /\d{2}/.test(vehicle);
             const hasMake = /[a-zA-Z]{2,}/.test(vehicle);
 
