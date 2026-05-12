@@ -573,7 +573,21 @@
             const tech = document.getElementById('new_tech').value || null;
             const waitingType = document.getElementById('new_waiting').value; 
 
-            if (!ro || !vehicle) { alert("RO Number and Vehicle are required."); return; }
+            // Basic check for empty fields
+            if (!ro || !vehicle) { 
+                alert("RO Number and Vehicle are required."); 
+                return; 
+            }
+
+            // ANTI-STUBBORN ADVISOR VALIDATION
+            // Looks for at least 2 numbers (Year) and at least 2 letters (Make)
+            const hasYear = /\d{2}/.test(vehicle);
+            const hasMake = /[a-zA-Z]{2,}/.test(vehicle);
+
+            if (!hasYear || !hasMake) {
+                alert("Nice try! Vehicle description must include a year and a make (e.g., '24 Sierra 1500').");
+                return;
+            }
 
             const { error } = await _supabase
                 .from('servicetracker')
