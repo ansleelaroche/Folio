@@ -214,6 +214,19 @@
             <h2 class="text-sm font-bold mb-3 text-white border-b border-slate-700 pb-1">Write Up New Vehicle</h2>
             
             <div class="space-y-3">
+                <!-- ROW 1: Customer Name & Phone -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer Name</label>
+                        <input id="new_customer" type="text" placeholder="Customer Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone</label>
+                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- ROW 2: RO Number, Hat, Tech, Vehicle -->
                 <div class="grid grid-cols-5 gap-2">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">RO Number</label>
@@ -241,7 +254,8 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-4 gap-2">
+                <!-- ROW 3: Intake Date/Time & Intake Type -->
+                <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Intake Date & Time</label>
                         <input id="new_intake" type="datetime-local" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
@@ -260,21 +274,12 @@
                             <option value="Body Shop">Body Shop</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Customer</label>
-                        <input id="new_customer" type="text" placeholder="Last Name" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
-                    </div>
                 </div>
 
-                <div class="grid grid-cols-4 gap-2">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Phone</label>
-                        <input id="new_phone" type="tel" placeholder="(555) 555-5555" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
-                    </div>
-                    <div class="col-span-3">
-                        <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Primary Issue</label>
-                        <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
-                    </div>
+                <!-- ROW 4: Primary Issue -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Primary Issue</label>
+                    <textarea id="new_issue" rows="1" placeholder="Customer states..." class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none resize-none"></textarea>
                 </div>
             </div>
 
@@ -294,8 +299,6 @@
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
-        
-        // NEW: Global caches for instant searching
         let cachedReportTasks = [];
         let currentBoardTasks = [];
 
@@ -425,7 +428,6 @@
         async function getTasks() {
             if (!currentUser || isReportsView) return;
 
-            // PROTECTS THE CURSOR: Won't refresh the board if you are currently editing a cell or typing in the search bar
             if (document.activeElement && (document.activeElement.classList.contains('editable-cell') || document.activeElement.id.startsWith('new_') || document.activeElement.id === 'search-bar')) {
                 return;
             }
@@ -435,7 +437,6 @@
             let startRow = 0;
             const limit = 1000;
 
-            // NEW: The loop that forces Supabase to give us EVERY record, even past 1,000
             while (fetchMore) {
                 let query = _supabase.from('servicetracker').select('*').range(startRow, startRow + limit - 1);
 
@@ -464,12 +465,10 @@
                 }
             }
 
-            // Saves all records globally and then runs them through the filter
             currentBoardTasks = allFetched;
             filterBoard();
         }
 
-        // NEW: Instant Search Filter
         function filterBoard() {
             const term = document.getElementById('search-bar').value.toLowerCase();
             
@@ -827,7 +826,7 @@
                 const stats = techStats[t];
                 
                 techProgBox.innerHTML += `
-                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('tech', '${t}')">
+                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-slate-700" onclick="openReportDetails('tech', '${t}')">
                         <div class="flex justify-between items-end mb-2">
                             <span class="text-xs font-bold text-slate-300">Tech ${t}</span>
                             <span class="text-[10px] text-slate-500 font-mono">Active Workload: <span class="text-blue-400 font-bold ml-1">${stats.activeTotal}</span></span>
@@ -860,7 +859,7 @@
                 const stats = advStats[a];
                 
                 advProgBox.innerHTML += `
-                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-transparent hover:border-slate-700" onclick="openReportDetails('advisor', '${a}')">
+                    <div class="mb-2 p-2 -mx-2 rounded cursor-pointer hover:bg-slate-800/50 transition border border-slate-700" onclick="openReportDetails('advisor', '${a}')">
                         <div class="flex justify-between items-end mb-2">
                             <span class="text-xs font-bold text-slate-300">${a}</span>
                             <span class="text-[10px] text-slate-500 font-mono">Active Workload: <span class="text-purple-400 font-bold ml-1">${stats.activeTotal}</span></span>
