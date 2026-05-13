@@ -115,10 +115,10 @@
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-12 text-center">Hat #</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider">Issue Description</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Type</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-28">Intake (Time)</th>
+                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-28 text-red-400">Intake (Time)</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
-                        <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-red-400">Est. Date</th>
+                        <!-- REMOVED EST DATE COLUMN -->
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Completed</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">Del</th>
                     </tr>
@@ -435,7 +435,6 @@
             let payloadValue = value === "" ? null : value;
             const payload = {};
 
-            // TIMEZONE FIX: Translates local typed time into UTC for the database
             if (column === 'intake_date' && payloadValue) {
                 payloadValue = new Date(payloadValue).toISOString();
             }
@@ -456,7 +455,7 @@
             if (error) alert('Error saving data: ' + error.message);
             else {
                 flashSuccess();
-                if (column === 'is_waiting' || column === 'status' || column === 'completion_time' || column === 'assigned_user' || column === 'intake_date') {
+                if (column === 'is_waiting' || column === 'status' || column === 'assigned_user' || column === 'intake_date') {
                     getTasks();
                 }
             }
@@ -476,19 +475,26 @@
 
         function renderTasks(tasks) {
             const list = document.getElementById('task-list');
-            const offset = new Date().getTimezoneOffset() * 60000;
-            const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
+            const nowMs = Date.now();
 
             list.innerHTML = tasks.map(task => {
                 const safeIntakeTime = formatSafeDateTime(task.intake_date);
-                const safeCompletion = formatSafeDate(task.completion_time);
                 const safeCompleted = formatSafeDate(task.completed_date);
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
                 const safeTech = task.tech ? String(task.tech).trim() : '';
 
-                const isPastDue = safeCompletion && safeCompletion < todayStr && cleanStatus !== 'completed';
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
                 const isInShop = cleanStatus === 'in shop';
+
+                // NEW: 4-Day SLA Check
+                let isStale = false;
+                if (task.intake_date && cleanStatus !== 'completed') {
+                    const intakeObj = new Date(task.intake_date);
+                    if (!isNaN(intakeObj.getTime())) {
+                        const daysDiff = (nowMs - intakeObj.getTime()) / (1000 * 60 * 60 * 24);
+                        if (daysDiff > 4) isStale = true;
+                    }
+                }
 
                 return `
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'} ${isInShop ? 'in-shop-row bg-green-900/5 border-l-2 border-green-500' : ''}">
@@ -541,8 +547,9 @@
                         </select>
                     </td>
 
+                    <!-- UPDATED: Applies red blinking alert if > 4 days old -->
                     <td class="px-1 py-1 align-middle">
-                        <input type="datetime-local" value="${safeIntakeTime}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
+                        <input type="datetime-local" value="${safeIntakeTime}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isStale ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
 
                     <td class="px-1 py-1 align-middle">
@@ -564,10 +571,6 @@
                             <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
                             <option value="Completed" ${cleanStatus === 'completed' ? 'selected' : ''}>Completed</option>
                         </select>
-                    </td>
-
-                    <td class="px-1 py-1 align-middle">
-                        <input type="date" value="${safeCompletion}" onchange="updateField(${task.id}, 'completion_time', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isPastDue ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
                     
                     <td class="px-1 py-1 align-middle">
@@ -609,7 +612,6 @@
                 return;
             }
 
-            // TIMEZONE FIX
             const safeIntakeDB = intake ? new Date(intake).toISOString() : null;
 
             const { error } = await _supabase
