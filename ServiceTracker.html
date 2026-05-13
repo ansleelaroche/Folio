@@ -118,7 +118,6 @@
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-28 text-red-400">Intake (Time)</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-16">Tech</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20 text-center">Status</th>
-                        <!-- REMOVED EST DATE COLUMN -->
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-20">Completed</th>
                         <th class="px-1 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-wider w-10 text-center">Del</th>
                     </tr>
@@ -414,6 +413,12 @@
         async function getTasks() {
             if (!currentUser || isReportsView) return;
 
+            // SAFETY FIX: If the user has clicked inside ANY input box to edit something, 
+            // the board will silently pause its background refresh so it doesn't steal their cursor!
+            if (document.activeElement && (document.activeElement.classList.contains('editable-cell') || document.activeElement.id.startsWith('new_'))) {
+                return;
+            }
+
             let query = _supabase.from('servicetracker').select('*');
 
             if (!showCompleted) {
@@ -486,7 +491,6 @@
                 const isCustomerWaiting = task.is_waiting === 'Waiting';
                 const isInShop = cleanStatus === 'in shop';
 
-                // NEW: 4-Day SLA Check
                 let isStale = false;
                 if (task.intake_date && cleanStatus !== 'completed') {
                     const intakeObj = new Date(task.intake_date);
@@ -500,7 +504,7 @@
                 <tr class="hover:bg-slate-800 transition duration-150 ${isCustomerWaiting ? 'bg-red-900/10 border-l-2 border-red-600' : 'border-l-2 border-transparent'} ${isInShop ? 'in-shop-row bg-green-900/5 border-l-2 border-green-500' : ''}">
                     
                     <td class="advisor-col px-1 py-1 align-middle">
-                        <select onchange="updateField(${task.id}, 'assigned_user', this.value)" class="bg-slate-800 border border-slate-700 text-blue-400 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                        <select onchange="updateField(${task.id}, 'assigned_user', this.value)" class="editable-cell bg-slate-800 border border-slate-700 text-blue-400 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!task.assigned_user ? 'selected' : ''}>None</option>
                             <option value="Frank LaRoche" ${task.assigned_user === 'Frank LaRoche' ? 'selected' : ''}>Frank</option>
                             <option value="Matt Cannoy" ${task.assigned_user === 'Matt Cannoy' ? 'selected' : ''}>Matt</option>
@@ -534,7 +538,7 @@
                     </td>
 
                     <td class="px-1 py-1 align-middle">
-                        <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
+                        <select onchange="updateField(${task.id}, 'is_waiting', this.value)" class="editable-cell bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full ${isCustomerWaiting ? 'text-red-400 border-red-900' : ''}">
                             <option value="Drop Off" ${task.is_waiting === 'Drop Off' ? 'selected' : ''}>Drop Off</option>
                             <option value="Waiting" ${task.is_waiting === 'Waiting' ? 'selected' : ''}>Waiting</option>
                             <option value="Tow In" ${task.is_waiting === 'Tow In' ? 'selected' : ''}>Tow In</option>
@@ -547,13 +551,12 @@
                         </select>
                     </td>
 
-                    <!-- UPDATED: Applies red blinking alert if > 4 days old -->
                     <td class="px-1 py-1 align-middle">
                         <input type="datetime-local" value="${safeIntakeTime}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] rounded transition-all duration-300 ${isStale ? 'past-due-blink' : '!text-slate-400'}">
                     </td>
 
                     <td class="px-1 py-1 align-middle">
-                        <select onchange="updateField(${task.id}, 'tech', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                        <select onchange="updateField(${task.id}, 'tech', this.value)" class="editable-cell bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="" ${!safeTech ? 'selected' : ''}>Assign...</option>
                             <option value="1166" ${safeTech === '1166' ? 'selected' : ''}>1166</option>
                             <option value="1197" ${safeTech === '1197' ? 'selected' : ''}>1197</option>
@@ -565,7 +568,7 @@
                     </td>
 
                     <td class="px-1 py-1 align-middle text-center">
-                        <select onchange="updateField(${task.id}, 'status', this.value)" class="bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
+                        <select onchange="updateField(${task.id}, 'status', this.value)" class="editable-cell bg-slate-800 border border-slate-700 text-slate-200 p-1 rounded text-[10px] font-bold cursor-pointer focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-slate-500 transition w-full">
                             <option value="Pending" ${cleanStatus === 'pending' || !cleanStatus ? 'selected' : ''}>Pending</option>
                             <option value="In Shop" ${cleanStatus === 'in shop' ? 'selected' : ''}>In Shop</option>
                             <option value="Parts Hold" ${cleanStatus === 'parts hold' || cleanStatus === 'partshold' ? 'selected' : ''}>Parts Hold</option>
