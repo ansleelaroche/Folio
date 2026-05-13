@@ -239,7 +239,6 @@
                 <div class="grid grid-cols-4 gap-2">
                     <div class="col-span-2">
                         <label class="block text-[10px] font-bold text-slate-400 mb-0.5">Intake Date & Time</label>
-                        <!-- NOW USES DATETIME-LOCAL FOR AUTOMATIC TIME STAMPING -->
                         <input id="new_intake" type="datetime-local" class="w-full bg-slate-900 border border-slate-600 text-slate-200 p-1 text-[10px] rounded focus:ring-1 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
@@ -292,7 +291,6 @@
         let isReportsView = false;
         let cachedReportTasks = [];
 
-        // Kept for standard dates like completion_time
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
             if (dateStr.includes('-') && dateStr.length >= 10 && !dateStr.includes('T')) {
@@ -306,7 +304,6 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // NEW: Specific parser to format dates AND times cleanly into the input box
         function formatSafeDateTime(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
@@ -399,7 +396,6 @@
         function openModal() { 
             document.getElementById('taskModal').classList.remove('hidden'); 
             const offset = new Date().getTimezoneOffset() * 60000;
-            // NEW: Automatically stamps the exact minute they click the "+ New RO" button
             document.getElementById('new_intake').value = new Date(Date.now() - offset).toISOString().slice(0, 16);
         }
 
@@ -428,7 +424,6 @@
                 query = query.eq('assigned_user', viewFilter);
             }
 
-            // NEW: Forces the board to strictly sort oldest-to-newest based on the intake date & time
             query = query.order('intake_date', { ascending: true, nullsLast: true }).order('created_at', { ascending: true });
 
             const { data: tasks, error } = await query;
@@ -437,8 +432,14 @@
         }
 
         async function updateField(taskId, column, value) {
-            const payloadValue = value === "" ? null : value;
+            let payloadValue = value === "" ? null : value;
             const payload = {};
+
+            // TIMEZONE FIX: Translates local typed time into UTC for the database
+            if (column === 'intake_date' && payloadValue) {
+                payloadValue = new Date(payloadValue).toISOString();
+            }
+
             payload[column] = payloadValue;
 
             if (column === 'status') {
@@ -455,7 +456,6 @@
             if (error) alert('Error saving data: ' + error.message);
             else {
                 flashSuccess();
-                // Because we ONLY sort by intake_date now, changing status/advisor won't make rows magically jump!
                 if (column === 'is_waiting' || column === 'status' || column === 'completion_time' || column === 'assigned_user' || column === 'intake_date') {
                     getTasks();
                 }
@@ -480,9 +480,7 @@
             const todayStr = new Date(Date.now() - offset).toISOString().split('T')[0];
 
             list.innerHTML = tasks.map(task => {
-                // Uses the new parser to read the database time cleanly
                 const safeIntakeTime = formatSafeDateTime(task.intake_date);
-                
                 const safeCompletion = formatSafeDate(task.completion_time);
                 const safeCompleted = formatSafeDate(task.completed_date);
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
@@ -543,7 +541,6 @@
                         </select>
                     </td>
 
-                    <!-- UPDATED: Now supports exact time entry alongside the date -->
                     <td class="px-1 py-1 align-middle">
                         <input type="datetime-local" value="${safeIntakeTime}" onchange="updateField(${task.id}, 'intake_date', this.value)" class="editable-cell w-full px-1 py-0.5 text-[10px] !text-slate-400 rounded">
                     </td>
@@ -612,6 +609,9 @@
                 return;
             }
 
+            // TIMEZONE FIX
+            const safeIntakeDB = intake ? new Date(intake).toISOString() : null;
+
             const { error } = await _supabase
                 .from('servicetracker')
                 .insert([{ 
@@ -621,7 +621,7 @@
                     customer_name: customer,
                     phone_number: phone, 
                     issue_description: issue, 
-                    intake_date: intake, 
+                    intake_date: safeIntakeDB, 
                     tech: tech, 
                     status: 'Pending', 
                     is_waiting: waitingType, 
