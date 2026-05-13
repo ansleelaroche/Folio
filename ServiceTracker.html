@@ -79,6 +79,12 @@
                 Viewing: Frank's ROs (Swap)
             </button>
 
+            <!-- Search Bar Container (Board Only) -->
+            <div id="search-container" class="flex items-center space-x-1.5 bg-slate-800 px-2 py-1 rounded border border-slate-700 transition focus-within:border-blue-500 focus-within:bg-slate-900 w-48">
+                <span class="text-slate-400 text-xs">🔍</span>
+                <input type="text" id="search-bar" oninput="filterBoard()" placeholder="Search RO, Name, Car..." class="bg-transparent border-none text-white text-[10px] w-full focus:outline-none placeholder-slate-500 font-bold">
+            </div>
+
             <!-- Show Completed Toggle (Board Only) -->
             <label id="completed-toggle-container" class="flex items-center space-x-1.5 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-700 hover:bg-slate-700 transition">
                 <input type="checkbox" id="toggle-completed" onchange="toggleCompleted()" class="h-3 w-3 rounded bg-slate-900 border-slate-600 focus:ring-blue-500 cursor-pointer">
@@ -288,7 +294,10 @@
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
+        
+        // NEW: Global caches for instant searching
         let cachedReportTasks = [];
+        let currentBoardTasks = [];
 
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
@@ -359,6 +368,7 @@
         function toggleReportsView() {
             isReportsView = !isReportsView;
             const btn = document.getElementById('btn-toggle-reports');
+            const searchContainer = document.getElementById('search-container');
             
             if (isReportsView) {
                 document.getElementById('board-container').classList.add('hidden');
@@ -366,6 +376,7 @@
                 document.getElementById('switch-view-btn').classList.add('hidden');
                 document.getElementById('btn-new-ro').classList.add('hidden');
                 document.getElementById('reports-container').classList.remove('hidden');
+                searchContainer.classList.add('hidden');
                 
                 btn.innerHTML = '🔙 Back to Board';
                 btn.classList.replace('bg-purple-900/30', 'bg-slate-700');
@@ -378,6 +389,7 @@
                 document.getElementById('board-container').classList.remove('hidden');
                 document.getElementById('completed-toggle-container').classList.remove('hidden');
                 document.getElementById('btn-new-ro').classList.remove('hidden');
+                searchContainer.classList.remove('hidden');
                 
                 if (currentUser === 'Frank LaRoche' || currentUser === 'Matt Cannoy') {
                     document.getElementById('switch-view-btn').classList.remove('hidden');
@@ -413,27 +425,68 @@
         async function getTasks() {
             if (!currentUser || isReportsView) return;
 
-            // SAFETY FIX: If the user has clicked inside ANY input box to edit something, 
-            // the board will silently pause its background refresh so it doesn't steal their cursor!
-            if (document.activeElement && (document.activeElement.classList.contains('editable-cell') || document.activeElement.id.startsWith('new_'))) {
+            // PROTECTS THE CURSOR: Won't refresh the board if you are currently editing a cell or typing in the search bar
+            if (document.activeElement && (document.activeElement.classList.contains('editable-cell') || document.activeElement.id.startsWith('new_') || document.activeElement.id === 'search-bar')) {
                 return;
             }
 
-            let query = _supabase.from('servicetracker').select('*');
+            let allFetched = [];
+            let fetchMore = true;
+            let startRow = 0;
+            const limit = 1000;
 
-            if (!showCompleted) {
-                query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
+            // NEW: The loop that forces Supabase to give us EVERY record, even past 1,000
+            while (fetchMore) {
+                let query = _supabase.from('servicetracker').select('*').range(startRow, startRow + limit - 1);
+
+                if (!showCompleted) {
+                    query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
+                }
+
+                if (viewFilter !== 'ALL') {
+                    query = query.eq('assigned_user', viewFilter);
+                }
+
+                query = query.order('intake_date', { ascending: true, nullsLast: true }).order('created_at', { ascending: true });
+
+                const { data, error } = await query;
+                if (error) { 
+                    console.error('Error fetching:', error.message); 
+                    break;
+                }
+
+                allFetched = allFetched.concat(data);
+
+                if (data.length < limit) {
+                    fetchMore = false;
+                } else {
+                    startRow += limit;
+                }
             }
 
-            if (viewFilter !== 'ALL') {
-                query = query.eq('assigned_user', viewFilter);
+            // Saves all records globally and then runs them through the filter
+            currentBoardTasks = allFetched;
+            filterBoard();
+        }
+
+        // NEW: Instant Search Filter
+        function filterBoard() {
+            const term = document.getElementById('search-bar').value.toLowerCase();
+            
+            if (!term) {
+                renderTasks(currentBoardTasks);
+                return;
             }
-
-            query = query.order('intake_date', { ascending: true, nullsLast: true }).order('created_at', { ascending: true });
-
-            const { data: tasks, error } = await query;
-            if (error) console.error('Error fetching:', error.message);
-            else renderTasks(tasks);
+            
+            const filtered = currentBoardTasks.filter(t => 
+                (t.ro_number && String(t.ro_number).toLowerCase().includes(term)) ||
+                (t.customer_name && t.customer_name.toLowerCase().includes(term)) ||
+                (t.vehicle_desc && t.vehicle_desc.toLowerCase().includes(term)) ||
+                (t.phone_number && String(t.phone_number).toLowerCase().includes(term)) ||
+                (t.hat && String(t.hat).toLowerCase().includes(term))
+            );
+            
+            renderTasks(filtered);
         }
 
         async function updateField(taskId, column, value) {
