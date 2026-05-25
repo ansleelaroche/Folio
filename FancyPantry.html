@@ -26,7 +26,7 @@
             font-family: 'Kodchasan', sans-serif !important;
         }
 
-        /* Accurate Custom Palette Sync */
+        /* Color Palette Sync */
         .color-dairy { color: #bae6fd; }
         .color-produce { color: #fde68a; }
         .color-condiments { color: #fcd34d; }
@@ -39,12 +39,37 @@
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Smooth Drawer Animations */
         @keyframes slideRight {
             from { transform: translateX(-100%); }
             to { transform: translateX(0); }
         }
         .animate-slide-right { animation: slideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Masonry Grid (Desktop Only) */
+        @media (min-width: 1024px) {
+            .desktop-masonry {
+                column-count: 3;
+                column-gap: 1.5rem;
+            }
+            .masonry-item {
+                break-inside: avoid;
+                margin-bottom: 1.5rem;
+                display: inline-block;
+                width: 100%;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .desktop-masonry {
+                column-count: 2;
+                column-gap: 1.5rem;
+            }
+            .masonry-item {
+                break-inside: avoid;
+                margin-bottom: 1.5rem;
+                display: inline-block;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -56,7 +81,7 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Core 9 Balanced Categories with Exact Color Mapping
+    // Optimized Core 11 Categories
     const META = {
         "Produce": ["leaf", "#fde68a"], 
         "Dairy & Eggs": ["milk", "#bae6fd"], 
@@ -64,21 +89,24 @@
         "Condiments & Spreads": ["utensils", "#fcd34d"], 
         "Frozen Foods": ["snowflake", "#cbd5e1"],
         "Beverages": ["droplets", "#93c5fd"],
-        "Snacks & Bakery": ["zap", "#fdba74"],
+        "Snacks": ["zap", "#fdba74"],
+        "Bakery & Breads": ["wheat", "#fde68a"],
+        "Baking Essentials": ["cookie", "#fbcfe8"],
         "Pantry Staples": ["package", "#d9f99d"],
         "Household & Pet": ["cog", "#d4d4d8"]
     };
 
     const AUTO_MAP = {
-        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "cucumber", "spinach", "pepper", "carrot", "grape", "mandarine", "avacado", "mango"],
-        "Dairy & Eggs": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream", "parmesan", "provalone", "american", "ripple"],
-        "Meat & Proteins": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "eggs", "ham", "fish", "shrimp", "salmon", "cod", "tuna", "meat", "seafood", "burger", "nugget", "hot dog"],
-        "Condiments & Spreads": ["sauce", "mayo", "ketchup", "mustard", "oil", "vinegar", "dressing", "jam", "jelly", "honey", "syrup", "relish", "ranch", "soy", "spread"],
-        "Frozen Foods": ["frozen", "pizza", "roll", "waffle", "ice cream", "dessert", "meal"],
+        "Produce": ["apple", "banana", "onion", "garlic", "lettuce", "tomato", "potato", "berry", "fruit", "veg", "cucumber", "spinach", "pepper", "carrot", "grape", "mandarine", "avacado", "mango", "romain"],
+        "Dairy & Eggs": ["milk", "cheese", "yogurt", "butter", "cream", "egg", "sour cream", "parmesan", "provalone", "american", "ripple", "cheddar"],
+        "Meat & Proteins": ["chicken", "beef", "pork", "steak", "turkey", "tofu", "tempeh", "sausage", "bacon", "ham", "fish", "shrimp", "salmon", "cod", "tuna", "meat", "seafood", "burger", "nugget", "smash"],
+        "Condiments & Spreads": ["sauce", "mayo", "ketchup", "mustard", "dressing", "jam", "jelly", "honey", "syrup", "relish", "ranch", "soy", "spread"],
+        "Frozen Foods": ["frozen", "pizza", "waffle", "ice cream", "dessert", "meal"],
         "Beverages": ["water", "juice", "soda", "coke", "beer", "wine", "coffee", "tea", "seltz", "lemonade", "capri"],
-        "Snacks & Bakery": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy", "bread", "bagel", "tortilla", "muffin", "bun", "toast", "poptart", "biscuit", "pouch", "straw"],
-        "Household & Pet": ["shampoo", "wash", "foil", "cat", "kibble", "soap", "clean", "trash", "paper", "napkin", "foil", "dog", "walker"],
-        "Pantry Staples": ["pasta", "rice", "noodle", "quinoa", "couscous", "spaghetti", "penne", "ramen", "soup", "bean", "sugar", "flour", "bouillon", "powder", "salt", "pepper", "extract", "cereal", "can", "jar", "baking", "oats", "sides"]
+        "Snacks": ["chip", "cracker", "nut", "bar", "pretzel", "popcorn", "cookie", "candy", "poptart", "pouch", "straw", "cheerios", "granola", "crunch", "jacks"],
+        "Bakery & Breads": ["bread", "bagel", "tortilla", "muffin", "bun", "toast", "biscuit", "roll", "croissant", "buns"],
+        "Baking Essentials": ["flour", "baking powder", "baking soda", "extract", "vanilla", "olive oil", "chicken bouillon", "blue agave", "sea salt", "black pepper", "kosher salt", "sugar", "salt", "pepper", "cinnamon"],
+        "Household & Pet": ["shampoo", "wash", "foil", "cat", "kibble", "soap", "clean", "trash", "paper", "napkin", "dog", "walker"]
     };
 
     const toTitleCase = (str) => {
@@ -86,17 +114,52 @@
         return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     };
 
-    const normalizeCategory = (catName) => {
-        if (!catName) return "Pantry Staples";
-        const name = catName.toLowerCase().trim();
-        if (name.includes("produce")) return "Produce";
-        if (name.includes("dairy")) return "Dairy & Eggs";
-        if (name.includes("protein") || name.includes("meat") || name.includes("seafood")) return "Meat & Proteins";
-        if (name.includes("condiment") || name.includes("spread")) return "Condiments & Spreads";
-        if (name.includes("frozen") || name.includes("prepared") || name.includes("meal") || name.includes("dessert")) return "Frozen Foods";
-        if (name.includes("drink")) return "Beverages";
-        if (name.includes("snack") || name.includes("bakery") || name.includes("bread")) return "Snacks & Bakery";
-        if (name.includes("supplies") || name.includes("dishware") || name.includes("misc")) return "Household & Pet";
+    const normalizeCategory = (catName, nameStr, roomStr) => {
+        const cat = (catName || "").toLowerCase().trim();
+        const name = (nameStr || "").toLowerCase().trim();
+        const room = (roomStr || "").toLowerCase().trim();
+
+        if (cat.includes("supplies") || cat.includes("dishware") || cat.includes("misc") || 
+            /shampoo|wash|foil|cat|kibble|soap|clean|trash|paper|napkin|dog|walker/.test(name)) {
+            return "Household & Pet";
+        }
+        if (cat.includes("frozen") || cat.includes("prepared") || cat.includes("meal") || cat.includes("dessert") || 
+            name.includes("frozen") || name.includes("pizza rolls") || room === "freezer") {
+            return "Frozen Foods";
+        }
+        if (cat.includes("drink") || cat.includes("beverage") || 
+            /tea|water|capri|sun|lemonade|juice|soda|coke|beer|wine|seltz|drink/.test(name)) {
+            if (!name.includes("pouches")) return "Beverages";
+        }
+        if (cat.includes("baking") || 
+            /flour|baking powder|baking soda|extract|vanilla|olive oil|chicken bouillon|blue agave|sea salt|black pepper|kosher salt/.test(name) ||
+            ["sugar", "light brown sugar", "salt", "pepper", "cinnamon sugar"].includes(name)) {
+            return "Baking Essentials";
+        }
+        if (cat.includes("bakery") || cat.includes("bread") || 
+            /bread|bagel|tortilla|muffin|bun|toast|biscuit|roll|croissant|buns|hawaiian/.test(name)) {
+            return "Bakery & Breads";
+        }
+        if (cat.includes("produce") || 
+            /cucumber|tomato|lettuce|banana|apple|onion|potato|carrot|grape|mandarine|avacado|mango|berry|fruit|veg|romain/.test(name)) {
+            return "Produce";
+        }
+        if (cat.includes("dairy") || 
+            /cream|provalone|parmesan|cheese|butter|egg|yogurt|kids|milk|cheddar|american|ripple/.test(name)) {
+            return "Dairy & Eggs";
+        }
+        if (cat.includes("protein") || cat.includes("meat") || cat.includes("seafood") || 
+            /ham|turkey|burger|salmon|loin|breast|beef|nugget|dog|steak|pork|sausage|bacon|tofu|seafood|smash/.test(name)) {
+            return "Meat & Proteins";
+        }
+        if (cat.includes("condiment") || cat.includes("spread") || 
+            /mayo|ranch|ketchup|sauce|relish|mustard|honey|jelly|jam|dressing|oil|vinegar|syrup|soy/.test(name)) {
+            return "Condiments & Spreads";
+        }
+        if (cat.includes("snack") || 
+            /bar|poptart|cookie|popcorn|pouch|straw|chip|cracker|snack|pouches|cheerios|granola|crunch|jacks/.test(name)) {
+            return "Snacks";
+        }
         return "Pantry Staples";
     };
 
@@ -148,20 +211,15 @@
                 return a.name.localeCompare(b.name);
             });
             return sorted.reduce((acc, i) => {
-                const mappedCat = normalizeCategory(i.category || "Misc");
+                const mappedCat = normalizeCategory(i.category, i.name, i.room);
                 if (!acc[mappedCat]) acc[mappedCat] = [];
                 acc[mappedCat].push(i);
                 return acc;
             }, {});
         }, [items, activeRoom]);
 
-        const columnedCategories = useMemo(() => {
-            const cols = [[], [], []];
-            const sortedActiveCats = Object.keys(grouped).sort();
-            sortedActiveCats.forEach((cat, index) => {
-                cols[index % 3].push(cat);
-            });
-            return cols;
+        const activeCategoriesSorted = useMemo(() => {
+            return Object.keys(grouped).sort();
         }, [grouped]);
 
         const NavigationMenu = () => {
@@ -211,7 +269,7 @@
                 </aside>
 
                 {/* MOBILE TOP NAVIGATION ROW */}
-                <header className="md:hidden flex items-center justify-between bg-[#141923] border-b border-[#222936] px-4 py-3.5 z-30 sticky top-0">
+                <header className="md:hidden flex items-center justify-between bg-[#141923] border-b border-[#222936] px-4 py-4 z-30 sticky top-0">
                     <div className="flex items-center gap-3">
                         <button onClick={() => setIsMobileMenuOpen(true)} className="p-1.5 text-gray-400 hover:text-white transition-colors">
                             <i data-lucide="menu" className="w-5 h-5"></i>
@@ -234,7 +292,7 @@
                     </div>
                 )}
 
-                {/* MAIN GRID HUB DISPLAY */}
+                {/* MAIN HUB WORKSPACE */}
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto custom-scroll max-w-7xl mx-auto w-full">
                     <header className="hidden md:flex justify-between items-center mb-8">
                         <div>
@@ -242,63 +300,59 @@
                         </div>
                     </header>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 items-start">
-                        {columnedCategories.map((col, colIdx) => (
-                            <div key={colIdx} className="flex flex-col gap-4 md:gap-6">
-                                {col.map(cat => {
-                                    const meta = META[cat];
-                                    return (
-                                        <div key={cat} className="bg-[#141923] border border-[#222936] rounded-xl p-4 md:p-5 flex flex-col shadow-sm">
-                                            <div className="flex items-center gap-2.5 border-b border-[#222936] pb-3 mb-4">
-                                                <i data-lucide={meta[0]} style={{ color: meta[1] }} className="w-4 h-4"></i>
-                                                <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: meta[1] }}>{cat}</h3>
-                                            </div>
-                                            
-                                            <ul className="space-y-2.5 divide-y divide-[#1e2533]/40">
-                                                {grouped[cat].map(item => {
-                                                    const isOut = parseFloat(item.qty) === 0;
-                                                    return (
-                                                        <li key={item.id} className="pt-2.5 first:pt-0">
-                                                            {editingId === item.id ? (
-                                                                <div className="flex gap-2 items-center bg-[#0b0f17] p-1.5 rounded border border-[#222936]">
-                                                                    <input className="bg-transparent text-xs text-white outline-none px-1 flex-1" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                                    <input className="bg-transparent text-xs text-center text-gray-400 w-10 font-bold outline-none border-l border-[#222936]" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                                    <button onClick={() => handleUpdate(item.id)} className="bg-teal-500 text-[#0b0f17] text-[10px] font-black px-2 py-1 rounded">SAVE</button>
-                                                                </div>
-                                                            ) : (
-                                                                <div 
-                                                                    onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
-                                                                    className="flex justify-between items-center group cursor-pointer"
+                    <div className="block md:desktop-masonry space-y-4 md:space-y-0">
+                        {activeCategoriesSorted.map(cat => {
+                            const meta = META[cat];
+                            return (
+                                <div key={cat} className="masonry-item bg-[#141923] border border-[#222936] rounded-xl p-4 md:p-5 flex flex-col shadow-sm">
+                                    <div className="flex items-center gap-2.5 border-b border-[#222936] pb-3 mb-4">
+                                        <i data-lucide={meta[0]} style={{ color: meta[1] }} className="w-4 h-4"></i>
+                                        <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: meta[1] }}>{cat}</h3>
+                                    </div>
+                                    
+                                    <ul className="space-y-2.5 divide-y divide-[#1e2533]/40">
+                                        {grouped[cat].map(item => {
+                                            const isOut = parseFloat(item.qty) === 0;
+                                            return (
+                                                <li key={item.id} className="pt-2.5 first:pt-0">
+                                                    {editingId === item.id ? (
+                                                        <div className="flex gap-2 items-center bg-[#0b0f17] p-1.5 rounded border border-[#222936]">
+                                                            <input className="bg-transparent text-xs text-white outline-none px-1 flex-1" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                            <input className="bg-transparent text-xs text-center text-gray-400 w-10 font-bold outline-none border-l border-[#222936]" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                            <button onClick={() => handleUpdate(item.id)} className="bg-teal-500 text-[#0b0f17] text-[10px] font-black px-2 py-1 rounded">SAVE</button>
+                                                        </div>
+                                                    ) : (
+                                                        <div 
+                                                            onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
+                                                            className="flex justify-between items-center group cursor-pointer"
+                                                        >
+                                                            <span className={`text-xs font-semibold tracking-wide transition-colors ${isOut ? 'color-outofstock line-through opacity-70' : 'text-gray-200'}`}>
+                                                                {toTitleCase(item.name)}
+                                                            </span>
+                                                            <div className="flex items-center gap-3">
+                                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOut ? 'bg-red-500/10 color-outofstock' : 'bg-[#1e2533] text-gray-400'}`}>
+                                                                    x{item.qty}
+                                                                </span>
+                                                                <button 
+                                                                    onClick={(e) => { e.stopPropagation(); if(confirm("Discard product line?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }}
+                                                                    className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-xs transition-opacity"
                                                                 >
-                                                                    <span className={`text-xs font-semibold tracking-wide transition-colors ${isOut ? 'color-outofstock line-through opacity-70' : 'text-gray-200'}`}>
-                                                                        {toTitleCase(item.name)}
-                                                                    </span>
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOut ? 'bg-red-500/10 color-outofstock' : 'bg-[#1e2533] text-gray-400'}`}>
-                                                                            x{item.qty}
-                                                                        </span>
-                                                                        <button 
-                                                                            onClick={(e) => { e.stopPropagation(); if(confirm("Discard product line?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }}
-                                                                            className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-xs transition-opacity"
-                                                                        >
-                                                                            ✕
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </div>
+                            );
+                        })}
                     </div>
                 </main>
 
-                {/* MOBILE FAB ACTION ACCESSIBILITY LINK */}
+                {/* MOBILE FLOATING ACTION ACTION BUTTON */}
                 <button 
                     onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}}
                     className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-teal-500 text-[#0b0f17] rounded-full shadow-lg shadow-teal-500/20 flex items-center justify-center z-40 active:scale-95 transition-transform"
@@ -306,7 +360,7 @@
                     <i data-lucide="plus" className="w-6 h-6 stroke-[2.5]"></i>
                 </button>
 
-                {/* CONTEXT DRAWER INPUT BOX */}
+                {/* ADD MODAL CONSOLE */}
                 {isModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4 bg-black/70 backdrop-blur-sm">
                         <div className="bg-[#141923] w-full md:max-w-md p-6 md:p-8 border-t md:border border-[#222936] rounded-t-2xl md:rounded-xl shadow-2xl space-y-6">
