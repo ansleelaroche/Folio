@@ -45,29 +45,17 @@
         }
         .animate-slide-right { animation: slideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* Masonry Grid (Desktop Only) */
+        /* Smooth Masonry Container Fixing Stacking Issues */
         @media (min-width: 1024px) {
             .desktop-masonry {
                 column-count: 3;
                 column-gap: 1.5rem;
-            }
-            .masonry-item {
-                break-inside: avoid;
-                margin-bottom: 1.5rem;
-                display: inline-block;
-                width: 100%;
             }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
             .desktop-masonry {
                 column-count: 2;
                 column-gap: 1.5rem;
-            }
-            .masonry-item {
-                break-inside: avoid;
-                margin-bottom: 1.5rem;
-                display: inline-block;
-                width: 100%;
             }
         }
     </style>
@@ -81,7 +69,6 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Optimized Core 11 Categories
     const META = {
         "Produce": ["leaf", "#fde68a"], 
         "Dairy & Eggs": ["milk", "#bae6fd"], 
@@ -292,7 +279,7 @@
                     </div>
                 )}
 
-                {/* MAIN HUB WORKSPACE */}
+                {/* MAIN HUB DISPLAY */}
                 <main className="flex-1 p-4 md:p-8 overflow-y-auto custom-scroll max-w-7xl mx-auto w-full">
                     <header className="hidden md:flex justify-between items-center mb-8">
                         <div>
@@ -300,59 +287,62 @@
                         </div>
                     </header>
 
-                    <div className="block md:desktop-masonry space-y-4 md:space-y-0">
+                    {/* MASONRY DISPLAY - STACK FIX APPLIED */}
+                    <div className="block md:desktop-masonry space-y-4 md:space-y-0 w-full">
                         {activeCategoriesSorted.map(cat => {
                             const meta = META[cat];
                             return (
-                                <div key={cat} className="masonry-item bg-[#141923] border border-[#222936] rounded-xl p-4 md:p-5 flex flex-col shadow-sm">
-                                    <div className="flex items-center gap-2.5 border-b border-[#222936] pb-3 mb-4">
-                                        <i data-lucide={meta[0]} style={{ color: meta[1] }} className="w-4 h-4"></i>
-                                        <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: meta[1] }}>{cat}</h3>
-                                    </div>
-                                    
-                                    <ul className="space-y-2.5 divide-y divide-[#1e2533]/40">
-                                        {grouped[cat].map(item => {
-                                            const isOut = parseFloat(item.qty) === 0;
-                                            return (
-                                                <li key={item.id} className="pt-2.5 first:pt-0">
-                                                    {editingId === item.id ? (
-                                                        <div className="flex gap-2 items-center bg-[#0b0f17] p-1.5 rounded border border-[#222936]">
-                                                            <input className="bg-transparent text-xs text-white outline-none px-1 flex-1" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
-                                                            <input className="bg-transparent text-xs text-center text-gray-400 w-10 font-bold outline-none border-l border-[#222936]" value={editQty} onChange={e => setEditQty(e.target.value)} />
-                                                            <button onClick={() => handleUpdate(item.id)} className="bg-teal-500 text-[#0b0f17] text-[10px] font-black px-2 py-1 rounded">SAVE</button>
-                                                        </div>
-                                                    ) : (
-                                                        <div 
-                                                            onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
-                                                            className="flex justify-between items-center group cursor-pointer"
-                                                        >
-                                                            <span className={`text-xs font-semibold tracking-wide transition-colors ${isOut ? 'color-outofstock line-through opacity-70' : 'text-gray-200'}`}>
-                                                                {toTitleCase(item.name)}
-                                                            </span>
-                                                            <div className="flex items-center gap-3">
-                                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOut ? 'bg-red-500/10 color-outofstock' : 'bg-[#1e2533] text-gray-400'}`}>
-                                                                    x{item.qty}
-                                                                </span>
-                                                                <button 
-                                                                    onClick={(e) => { e.stopPropagation(); if(confirm("Discard product line?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }}
-                                                                    className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-xs transition-opacity"
-                                                                >
-                                                                    ✕
-                                                                </button>
+                                <div key={cat} className="inline-block w-full mb-4 md:mb-6 [break-inside:avoid]">
+                                    <div className="bg-[#141923] border border-[#222936] rounded-xl p-4 md:p-5 flex flex-col shadow-sm">
+                                        <div className="flex items-center gap-2.5 border-b border-[#222936] pb-3 mb-4">
+                                            <i data-lucide={meta[0]} style={{ color: meta[1] }} className="w-4 h-4"></i>
+                                            <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: meta[1] }}>{cat}</h3>
+                                        </div>
+                                        
+                                        <ul className="space-y-2.5 divide-y divide-[#1e2533]/40">
+                                            {grouped[cat].map(item => {
+                                                const isOut = parseFloat(item.qty) === 0;
+                                                return (
+                                                    <li key={item.id} className="pt-2.5 first:pt-0">
+                                                        {editingId === item.id ? (
+                                                            <div className="flex gap-2 items-center bg-[#0b0f17] p-1.5 rounded border border-[#222936]">
+                                                                <input className="bg-transparent text-xs text-white outline-none px-1 flex-1" value={editValue} onChange={e => setEditValue(e.target.value)} autoFocus />
+                                                                <input className="bg-transparent text-xs text-center text-gray-400 w-10 font-bold outline-none border-l border-[#222936]" value={editQty} onChange={e => setEditQty(e.target.value)} />
+                                                                <button onClick={() => handleUpdate(item.id)} className="bg-teal-500 text-[#0b0f17] text-[10px] font-black px-2 py-1 rounded">SAVE</button>
                                                             </div>
-                                                        </div>
-                                                    )}
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
+                                                        ) : (
+                                                            <div 
+                                                                onClick={() => { setEditingId(item.id); setEditValue(item.name); setEditQty(item.qty); }}
+                                                                className="flex justify-between items-center group cursor-pointer"
+                                                            >
+                                                                <span className={`text-xs font-semibold tracking-wide transition-colors ${isOut ? 'color-outofstock line-through opacity-70' : 'text-gray-200'}`}>
+                                                                    {toTitleCase(item.name)}
+                                                                </span>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isOut ? 'bg-red-500/10 color-outofstock' : 'bg-[#1e2533] text-gray-400'}`}>
+                                                                        x{item.qty}
+                                                                    </span>
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); if(confirm("Discard product line?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }}
+                                                                        className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-xs transition-opacity"
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
                 </main>
 
-                {/* MOBILE FLOATING ACTION ACTION BUTTON */}
+                {/* MOBILE FAB ACTION BUTTON */}
                 <button 
                     onClick={() => {setModalRoom(activeRoom === "Shopping List" ? "Fridge" : activeRoom); setIsModalOpen(true)}}
                     className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-teal-500 text-[#0b0f17] rounded-full shadow-lg shadow-teal-500/20 flex items-center justify-center z-40 active:scale-95 transition-transform"
