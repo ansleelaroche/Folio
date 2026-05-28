@@ -136,7 +136,7 @@
             </div>
             <div id="user-display" class="user-badge flex items-center gap-2">
                 <i class="fa fa-user-circle"></i>
-                <span id="user-name-text" class="mr-1">Demo User</span>
+                <span id="user-name-text" class="mr-1">Anslee Erickson</span>
                 <select id="rep-view-filter" class="rep-view-selector" onchange="render(true)"><option value="ALL">ALL LOGISTICS</option></select>
             </div>
             <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-3 py-1.5 rounded-full">Quick Links</button>
@@ -319,7 +319,7 @@
             <div class="p-6 flex gap-4 bg-black/5 border-t border-[var(--border)] shrink-0">
                 <button onclick="closeDraftModal()" class="flex-1 py-3 text-[10px] font-black uppercase opacity-50 hover:opacity-100 transition-opacity">Discard</button>
                 <button id="confirm-send-btn" onclick="sendMockEmail()" class="flex-[2] py-4 bg-[var(--brand)] text-black rounded font-black uppercase text-xs tracking-[0.2em] hover:brightness-110 shadow-lg flex items-center justify-center gap-2">
-                    <i class="fas fa-paper-plane"></i> Send Email
+                    <i class="fas fa-paper-plane"></i> Mock Send
                 </button>
             </div>
         </div>
@@ -335,53 +335,178 @@
         let renderLimit = 100;
         let activeEmailType = ''; 
 
-        const NAME_MAP = { "Kari": "Kari Westervelt", "Holly": "Holly Evans", "Courtney": "Courtney Youngblood", "Jewel": "Jewel Jenkins", "Noah": "Noah Comans", "Wayne": "Wayne Rendt", "Tobbitha": "Tobbitha Bishoff", "Paula": "Paula Bowen", "Furniture": "Furniture", "Tier 2": "Tier 2" };
+        const NAME_MAP = { "Kari": "Kari Westervelt", "Holly": "Holly Evans", "Courtney": "Courtney Youngblood", "Jewel": "Jewel Jenkins", "Noah": "Noah Comans", "Wayne": "Wayne Bow", "Tobbitha": "Tobbitha Bishoff", "Paula": "Paula Bowen", "Furniture": "Furniture", "Tier 2": "Tier 2" };
 
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        const yesterdayStr = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+        const olderStr = new Date(Date.now() - 3 * 86400000).toLocaleDateString('en-CA');
+        const oldStr = new Date(Date.now() - 10 * 86400000).toLocaleDateString('en-CA');
+        
         const mockDataset = [
             {
-                id: "T-8942", guid: "g1", order: "W98765432", company: "Acme Corp", account: "987654",
-                shippingAddress: "123 Business Rd, Daytona FL", contactInfo: "Jane Doe - 555-0192", 
-                submitRep: "Sarah Smith", logisticsOwner: "Anslee Erickson", driverInfo: "Bob - Route 12", 
-                status: "Pending", issue: "Missing Item", description: "Customer called stating they received 4 boxes of paper instead of 5.", 
-                item: "WBM21200", warehouse: "CFL", route: "12A", warehouseNotes: "", driverNotes: "", 
-                fullStamp: new Date().toLocaleDateString('en-CA') + " | 08:30 AM", completionTime: null,
-                date: new Date().toLocaleDateString('en-CA'), timestamp: Date.now() - 3600000, 
+                id: "T-8942", guid: "g1001", order: "W9990001", company: "Wayne Enterprises", account: "100200",
+                shippingAddress: "1007 Mountain Drive, Gotham NJ 07020", contactInfo: "Lucius Fox - 555-0192", 
+                submitRep: "Lucius Fox", logisticsOwner: "Unassigned", driverInfo: "Bob - Route G1", 
+                status: "Pending", issue: "Missing Items", description: "Short 2 cases of standard copy paper.", 
+                item: "WBM21200", warehouse: "NJ-WH", route: "G1", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 08:30 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now(), 
                 warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
-                searchString: "acme corp w98765432 987654 missing item"
+                searchString: "wayne enterprises w9990001 missing items"
             },
             {
-                id: "T-8943", guid: "g2", order: "W12345678", company: "Globex Inc", account: "123456",
-                shippingAddress: "456 Corporate Blvd, Orlando FL", contactInfo: "John Smith - 555-1122", 
-                submitRep: "Mike Johnson", logisticsOwner: "Wayne Rendt", driverInfo: "Jim - Route 8", 
-                status: "Working on", issue: "Damaged Goods", description: "Desk arrived with a huge scratch on the top surface.", 
-                item: "HON10589", warehouse: "CFL", route: "8B", warehouseNotes: "05/28/2026: Emailed warehouse to check stock for replacement - Wayne Rendt", driverNotes: "", 
-                fullStamp: new Date(Date.now() - 86400000).toLocaleDateString('en-CA') + " | 09:15 AM", completionTime: null,
-                date: new Date(Date.now() - 86400000).toLocaleDateString('en-CA'), timestamp: Date.now() - 86400000, 
-                warehouseEmailSent: "2026-05-28 | 09:30 AM", repEmailSent: "Never", isCoaching: true, 
-                searchString: "globex inc w12345678 123456 damaged goods"
-            },
-            {
-                id: "T-8944", guid: "g3", order: "W55555555", company: "Stark Industries", account: "555555",
-                shippingAddress: "789 Tower Ln, Miami FL", contactInfo: "Tony S. - 555-9999", 
-                submitRep: "Pepper Potts", logisticsOwner: "Holly Evans", driverInfo: "Happy - Route 1", 
-                status: "Completed", issue: "Wrong Item Shipped", description: "Received blue pens instead of black.", 
-                item: "PIL31020", warehouse: "SFL", route: "1A", warehouseNotes: "Swapped product at dock.", driverNotes: "Delivered correct item.", 
-                fullStamp: new Date(Date.now() - 172800000).toLocaleDateString('en-CA') + " | 14:20 PM", 
-                completionTime: new Date(Date.now() - 86400000).toLocaleDateString('en-CA') + " | 10:00 AM",
-                date: new Date(Date.now() - 172800000).toLocaleDateString('en-CA'), timestamp: Date.now() - 172800000, 
-                warehouseEmailSent: "Never", repEmailSent: "2026-05-26 | 15:00 PM", isCoaching: false, 
-                searchString: "stark industries w55555555 555555 wrong item shipped"
-            },
-            {
-                id: "T-8945", guid: "g4", order: "W55555555", company: "Stark Industries", account: "555555",
-                shippingAddress: "789 Tower Ln, Miami FL", contactInfo: "Tony S. - 555-9999", 
-                submitRep: "Pepper Potts", logisticsOwner: "Unassigned", driverInfo: "Happy - Route 1", 
-                status: "Pending", issue: "Route Update - Logistics", description: "Need to update delivery window to afternoons only.", 
-                item: "N/A", warehouse: "SFL", route: "1A", warehouseNotes: "", driverNotes: "", 
-                fullStamp: new Date(Date.now() - 3600000).toLocaleDateString('en-CA') + " | 11:00 AM", completionTime: null,
-                date: new Date(Date.now() - 3600000).toLocaleDateString('en-CA'), timestamp: Date.now() - 3600000, 
+                id: "T-8943", guid: "g1002", order: "W9990002", company: "Stark Industries", account: "100201",
+                shippingAddress: "10880 Malibu Point, Malibu CA 90265", contactInfo: "Tony S. - 555-1122", 
+                submitRep: "Pepper Potts", logisticsOwner: "Anslee Erickson", driverInfo: "Happy - Route A1", 
+                status: "Working on", issue: "ETA", description: "Customer is asking when the delivery will arrive today.", 
+                item: "N/A", warehouse: "LAX", route: "A1", warehouseNotes: "Checking with warehouse on ETA.", driverNotes: "", 
+                fullStamp: todayStr + " | 09:15 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 3600000, 
                 warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
-                searchString: "stark industries w55555555 555555 route update"
+                searchString: "stark industries w9990002 eta"
+            },
+            {
+                id: "T-8944", guid: "g1003", order: "W9990003", company: "Daily Planet", account: "100202",
+                shippingAddress: "344 Clinton St, Metropolis NY 10001", contactInfo: "Clark K. - 555-9999", 
+                submitRep: "Lois Lane", logisticsOwner: "Wayne Bow", driverInfo: "Jimmy - Route NY3", 
+                status: "Escalated - Wayne", issue: "Closing Returns", description: "Customer returning 10 damaged chairs.", 
+                item: "HON10589", warehouse: "NY-WH", route: "NY3", warehouseNotes: "", driverNotes: "", 
+                fullStamp: yesterdayStr + " | 14:20 PM", completionTime: null,
+                date: yesterdayStr, timestamp: Date.now() - 86400000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: true, 
+                searchString: "daily planet w9990003 closing returns"
+            },
+            {
+                id: "T-8945", guid: "g1004", order: "W9990004", company: "Oscorp", account: "100203",
+                shippingAddress: "Oscorp Tower, New York NY 10010", contactInfo: "Norman O. - 555-0000", 
+                submitRep: "Harry Osborn", logisticsOwner: "Holly Evans", driverInfo: "Flint - Route NY1", 
+                status: "Completed", issue: "Wrong Delivery Location", description: "Delivered to 2nd floor instead of 10th floor.", 
+                item: "N/A", warehouse: "NY-WH", route: "NY1", warehouseNotes: "Swapped product at dock.", driverNotes: "Delivered correct item.", 
+                fullStamp: yesterdayStr + " | 11:00 AM", completionTime: yesterdayStr + " | 10:00 AM",
+                date: yesterdayStr, timestamp: Date.now() - 172800000, 
+                warehouseEmailSent: "Never", repEmailSent: yesterdayStr + " | 15:00 PM", isCoaching: false, 
+                searchString: "oscorp w9990004 wrong delivery location"
+            },
+            {
+                id: "T-8946", guid: "g1005", order: "W9990005", company: "Avengers Facility", account: "100204",
+                shippingAddress: "Upstate New York", contactInfo: "Steve R. - 555-1234", 
+                submitRep: "Happy Hogan", logisticsOwner: "Anslee Erickson", driverInfo: "Stan - Route NY5", 
+                status: "Pending", issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Need installation of 5 conference tables.", 
+                item: "SAF9988", warehouse: "NY-WH", route: "NY5", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 07:00 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 7200000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "avengers facility w9990005 furniture"
+            },
+            {
+                id: "T-8947", guid: "g1006", order: "W9990006", company: "Dunder Mifflin", account: "100205",
+                shippingAddress: "1725 Slough Ave, Scranton PA 18505", contactInfo: "Pam B. - 555-4321", 
+                submitRep: "Jim Halpert", logisticsOwner: "Kari Westervelt", driverInfo: "Dwight - Route PA2", 
+                status: "Working on", issue: "Wrong Delivery Location", description: "Paper dropped off at the wrong building.", 
+                item: "WBM21200", warehouse: "PA-WH", route: "PA2", warehouseNotes: "", driverNotes: "Nobody at dock.", 
+                fullStamp: todayStr + " | 10:30 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 14400000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "dunder mifflin w9990006 wrong delivery location paper"
+            },
+            {
+                id: "T-8948", guid: "g1007", order: "W9990007", company: "Initech", account: "100206",
+                shippingAddress: "123 Business Park, New York NY 10012", contactInfo: "Milton W. - 555-5678", 
+                submitRep: "Peter Gibbons", logisticsOwner: "Unassigned", driverInfo: "Bill - Route NY2", 
+                status: "Pending", issue: "ETA", description: "Need ETA on the stapler shipment.", 
+                item: "SWI7471", warehouse: "NY-WH", route: "NY2", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 11:45 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 1800000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "initech w9990007 eta"
+            },
+            {
+                id: "T-8949", guid: "g1008", order: "W9990008", company: "Tyrell Corp", account: "100207",
+                shippingAddress: "Eldorado Bldg, New York NY 10019", contactInfo: "Eldon T. - 555-8888", 
+                submitRep: "Roy Batty", logisticsOwner: "Anslee Erickson", driverInfo: "Deckard - Route NY4", 
+                status: "Follow-up", issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Whiteboard arrived shattered.", 
+                item: "QRT1234", warehouse: "NY-WH", route: "NY4", warehouseNotes: "", driverNotes: "", 
+                fullStamp: yesterdayStr + " | 08:15 AM", completionTime: null,
+                date: yesterdayStr, timestamp: Date.now() - 90000000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "tyrell corp w9990008 furniture whiteboard"
+            },
+            {
+                id: "T-8950", guid: "g1009", order: "W9990009", company: "Monsters Inc", account: "100208",
+                shippingAddress: "Monstropolis, New York NY 10021", contactInfo: "Sulley - 555-3333", 
+                submitRep: "Mike Wazowski", logisticsOwner: "Holly Evans", driverInfo: "George - Route NY1", 
+                status: "Escalated - Holly", issue: "Missing Items", description: "Missing 3 boxes of Keurig coffee pods.", 
+                item: "KCU123", warehouse: "NY-WH", route: "NY1", warehouseNotes: "We do not have any more in stock.", driverNotes: "", 
+                fullStamp: olderStr + " | 09:00 AM", completionTime: null,
+                date: olderStr, timestamp: Date.now() - 259200000, 
+                warehouseEmailSent: olderStr + " | 10:00 AM", repEmailSent: olderStr + " | 10:30 AM", isCoaching: false, 
+                searchString: "monsters inc w9990009 missing items coffee"
+            },
+            {
+                id: "T-8951", guid: "g1010", order: "W9990010", company: "Umbrella Corp", account: "100209",
+                shippingAddress: "Raccoon City, South Daytona FL 32119", contactInfo: "Jill V. - 555-7777", 
+                submitRep: "Albert Wesker", logisticsOwner: "Kari Westervelt", driverInfo: "Chris - Route FL1", 
+                status: "Completed", issue: "Wrong Delivery Location", description: "Breakroom supplies left in the lobby.", 
+                item: "BKM444", warehouse: "CFL", route: "FL1", warehouseNotes: "", driverNotes: "Dropped off at back door.", 
+                fullStamp: oldStr + " | 08:30 AM", completionTime: oldStr + " | 10:00 AM",
+                date: oldStr, timestamp: Date.now() - 864000000, 
+                warehouseEmailSent: "Never", repEmailSent: oldStr + " | 11:00 AM", isCoaching: false, 
+                searchString: "umbrella corp w9990010 wrong delivery location"
+            },
+            {
+                id: "T-8952", guid: "g1011", order: "W9990011", company: "Globex", account: "100210",
+                shippingAddress: "Cypress Creek, South Daytona FL 32119", contactInfo: "Homer S. - 555-6666", 
+                submitRep: "Hank Scorpio", logisticsOwner: "Wayne Bow", driverInfo: "Moe - Route FL2", 
+                status: "Sent Back", issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Chairs are the wrong color.", 
+                item: "HON4444", warehouse: "CFL", route: "FL2", warehouseNotes: "", driverNotes: "", 
+                fullStamp: yesterdayStr + " | 13:00 PM", completionTime: null,
+                date: yesterdayStr, timestamp: Date.now() - 100000000, 
+                warehouseEmailSent: "Never", repEmailSent: yesterdayStr + " | 14:00 PM", isCoaching: true, 
+                searchString: "globex w9990011 furniture chairs"
+            },
+            {
+                id: "T-8953", guid: "g1012", order: "W9990012", company: "Cyberdyne", account: "100211",
+                shippingAddress: "Tech Park, Los Angeles CA 90001", contactInfo: "John C. - 555-2222", 
+                submitRep: "Sarah Connor", logisticsOwner: "Anslee Erickson", driverInfo: "T-800 - Route A2", 
+                status: "Working on", issue: "Missing Items", description: "Missing 2 monitors.", 
+                item: "HP24M", warehouse: "LAX", route: "A2", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 10:00 AM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 10000000, 
+                warehouseEmailSent: todayStr + " | 10:15 AM", repEmailSent: "Never", isCoaching: false, 
+                searchString: "cyberdyne w9990012 missing items monitors"
+            },
+            {
+                id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
+                shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
+                submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
+                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
+                item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 14:00 PM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 5000000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "weyland-yutani w9990013 route update"
+            },
+            {
+                id: "T-8955", guid: "g1014", order: "W9990014", company: "Wonka Industries", account: "100213",
+                shippingAddress: "Factory St, Scranton PA 18501", contactInfo: "Willy W. - 555-1111", 
+                submitRep: "Charlie Bucket", logisticsOwner: "Kari Westervelt", driverInfo: "Oompa - Route PA1", 
+                status: "Completed", issue: "ETA", description: "Where is my candy shipment?", 
+                item: "SNK999", warehouse: "PA-WH", route: "PA1", warehouseNotes: "", driverNotes: "Delivered to front desk.", 
+                fullStamp: olderStr + " | 08:00 AM", completionTime: olderStr + " | 11:30 AM",
+                date: olderStr, timestamp: Date.now() - 300000000, 
+                warehouseEmailSent: "Never", repEmailSent: olderStr + " | 12:00 PM", isCoaching: false, 
+                searchString: "wonka industries w9990014 eta candy"
+            },
+            {
+                id: "T-8956", guid: "g1015", order: "W9990015", company: "Acme Corp", account: "100214",
+                shippingAddress: "Desert Rd, Dallas TX 75001", contactInfo: "Road R. - 555-9876", 
+                submitRep: "Wile E. Coyote", logisticsOwner: "Unassigned", driverInfo: "Bugs - Route T1", 
+                status: "Pending", issue: "Closing Returns", description: "Returning giant rubber band.", 
+                item: "ACM123", warehouse: "TX-WH", route: "T1", warehouseNotes: "", driverNotes: "", 
+                fullStamp: todayStr + " | 15:00 PM", completionTime: null,
+                date: todayStr, timestamp: Date.now() - 1200000, 
+                warehouseEmailSent: "Never", repEmailSent: "Never", isCoaching: false, 
+                searchString: "acme corp w9990015 closing returns"
             }
         ];
 
@@ -589,7 +714,7 @@
             let dispoToSave = newDispo;
 
             if (newDispo === "Escalated - Holly") { ownerToPass = "Holly"; t.logisticsOwner = "Holly Evans"; } 
-            else if (newDispo === "Escalated - Wayne") { ownerToPass = "Wayne"; t.logisticsOwner = "Wayne Rendt"; }
+            else if (newDispo === "Escalated - Wayne") { ownerToPass = "Wayne"; t.logisticsOwner = "Wayne Bow"; }
             else if (newDispo === "Escalated - Kari") { ownerToPass = "Kari"; t.logisticsOwner = "Kari Westervelt"; } 
             else if (newDispo === "Route Update - Logistics") { 
                 ownerToPass = ""; 
@@ -678,7 +803,7 @@
             if (inputElement.value.length < 3) { document.getElementById(dropdownId).style.display = 'none'; return; }
             galSearchTimeout = setTimeout(() => {
                 const mockUsers = [
-                    { displayName: "Wayne Rendt", mail: "wayne.rendt@wbmason.com" },
+                    { displayName: "Wayne Bow", mail: "wayne.rendt@wbmason.com" },
                     { displayName: "Holly Evans", mail: "holly.evans@wbmason.com" },
                     { displayName: "Kari Westervelt", mail: "kari.westervelt@wbmason.com" }
                 ];
@@ -769,7 +894,7 @@
                 }
                 
                 closeDraftModal(); 
-                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Email`; 
+                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Mock Send`; 
                 btn.disabled = false; 
                 
                 render(false);
