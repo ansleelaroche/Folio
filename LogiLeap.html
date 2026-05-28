@@ -685,6 +685,8 @@
         // --- MOCK DATASET ---
         const todayStr = new Date().toLocaleDateString('en-CA');
         const yesterdayStr = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+        const olderStr = new Date(Date.now() - 3 * 86400000).toLocaleDateString('en-CA');
+        const oldStr = new Date(Date.now() - 10 * 86400000).toLocaleDateString('en-CA');
         
         const mockDataset = [
             {
@@ -730,6 +732,96 @@
                 issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Need installation of 5 conference tables.", item: "SAF9988",
                 date: todayStr, timestamp: Date.now() - 7200000, timeWindow: "No Window Data", modifiedOn: "N/A",
                 zip3: "120", lat: 42.7, lng: -74.0, isCoaching: false, coachingNotes: "", searchString: "avengers facility w9990005 furniture",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1006", guid: "g1006", order: "W9990006", accountNum: "100205", company: "Dunder Mifflin",
+                address: "1725 Slough Ave, Scranton PA 18505", whs: "PA-WH", route: "PA2", status: "Working on", owner: "Kari Westervelt",
+                submitRep: "Jim Halpert", notes: "Driver noted they could not find the loading dock.", otherNotes: "", warehouseNotes: "", driverNotes: "Nobody at dock.",
+                issue: "Wrong Delivery Location", description: "Paper dropped off at the wrong building.", item: "WBM21200",
+                date: todayStr, timestamp: Date.now() - 14400000, timeWindow: "No Window Data", modifiedOn: todayStr,
+                zip3: "185", lat: 41.4, lng: -75.6, isCoaching: false, coachingNotes: "", searchString: "dunder mifflin w9990006 wrong delivery location paper",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1007", guid: "g1007", order: "W9990007", accountNum: "100206", company: "Initech",
+                address: "123 Business Park, New York NY 10012", whs: "NY-WH", route: "NY2", status: "Pending", owner: "Unassigned",
+                submitRep: "Peter Gibbons", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "ETA", description: "Need ETA on the stapler shipment.", item: "SWI7471",
+                date: todayStr, timestamp: Date.now() - 1800000, timeWindow: "No Window Data", modifiedOn: "N/A",
+                zip3: "100", lat: 40.7, lng: -74.0, isCoaching: false, coachingNotes: "", searchString: "initech w9990007 eta",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1008", guid: "g1008", order: "W9990008", accountNum: "100207", company: "Tyrell Corp",
+                address: "Eldorado Bldg, New York NY 10019", whs: "NY-WH", route: "NY4", status: "Follow-up", owner: "Anslee Erickson",
+                submitRep: "Roy Batty", notes: "Sent to furniture team for review.", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Whiteboard arrived shattered.", item: "QRT1234",
+                date: yesterdayStr, timestamp: Date.now() - 90000000, timeWindow: "No Window Data", modifiedOn: yesterdayStr,
+                zip3: "100", lat: 40.7, lng: -74.0, isCoaching: false, coachingNotes: "", searchString: "tyrell corp w9990008 furniture whiteboard",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1009", guid: "g1009", order: "W9990009", accountNum: "100208", company: "Monsters Inc",
+                address: "Monstropolis, New York NY 10021", whs: "NY-WH", route: "NY1", status: "Escalated - Holly", owner: "Holly Evans",
+                submitRep: "Mike Wazowski", notes: "Need Holly to approve this credit.", otherNotes: "", warehouseNotes: "We do not have any more in stock.", driverNotes: "",
+                issue: "Missing Items", description: "Missing 3 boxes of Keurig coffee pods.", item: "KCU123",
+                date: olderStr, timestamp: Date.now() - 259200000, timeWindow: "No Window Data", modifiedOn: olderStr,
+                zip3: "100", lat: 40.7, lng: -74.0, isCoaching: false, coachingNotes: "", searchString: "monsters inc w9990009 missing items coffee",
+                repEmailDate: "Yes", whEmailDate: "Yes", mgrEmailDate: null
+            },
+            {
+                id: "L-1010", guid: "g1010", order: "W9990010", accountNum: "100209", company: "Umbrella Corp",
+                address: "Raccoon City, South Daytona FL 32119", whs: "CFL", route: "FL1", status: "Completed", owner: "Kari Westervelt",
+                submitRep: "Albert Wesker", notes: "Driver redelivered.", otherNotes: "", warehouseNotes: "", driverNotes: "Dropped off at back door.",
+                issue: "Wrong Delivery Location", description: "Breakroom supplies left in the lobby.", item: "BKM444",
+                date: oldStr, timestamp: Date.now() - 864000000, timeWindow: "Completed: 10:00 AM", modifiedOn: oldStr,
+                zip3: "321", lat: 29.2, lng: -81.0, isCoaching: false, coachingNotes: "", searchString: "umbrella corp w9990010 wrong delivery location",
+                repEmailDate: "Yes", whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1011", guid: "g1011", order: "W9990011", accountNum: "100210", company: "Globex",
+                address: "Cypress Creek, South Daytona FL 32119", whs: "CFL", route: "FL2", status: "Sent Back", owner: "Wayne Rendt",
+                submitRep: "Hank Scorpio", notes: "Need more info from the rep.", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Chairs are the wrong color.", item: "HON4444",
+                date: yesterdayStr, timestamp: Date.now() - 100000000, timeWindow: "No Window Data", modifiedOn: yesterdayStr,
+                zip3: "321", lat: 29.2, lng: -81.0, isCoaching: true, coachingNotes: "Need item numbers and photos before submitting.", searchString: "globex w9990011 furniture chairs",
+                repEmailDate: "Yes", whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1012", guid: "g1012", order: "W9990012", accountNum: "100211", company: "Cyberdyne",
+                address: "Tech Park, Los Angeles CA 90001", whs: "LAX", route: "A2", status: "Working on", owner: "Anslee Erickson",
+                submitRep: "Sarah Connor", notes: "Emailed LAX warehouse.", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Missing Items", description: "Missing 2 monitors.", item: "HP24M",
+                date: todayStr, timestamp: Date.now() - 10000000, timeWindow: "No Window Data", modifiedOn: todayStr,
+                zip3: "900", lat: 34.0, lng: -118.2, isCoaching: false, coachingNotes: "", searchString: "cyberdyne w9990012 missing items monitors",
+                repEmailDate: null, whEmailDate: "Yes", mgrEmailDate: null
+            },
+            {
+                id: "L-1013", guid: "g1013", order: "W9990013", accountNum: "100212", company: "Weyland-Yutani",
+                address: "Bldg 4, San Francisco CA 94016", whs: "SFO", route: "S1", status: "Pending", owner: "Tier 2",
+                submitRep: "Ellen Ripley", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Route Update", description: "Need to change delivery day to Tuesday.", item: "N/A",
+                date: todayStr, timestamp: Date.now() - 5000000, timeWindow: "No Window Data", modifiedOn: "N/A",
+                zip3: "940", lat: 37.5, lng: -122.3, isCoaching: false, coachingNotes: "", searchString: "weyland-yutani w9990013 route update",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1014", guid: "g1014", order: "W9990014", accountNum: "100213", company: "Wonka Industries",
+                address: "Factory St, Scranton PA 18501", whs: "PA-WH", route: "PA1", status: "Completed", owner: "Kari Westervelt",
+                submitRep: "Charlie Bucket", notes: "Driver redelivered.", otherNotes: "", warehouseNotes: "", driverNotes: "Delivered to front desk.",
+                issue: "ETA", description: "Where is my candy shipment?", item: "SNK999",
+                date: olderStr, timestamp: Date.now() - 300000000, timeWindow: "Completed: 11:30 AM", modifiedOn: olderStr,
+                zip3: "185", lat: 41.4, lng: -75.6, isCoaching: false, coachingNotes: "", searchString: "wonka industries w9990014 eta candy",
+                repEmailDate: "Yes", whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1015", guid: "g1015", order: "W9990015", accountNum: "100214", company: "Acme Corp",
+                address: "Desert Rd, Dallas TX 75001", whs: "TX-WH", route: "T1", status: "Pending", owner: "Unassigned",
+                submitRep: "Wile E. Coyote", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Closing Returns", description: "Returning giant rubber band.", item: "ACM123",
+                date: todayStr, timestamp: Date.now() - 1200000, timeWindow: "No Window Data", modifiedOn: "N/A",
+                zip3: "750", lat: 33.0, lng: -96.7, isCoaching: false, coachingNotes: "", searchString: "acme corp w9990015 closing returns",
                 repEmailDate: null, whEmailDate: null, mgrEmailDate: null
             }
         ];
@@ -1153,6 +1245,7 @@
                             <option value="ETA" ${t.issue==='ETA'?'selected':''}>ETA</option>
                             <option value="Closing Returns" ${t.issue==='Closing Returns'?'selected':''}>Closing Returns</option>
                             <option value="Wrong Delivery Location" ${t.issue==='Wrong Delivery Location'?'selected':''}>Wrong Delivery Location</option>
+                            <option value="Route Update" ${t.issue==='Route Update'?'selected':''}>Route Update</option>
                             <option value="Furniture (If your item is furniture, you MUST choose this option!)" ${t.issue==='Furniture (If your item is furniture, you MUST choose this option!)'?'selected':''}>Furniture</option>
                         </select>
                     </td>
