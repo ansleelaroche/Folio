@@ -84,21 +84,23 @@
         /* --- App Wrapper for Responsive Scaling --- */
         .app-wrapper {
             width: 100%;
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
-            /* Dynamically sizes the iframe to the user's screen minus the nav bar */
-            height: calc(100vh - 160px);
-            min-height: 700px;
-        }
-
-        .iframe-container {
-            width: 100%;
-            height: 100%;
-            border: none;
+            /* Dynamically sizes to the user's screen minus the nav bar */
+            height: calc(100vh - 120px);
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
             border-radius: 16px;
             background: var(--bg-color);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border-top: 4px solid var(--accent-primary);
+        }
+
+        .iframe-container {
+            border: none;
+            transform-origin: top left;
+            background: var(--bg-color);
         }
 
         /* --- Resume Dashboard Styles --- */
@@ -439,10 +441,44 @@
 
             // Show the selected tab content and mark button as active
             document.getElementById(tabName).classList.add('active');
-            
-            // Find the clicked button based on the function argument and add active class
             event.currentTarget.classList.add('active');
+
+            // Force a recalculation of the iframe scaling so it renders perfectly upon opening
+            scaleIframes();
         }
+
+        function scaleIframes() {
+            // Target only the currently visible app wrapper to save memory and ensure correct dimensions
+            const activeWrapper = document.querySelector('.tab-content.active .app-wrapper');
+            if (!activeWrapper) return;
+
+            const iframe = activeWrapper.querySelector('.iframe-container');
+            if (!iframe) return;
+
+            // This is the ideal "desktop width" your apps were designed for. 
+            // The iframe will act like a monitor of this exact width, then shrink down to fit the page.
+            const targetDesktopWidth = 1536; 
+
+            // Get the actual space available on the user's screen
+            const containerWidth = activeWrapper.clientWidth;
+            const containerHeight = activeWrapper.clientHeight;
+
+            // Figure out the math to shrink/grow the app to perfectly fit the wrapper
+            const scaleRatio = containerWidth / targetDesktopWidth;
+
+            // Lock the iframe to the target width
+            iframe.style.width = `${targetDesktopWidth}px`;
+            
+            // Adjust the height proportionally so that after we scale it, it perfectly fills the container's height without a gap
+            iframe.style.height = `${containerHeight / scaleRatio}px`;
+            
+            // Apply the scaling magic
+            iframe.style.transform = `scale(${scaleRatio})`;
+        }
+
+        // Run the scaler immediately when the page loads, and anytime the user resizes their browser
+        window.addEventListener('resize', scaleIframes);
+        document.addEventListener('DOMContentLoaded', scaleIframes);
     </script>
 </body>
 </html>
