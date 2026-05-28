@@ -22,31 +22,36 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 30px 20px;
             line-height: 1.7;
+            overflow-x: hidden;
         }
 
         /* --- Navigation Tabs --- */
         .tab-nav {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 30px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 50;
         }
 
         .tab-btn {
             background: var(--card-bg);
             color: var(--text-main);
             border: 1px solid var(--border-color);
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             font-family: 'Inter', sans-serif;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .tab-btn:hover {
@@ -76,12 +81,22 @@
             transform: translateY(0);
         }
 
+        /* --- App Wrapper for Responsive Scaling --- */
+        .app-wrapper {
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            /* Dynamically sizes the iframe to the user's screen minus the nav bar */
+            height: calc(100vh - 160px);
+            min-height: 700px;
+        }
+
         .iframe-container {
             width: 100%;
-            height: 750px;
+            height: 100%;
             border: none;
-            border-radius: 24px;
-            background: var(--card-bg);
+            border-radius: 16px;
+            background: var(--bg-color);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border-top: 4px solid var(--accent-primary);
         }
@@ -251,14 +266,8 @@
 
         /* --- Animations --- */
         @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .animate {
@@ -273,21 +282,10 @@
         .delay-5 { animation-delay: 0.9s; }
 
         @media (max-width: 768px) {
-            .job-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            .dashboard-container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 2.2em;
-            }
-            .contact-info span {
-                display: block;
-                margin: 5px 0;
-            }
+            .job-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .dashboard-container { padding: 30px 20px; }
+            h1 { font-size: 2.2em; }
+            .contact-info span { display: block; margin: 5px 0; }
         }
     </style>
 </head>
@@ -295,6 +293,8 @@
 
     <nav class="tab-nav animate delay-1">
         <button class="tab-btn active" onclick="openTab('resume')">Resume</button>
+        <button class="tab-btn" onclick="openTab('logi-leap')">LogiLeap</button>
+        <button class="tab-btn" onclick="openTab('logi-log')">LogiLog</button>
         <button class="tab-btn" onclick="openTab('service-tracker')">Service Tracker</button>
         <button class="tab-btn" onclick="openTab('fancy-pantry')">Fancy Pantry</button>
     </nav>
@@ -399,12 +399,28 @@
         </div>
     </div>
 
-    <div id="service-tracker" class="tab-content" style="max-width: 1200px; margin: 0 auto;">
-        <iframe src="https://ansleelaroche.github.io/Folio/ServiceTracker.html" class="iframe-container" title="Service Tracker App"></iframe>
+    <div id="logi-leap" class="tab-content">
+        <div class="app-wrapper">
+            <iframe src="https://ansleelaroche.github.io/Folio/LogiLeap.html" class="iframe-container" title="LogiLeap App"></iframe>
+        </div>
     </div>
 
-    <div id="fancy-pantry" class="tab-content" style="max-width: 1200px; margin: 0 auto;">
-        <iframe src="https://ansleelaroche.github.io/Folio/FancyPantry.html" class="iframe-container" title="Fancy Pantry App"></iframe>
+    <div id="logi-log" class="tab-content">
+        <div class="app-wrapper">
+            <iframe src="https://ansleelaroche.github.io/Folio/LogiLog.html" class="iframe-container" title="LogiLog App"></iframe>
+        </div>
+    </div>
+
+    <div id="service-tracker" class="tab-content">
+        <div class="app-wrapper">
+            <iframe src="https://ansleelaroche.github.io/Folio/ServiceTracker.html" class="iframe-container" title="Service Tracker App"></iframe>
+        </div>
+    </div>
+
+    <div id="fancy-pantry" class="tab-content">
+        <div class="app-wrapper">
+            <iframe src="https://ansleelaroche.github.io/Folio/FancyPantry.html" class="iframe-container" title="Fancy Pantry App"></iframe>
+        </div>
     </div>
 
     <script>
