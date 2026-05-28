@@ -5,115 +5,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anslee Erickson - Resume Dashboard</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --text-main: #9ca3af;
+            --text-light: #f3f4f6;
+            --accent-primary: #00e5ff;
+            --accent-secondary: #3b82f6;
+            --border-color: #1f2937;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            padding: 40px 20px;
+            line-height: 1.7;
         }
+
         .dashboard-container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-top: 4px solid var(--accent-primary);
+            position: relative;
+            overflow: hidden;
         }
+
+        /* Ambient Glow Effect */
+        .dashboard-container::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            left: -150px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
         header {
             text-align: center;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
         }
+
         h1 {
             margin: 0;
-            color: #2c3e50;
-            font-size: 2.5em;
+            color: var(--text-light);
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: -1px;
         }
+
         .contact-info {
-            margin-top: 10px;
-            font-size: 1em;
-            color: #555;
+            margin-top: 15px;
+            font-size: 1.05em;
+            color: var(--accent-primary);
+            font-weight: 300;
         }
+
         .contact-info span {
-            margin: 0 10px;
+            margin: 0 15px;
         }
+
         h2 {
-            color: #2c3e50;
-            border-bottom: 1px solid #ecf0f1;
-            padding-bottom: 10px;
-            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-top: 45px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
         }
+
+        h2::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            margin-right: 15px;
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
         .experience-item, .education-item {
-            margin-bottom: 25px;
+            margin-bottom: 35px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
+
+        .experience-item:hover, .education-item:hover {
+            border-color: var(--border-color);
+            transform: translateY(-2px);
+        }
+
         .job-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 5px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
+
         .job-title {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #34495e;
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--text-light);
         }
+
         .company {
-            font-weight: 600;
-            color: #7f8c8d;
+            font-weight: 400;
+            color: var(--accent-secondary);
+            margin-left: 10px;
+            font-size: 1.1em;
         }
+
         .date {
-            color: #95a5a6;
+            color: var(--text-main);
             font-size: 0.95em;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 20px;
         }
+
         ul {
             margin-top: 10px;
             padding-left: 20px;
         }
+
         li {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            position: relative;
+            list-style-type: none;
         }
+
+        li::before {
+            content: '▹';
+            position: absolute;
+            left: -20px;
+            color: var(--accent-primary);
+        }
+
         .skills-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            list-style: none;
+            gap: 12px;
             padding: 0;
         }
+
         .skills-list li {
-            background: #3498db;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 500;
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .skills-list li::before {
+            content: none;
+        }
+
+        .skills-list li:hover {
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            opacity: 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Staggered animation delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+        .delay-4 { animation-delay: 0.7s; }
+        .delay-5 { animation-delay: 0.9s; }
+
+        @media (max-width: 768px) {
+            .job-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .dashboard-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 2.2em;
+            }
+            .contact-info span {
+                display: block;
+                margin: 5px 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <header>
-            <h1>Anslee Erickson[cite: 1]</h1>
+        <header class="animate delay-1">
+            <h1>Anslee Erickson</h1>
             <div class="contact-info">
-                <span>386-589-3306[cite: 1]</span> | 
-                <span>1983 Magnolia Avenue, South Daytona, FL 32119[cite: 1]</span>
+                <span>386-589-3306</span> &bull; 
+                <span>1983 Magnolia Avenue, South Daytona, FL 32119</span>
             </div>
         </header>
 
-        <section class="profile">
+        <section class="profile animate delay-2">
             <h2>Professional Profile</h2>
-            <p>Results-driven Data Analyst[cite: 1] with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
+            <p>Results-driven Data Analyst with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
         </section>
 
-        <section class="experience">
+        <section class="experience animate delay-3">
             <h2>Professional Experience</h2>
 
             <div class="experience-item">
                 <div class="job-header">
                     <div>
-                        <span class="job-title">Data Analyst[cite: 1]</span> | <span class="company">W.B. Mason[cite: 1]</span>
+                        <span class="job-title">Data Analyst</span> <span class="company">| W.B. Mason</span>
                     </div>
                     <span class="date">February 2024 &ndash; Present</span>
                 </div>
@@ -127,42 +267,42 @@
             <div class="experience-item">
                 <div class="job-header">
                     <div>
-                        <span class="job-title">[Previous Role]</span> | <span class="company">W.B. Mason[cite: 1]</span>
+                        <span class="job-title">[Previous Role]</span> <span class="company">| W.B. Mason</span>
                     </div>
-                    <span class="date">2021 &ndash; January 2024[cite: 1]</span>
+                    <span class="date">2021 &ndash; January 2024</span>
                 </div>
                 <ul>
-                    <li>[Summarize key responsibilities and achievements from the initial years at the company here.][cite: 1]</li>
+                    <li>[Summarize key responsibilities and achievements from the initial years at the company here.]</li>
                 </ul>
             </div>
 
             <div class="experience-item">
                 <div class="job-header">
                     <div>
-                        <span class="job-title">Digital Asset Elevator[cite: 1]</span> | <span class="company">[Company Name]</span>
+                        <span class="job-title">Digital Asset Elevator</span> <span class="company">| [Company Name]</span>
                     </div>
-                    <span class="date">2019 &ndash; 2021[cite: 1]</span>
+                    <span class="date">2019 &ndash; 2021</span>
                 </div>
                 <ul>
-                    <li>[Highlight key learnings and achievements in this role.][cite: 1]</li>
+                    <li>[Highlight key learnings and achievements in this role.]</li>
                 </ul>
             </div>
 
             <div class="experience-item">
                 <div class="job-header">
                     <div>
-                        <span class="job-title">Associate Store Manager[cite: 1]</span> | <span class="company">T-Mobile[cite: 1]</span>
+                        <span class="job-title">Associate Store Manager</span> <span class="company">| T-Mobile</span>
                     </div>
-                    <span class="date">2017 &ndash; 2019[cite: 1]</span>
+                    <span class="date">2017 &ndash; 2019</span>
                 </div>
                 <ul>
-                    <li>Managed daily store operations in New Smyrna Beach, FL[cite: 1], driving sales growth and maintaining high customer satisfaction.[cite: 1]</li>
-                    <li>Achieved measurable accomplishments resulting in profitability increases.[cite: 1]</li>
+                    <li>Managed daily store operations in New Smyrna Beach, FL, driving sales growth and maintaining high customer satisfaction.</li>
+                    <li>Achieved measurable accomplishments resulting in profitability increases.</li>
                 </ul>
             </div>
         </section>
 
-        <section class="skills">
+        <section class="skills animate delay-4">
             <h2>Technical Skills</h2>
             <ul class="skills-list">
                 <li>Data Analysis</li>
@@ -176,7 +316,7 @@
             </ul>
         </section>
 
-        <section class="education">
+        <section class="education animate delay-5">
             <h2>Education</h2>
             <div class="education-item">
                 <div class="job-header">
