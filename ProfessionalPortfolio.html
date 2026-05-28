@@ -292,6 +292,7 @@
 </head>
 <body>
 
+    <!-- Navigation Tabs -->
     <nav class="tab-nav animate delay-1">
         <button class="tab-btn active" onclick="openTab('resume')">Resume</button>
         <button class="tab-btn" onclick="openTab('logi-leap')">LogiLeap</button>
@@ -300,6 +301,7 @@
         <button class="tab-btn" onclick="openTab('fancy-pantry')">Fancy Pantry</button>
     </nav>
 
+    <!-- Resume Tab Content -->
     <div id="resume" class="tab-content active">
         <div class="dashboard-container">
             <header class="animate delay-1">
@@ -312,7 +314,7 @@
 
             <section class="profile animate delay-2">
                 <h2>Professional Profile</h2>
-                <p>Results-driven Data Analyst with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
+                <p>Results-driven Data Analyst with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in leveraging Power Apps, Power Automate, Excel, and AI-assisted generation to design robust, scalable solutions. Experienced in version control and deployment via GitHub, creating comprehensive logistics management platforms and customer service widgets that streamline complex operations, track team performance, and drastically improve cross-departmental workflows.</p>
             </section>
 
             <section class="experience animate delay-3">
@@ -384,6 +386,8 @@
                     <li>Power Automate</li>
                     <li>Microsoft Excel</li>
                     <li>3D Modeling & Rendering</li>
+                    <li>GitHub</li>
+                    <li>AI-Assisted Development</li>
                 </ul>
             </section>
 
@@ -405,30 +409,35 @@
         </div>
     </div>
 
+    <!-- LogiLeap App Tab Content -->
     <div id="logi-leap" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/LogiLeap.html" class="iframe-container" title="LogiLeap App"></iframe>
         </div>
     </div>
 
+    <!-- LogiLog App Tab Content -->
     <div id="logi-log" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/LogiLog.html" class="iframe-container" title="LogiLog App"></iframe>
         </div>
     </div>
 
+    <!-- Service Tracker App Tab Content -->
     <div id="service-tracker" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/ServiceTracker.html" class="iframe-container" title="Service Tracker App"></iframe>
         </div>
     </div>
 
+    <!-- Fancy Pantry App Tab Content -->
     <div id="fancy-pantry" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/FancyPantry.html" class="iframe-container" title="Fancy Pantry App"></iframe>
         </div>
     </div>
 
+    <!-- JavaScript for Tab Switching and Responsive Iframe Scaling -->
     <script>
         function openTab(tabName) {
             // Hide all tab content
