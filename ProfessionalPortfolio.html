@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anslee Erickson - Resume Dashboard</title>
+    <title>Anslee Erickson - Portfolio Dashboard</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
@@ -26,6 +26,67 @@
             line-height: 1.7;
         }
 
+        /* --- Navigation Tabs --- */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-btn:hover {
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        /* --- Tab Content Areas --- */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 750px;
+            border: none;
+            border-radius: 24px;
+            background: var(--card-bg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-top: 4px solid var(--accent-primary);
+        }
+
+        /* --- Resume Dashboard Styles --- */
         .dashboard-container {
             max-width: 950px;
             margin: 0 auto;
@@ -38,7 +99,6 @@
             overflow: hidden;
         }
 
-        /* Ambient Glow Effect */
         .dashboard-container::before {
             content: '';
             position: absolute;
@@ -206,7 +266,6 @@
             animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        /* Staggered animation delays */
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.3s; }
         .delay-3 { animation-delay: 0.5s; }
@@ -233,102 +292,141 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <header class="animate delay-1">
-            <h1>Anslee Erickson</h1>
-            <div class="contact-info">
-                <span>386-589-3306</span> &bull; 
-                <span>1983 Magnolia Avenue, South Daytona, FL 32119</span>
-            </div>
-        </header>
 
-        <section class="profile animate delay-2">
-            <h2>Professional Profile</h2>
-            <p>Results-driven Data Analyst with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
-        </section>
+    <nav class="tab-nav animate delay-1">
+        <button class="tab-btn active" onclick="openTab('resume')">Resume</button>
+        <button class="tab-btn" onclick="openTab('service-tracker')">Service Tracker</button>
+        <button class="tab-btn" onclick="openTab('fancy-pantry')">Fancy Pantry</button>
+    </nav>
 
-        <section class="experience animate delay-3">
-            <h2>Professional Experience</h2>
-
-            <div class="experience-item">
-                <div class="job-header">
-                    <div>
-                        <span class="job-title">Data Analyst</span> <span class="company">| W.B. Mason</span>
-                    </div>
-                    <span class="date">February 2024 &ndash; Present</span>
+    <div id="resume" class="tab-content active">
+        <div class="dashboard-container">
+            <header class="animate delay-1">
+                <h1>Anslee Erickson</h1>
+                <div class="contact-info">
+                    <span>386-589-3306</span> &bull; 
+                    <span>1983 Magnolia Avenue, South Daytona, FL 32119</span>
                 </div>
-                <ul>
-                    <li>Lead departmental app development and automation initiatives to optimize internal workflows and efficiency.</li>
-                    <li>Design, build, and maintain custom applications (including the LogiLog reassignment tool and customer service search widgets) utilizing Power Apps and Power Automate.</li>
-                    <li>Oversee database management to ensure data integrity, streamline reporting processes, and enhance overall operational capabilities.</li>
-                </ul>
-            </div>
+            </header>
 
-            <div class="experience-item">
-                <div class="job-header">
-                    <div>
-                        <span class="job-title">[Previous Role]</span> <span class="company">| W.B. Mason</span>
+            <section class="profile animate delay-2">
+                <h2>Professional Profile</h2>
+                <p>Results-driven Data Analyst with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
+            </section>
+
+            <section class="experience animate delay-3">
+                <h2>Professional Experience</h2>
+
+                <div class="experience-item">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-title">Data Analyst</span> <span class="company">| W.B. Mason</span>
+                        </div>
+                        <span class="date">February 2024 &ndash; Present</span>
                     </div>
-                    <span class="date">2021 &ndash; January 2024</span>
+                    <ul>
+                        <li>Lead departmental app development and automation initiatives to optimize internal workflows and efficiency.</li>
+                        <li>Design, build, and maintain custom applications (including the LogiLog reassignment tool and customer service search widgets) utilizing Power Apps and Power Automate.</li>
+                        <li>Oversee database management to ensure data integrity, streamline reporting processes, and enhance overall operational capabilities.</li>
+                    </ul>
                 </div>
-                <ul>
-                    <li>[Summarize key responsibilities and achievements from the initial years at the company here.]</li>
-                </ul>
-            </div>
 
-            <div class="experience-item">
-                <div class="job-header">
-                    <div>
-                        <span class="job-title">Digital Asset Elevator</span> <span class="company">| [Company Name]</span>
+                <div class="experience-item">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-title">[Previous Role]</span> <span class="company">| W.B. Mason</span>
+                        </div>
+                        <span class="date">2021 &ndash; January 2024</span>
                     </div>
-                    <span class="date">2019 &ndash; 2021</span>
+                    <ul>
+                        <li>[Summarize key responsibilities and achievements from the initial years at the company here.]</li>
+                    </ul>
                 </div>
-                <ul>
-                    <li>[Highlight key learnings and achievements in this role.]</li>
-                </ul>
-            </div>
 
-            <div class="experience-item">
-                <div class="job-header">
-                    <div>
-                        <span class="job-title">Associate Store Manager</span> <span class="company">| T-Mobile</span>
+                <div class="experience-item">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-title">Digital Asset Elevator</span> <span class="company">| [Company Name]</span>
+                        </div>
+                        <span class="date">2019 &ndash; 2021</span>
                     </div>
-                    <span class="date">2017 &ndash; 2019</span>
+                    <ul>
+                        <li>[Highlight key learnings and achievements in this role.]</li>
+                    </ul>
                 </div>
-                <ul>
-                    <li>Managed daily store operations in New Smyrna Beach, FL, driving sales growth and maintaining high customer satisfaction.</li>
-                    <li>Achieved measurable accomplishments resulting in profitability increases.</li>
-                </ul>
-            </div>
-        </section>
 
-        <section class="skills animate delay-4">
-            <h2>Technical Skills</h2>
-            <ul class="skills-list">
-                <li>Data Analysis</li>
-                <li>Database Management</li>
-                <li>Process Automation</li>
-                <li>App Development</li>
-                <li>Power Apps</li>
-                <li>Power Automate</li>
-                <li>Microsoft Excel</li>
-                <li>3D Modeling</li>
-            </ul>
-        </section>
-
-        <section class="education animate delay-5">
-            <h2>Education</h2>
-            <div class="education-item">
-                <div class="job-header">
-                    <div>
-                        <span class="job-title">University of Central Florida (UCF)</span>
+                <div class="experience-item">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-title">Associate Store Manager</span> <span class="company">| T-Mobile</span>
+                        </div>
+                        <span class="date">2017 &ndash; 2019</span>
                     </div>
+                    <ul>
+                        <li>Managed daily store operations in New Smyrna Beach, FL, driving sales growth and maintaining high customer satisfaction.</li>
+                        <li>Achieved measurable accomplishments resulting in profitability increases.</li>
+                    </ul>
                 </div>
-                <ul>
-                    <li>Coursework focused on 3D Modeling, including spatial design and lighting controls.</li>
+            </section>
+
+            <section class="skills animate delay-4">
+                <h2>Technical Skills</h2>
+                <ul class="skills-list">
+                    <li>Data Analysis</li>
+                    <li>Database Management</li>
+                    <li>Process Automation</li>
+                    <li>App Development</li>
+                    <li>Power Apps</li>
+                    <li>Power Automate</li>
+                    <li>Microsoft Excel</li>
+                    <li>3D Modeling</li>
                 </ul>
-            </div>
-        </section>
+            </section>
+
+            <section class="education animate delay-5">
+                <h2>Education</h2>
+                <div class="education-item">
+                    <div class="job-header">
+                        <div>
+                            <span class="job-title">University of Central Florida (UCF)</span>
+                        </div>
+                    </div>
+                    <ul>
+                        <li>Coursework focused on 3D Modeling, including spatial design and lighting controls.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
     </div>
+
+    <div id="service-tracker" class="tab-content" style="max-width: 1200px; margin: 0 auto;">
+        <iframe src="https://ansleelaroche.github.io/Folio/ServiceTracker.html" class="iframe-container" title="Service Tracker App"></iframe>
+    </div>
+
+    <div id="fancy-pantry" class="tab-content" style="max-width: 1200px; margin: 0 auto;">
+        <iframe src="https://ansleelaroche.github.io/Folio/FancyPantry.html" class="iframe-container" title="Fancy Pantry App"></iframe>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            // Hide all tab content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show the selected tab content and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            
+            // Find the clicked button based on the function argument and add active class
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
