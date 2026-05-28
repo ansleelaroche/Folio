@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://alcdn.msauth.net/browser/2.14.2/js/msal-browser.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -135,7 +134,7 @@
             <i class="fa-solid fa-database text-[var(--brand)] text-2xl"></i>
         </div>
         <div class="mt-8 font-black uppercase tracking-widest text-[var(--brand)] flex items-center gap-2">
-            <i class="fa fa-cloud-download-alt"></i> Extracting Entire Dataset
+            <i class="fa fa-cloud-download-alt"></i> Loading Mock Portfolio Data
         </div>
         <div id="progress-container"><div id="progress-fill"></div></div>
         <div id="progress-text">Initializing Direct Native API...</div>
@@ -177,7 +176,7 @@
     <div id="email-modal">
         <div class="glass-panel rounded-xl w-[700px] max-w-[95vw] shadow-xl flex flex-col overflow-hidden p-6" id="modal-content">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-[var(--border)]">
-                <h3 class="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-2"><i class="fab fa-microsoft text-[var(--brand)]"></i> Outlook Dispatch</h3>
+                <h3 class="text-lg font-black text-white uppercase tracking-tighter flex items-center gap-2"><i class="fab fa-microsoft text-[var(--brand)]"></i> Mock Email Dispatch</h3>
                 <button onclick="closeEmailModal()" class="text-[var(--text-dim)] hover:text-[var(--danger)] transition-colors"><i class="fa fa-times text-lg"></i></button>
             </div>
             
@@ -202,7 +201,7 @@
             <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-[var(--border)]">
                 <button onclick="closeEmailModal()" class="px-6 py-2 rounded border border-[var(--border)] text-[var(--text-dim)] hover:text-white text-xs font-bold uppercase transition">Discard</button>
                 <button onclick="confirmEmailLog()" id="btn-send-email" class="px-8 py-2 bg-[var(--brand)] text-black text-xs font-black uppercase shadow hover:brightness-110 transition flex items-center gap-2">
-                    <i class="fas fa-paper-plane"></i> Send via Outlook & Log
+                    <i class="fas fa-paper-plane"></i> Mock Send
                 </button>
             </div>
         </div>
@@ -211,7 +210,7 @@
     <header class="glass-panel border-b border-[var(--border)] px-6 py-2 flex justify-between items-center shadow-md relative z-30">
         <div class="flex items-center gap-4">
             <i class="fa-solid fa-frog text-2xl text-[var(--brand)]"></i>
-            <h1 class="font-black uppercase tracking-tighter text-xl text-[var(--brand)]">LOGILEAP <span class="text-[10px] font-normal tracking-widest opacity-60 text-white ml-2">v106.18</span></h1>
+            <h1 class="font-black uppercase tracking-tighter text-xl text-[var(--brand)]">LOGILEAP <span class="text-[10px] font-normal tracking-widest opacity-60 text-white ml-2">PORTFOLIO DEMO</span></h1>
         </div>
 
         <div class="flex-1 max-w-2xl mx-12">
@@ -232,8 +231,8 @@
                 <button onclick="switchView('dmreport')" id="nav-dmreport" class="nav-btn"><i class="fas fa-envelope-open-text mb-1"></i>REPORT OUT</button>
             </div>
             <div class="text-right ml-2">
-                <div id="user-display-name" class="text-[10px] font-black uppercase text-white leading-none">Guest Rep</div>
-                <div class="text-[8px] text-[var(--brand)] font-mono uppercase tracking-widest mt-1">Authorized</div>
+                <div id="user-display-name" class="text-[10px] font-black uppercase text-white leading-none">Anslee Erickson</div>
+                <div class="text-[8px] text-[var(--brand)] font-mono uppercase tracking-widest mt-1">Data Analyst</div>
             </div>
             <button onclick="createNew()" class="px-4 py-2 bg-[var(--brand)] text-black rounded font-black text-[10px] uppercase shadow hover:brightness-110 transition flex items-center gap-2 ml-2"><i class="fas fa-plus"></i> New Ticket</button>
         </div>
@@ -241,12 +240,12 @@
 
     <div class="filters-bar glass-card border-b border-[var(--border)] px-6 py-3 flex flex-wrap gap-3 items-center relative shadow-sm">
         <div class="flex glass-panel rounded overflow-hidden">
-            <button onclick="setTimeFrame('today')" id="tf-today" class="time-btn active px-3 border-r border-[var(--border)]">TODAY</button>
+            <button onclick="setTimeFrame('today')" id="tf-today" class="time-btn px-3 border-r border-[var(--border)]">TODAY</button>
             <button onclick="setTimeFrame('curmo')" id="tf-curmo" class="time-btn px-3 border-r border-[var(--border)]">CUR MO</button>
             <button onclick="setTimeFrame('30d')" id="tf-30d" class="time-btn px-3 border-r border-[var(--border)]">30D</button>
             <button onclick="setTimeFrame('90d')" id="tf-90d" class="time-btn px-3 border-r border-[var(--border)]">90D</button>
             <button onclick="setTimeFrame('1y')" id="tf-1y" class="time-btn px-3 border-r border-[var(--border)]">1YR</button>
-            <button onclick="setTimeFrame('all')" id="tf-all" class="time-btn px-3">ALL</button>
+            <button onclick="setTimeFrame('all')" id="tf-all" class="time-btn active px-3">ALL</button>
         </div>
 
         <div class="flex gap-2 relative">
@@ -490,7 +489,7 @@
 
                 <details id="d365-delivery-panel" class="mt-4 glass-card rounded-xl shadow hidden border-l-4 border-[var(--brand)] group mb-6">
                     <summary class="p-5 text-[11px] font-black uppercase text-[var(--brand)] tracking-widest flex items-center justify-between cursor-pointer select-none outline-none">
-                        <span class="flex items-center gap-2"><i class="fa fa-truck"></i> D365 Delivery & Account Data</span>
+                        <span class="flex items-center gap-2"><i class="fa fa-truck"></i> Mock D365 Delivery & Account Data</span>
                         <i class="fas fa-chevron-down transition-transform group-open:rotate-180"></i>
                     </summary>
                     <div id="d365-delivery-content" class="p-5 pt-0 text-sm text-white grid grid-cols-2 gap-4 border-t border-[var(--border)] mt-2 pt-4"></div>
@@ -560,210 +559,25 @@
                 </div>
 
                 <div class="pt-6 mt-8 grid grid-cols-3 gap-6 opacity-40 font-mono text-[10px] uppercase font-black border-t border-[var(--border)]">
-                    <div>GUID: <span id="sys-guid" class="select-all hover:text-white cursor-pointer transition-colors"></span></div><div>RID: <span id="sys-rid"></span></div><div class="text-right">API: Dataverse Direct Native</div>
+                    <div>GUID: <span id="sys-guid" class="select-all hover:text-white cursor-pointer transition-colors"></span></div><div>RID: <span id="sys-rid"></span></div><div class="text-right">API: Local Mock Dataset</div>
                 </div>
             </div>
         </main>
     </div>
 
     <script id="worker-script" type="javascript/worker">
-        const ZIP_MAP = {'010':[42.2,-72.6],'020':[42.1,-71.2],'030':[42.9,-71.5],'040':[43.6,-70.3],'050':[43.6,-72.5],'060':[41.8,-72.7],'070':[40.8,-74.2],'080':[39.8,-75.0],'100':[40.7,-74.0],'110':[40.7,-73.7],'120':[42.7,-74.0],'130':[43.2,-76.3],'140':[42.8,-78.7],'150':[40.6,-80.2],'160':[40.9,-79.9],'170':[40.4,-77.2],'180':[40.7,-75.3],'190':[40.0,-75.3],'200':[38.9,-77.0],'210':[39.4,-76.6],'220':[38.8,-77.3],'230':[37.7,-77.1],'240':[37.2,-80.1],'250':[38.4,-81.6],'260':[40.1,-80.7],'270':[36.2,-80.3],'280':[35.4,-80.6],'290':[33.9,-80.9],'300':[33.9,-84.4],'310':[32.6,-83.5],'320':[30.0,-81.8],'330':[25.8,-80.2],'340':[29.0,-82.0],'350':[33.4,-86.7],'360':[32.2,-86.3],'370':[36.1,-86.8],'380':[35.1,-89.9],'390':[32.3,-90.2],'400':[38.2,-85.7],'410':[38.9,-84.5],'420':[36.9,-88.4],'430':[40.1,-83.0],'440':[41.4,-81.6],'450':[39.2,-84.4],'460':[39.9,-86.0],'470':[39.1,-85.0],'480':[42.5,-83.0],'490':[42.2,-85.5],'500':[41.6,-93.6],'530':[43.1,-88.0],'540':[45.0,-90.0],'550':[44.9,-93.0],'600':[42.1,-87.9],'630':[38.6,-90.4],'700':[29.9,-90.0],'730':[35.5,-97.5],'750':[33.0,-96.7],'770':[29.7,-95.3],'800':[39.7,-104.9],'850':[33.4,-112.0],'900':[34.0,-118.2],'940':[37.5,-122.3],'970':[45.4,-122.6],'980':[47.5,-122.2]};
-        
-        const parseEmailDate = (dString) => {
-            if(!dString) return null;
-            const d = new Date(dString);
-            if(isNaN(d)) return null;
-            return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' ' + d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-        };
-        
-        const normalizeRep = (name) => {
-            if(!name || name === "Unassigned") return "Unassigned";
-            let n = name.trim().toLowerCase();
-            if(n.includes("matt") || n.startsWith("m ") || n.startsWith("m.")) return "Matt Bleakley";
-            if(n.includes("guest")) return "Guest Rep";
-            return name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        };
-
         let globalDb = [];
 
         self.onmessage = function(e) {
             const { type, payload } = e.data;
             
-            if(type === 'PARSE' || type === 'MERGE') {
-                const parsed = payload.data.map(r => {
-                    const addr = r.cr714_shippingaddress || r.cr714_address || 'No Address Provided';
-                    const account = r.cr714_accountnumber || 'N/A';
-                    const item = r.cr714_item || 'N/A';
-                    
-                    let ownerRaw = r['cr714_logisticsowner@OData.Community.Display.V1.FormattedValue'] || r.cr714_logisticsowner || 'Unassigned';
-                    const issueType = r['cr714_issue@OData.Community.Display.V1.FormattedValue'] || r.cr714_issue || '';
-                    const createdDate = r.createdon ? new Date(r.createdon).toLocaleDateString('en-CA') : '';
-                    const currentToday = new Date().toLocaleDateString('en-CA');
-
-                    // ONE-WAY VALVE: Use the raw field to check if already handled
-                    const isAlreadyStamped = r.cr714_repemaildatestamp ? true : false;
-
-                    if (issueType.toLowerCase().includes("route update") && createdDate === currentToday && !isAlreadyStamped) {
-                        ownerRaw = "Tier 2";
-                    } else {
-                        if(ownerRaw.toLowerCase().includes("matt") || ownerRaw.toLowerCase().startsWith("m ")) ownerRaw = "Matt Bleakley";
-                        else ownerRaw = ownerRaw.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                    }
-
-                    let searchValues = [];
-                    let otherNotes = [];
-
-                    for (let key in r) {
-                        if (key.startsWith('cr714_') && r[key] !== null && r[key] !== undefined) {
-                            searchValues.push(String(r[key]).toLowerCase());
-                        }
-                        
-                    // Extract any column containing 'notes' except for the primary editable logisticsnotes
-                        if (key.toLowerCase().includes('notes') && !key.includes('@OData') && key !== 'cr714_logisticsnotes') {
-                            let val = r[`${key}@OData.Community.Display.V1.FormattedValue`] || r[key];
-                            if (val !== null && val !== undefined && String(val).trim() !== '') {
-                                let readableKey = key.replace(/^cr\d+_/i, '').replace(/_/g, ' ').toUpperCase();
-                                otherNotes.push(`[${readableKey}]\n${String(val).trim()}`);
-                            }
-                        }
-                    }
-
-                    let zipExtracted = addr.match(/\b\d{5}(?:-\d{4})?\b/)?.[0]?.substring(0,3) || addr.match(/\b\d{3}/)?.[0] || '000';
-                    
-                    // Assign explicit mapped coordinates if they come from the API payload
-                    let lat = r.cr714_latitude || r.address1_latitude;
-                    let lng = r.cr714_longitude || r.address1_longitude;
-                    if (!lat || !lng) {
-                        lat = ZIP_MAP[zipExtracted] ? ZIP_MAP[zipExtracted][0] : null;
-                        lng = ZIP_MAP[zipExtracted] ? ZIP_MAP[zipExtracted][1] : null;
-                    }
-
-                    let compTime = r.cr714_completiontime || r.cr714_completeddate || r.cr714_completiondate || r.cr714_datecompleted;
-                    let startTime = r.cr714_starttime || r.cr714_startdate;
-                    let targetDate = r.createdon;
-
-                    let timeWindowStr = 'No Window Data';
-                    if(startTime && compTime) {
-                        timeWindowStr = `${new Date(startTime).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})} -> ${new Date(compTime).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
-                    } else if (compTime) {
-                        timeWindowStr = `Completed: ${new Date(compTime).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
-                    } else if (startTime) {
-                        timeWindowStr = `Started: ${new Date(startTime).toLocaleString('en-US', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}`;
-                    }
-
-                    return {
-                        id: r.cr714_ticket || r.cr714_id || Math.random().toString(36).substr(2,6),
-                        guid: (r.cr714_logisticslog_2id || '').trim().replace(/[{}]/g, ''),
-                        order: (r.cr714_salesordernumber || 'N/A').trim(),
-                        accountNum: account,
-                        company: r.cr714_companyordeliveryname || 'Unknown Company',
-                        address: addr, 
-                        // Priority: Formatted Name -> Raw Value (if not a GUID) -> N/A
-                        whs: (r['cr714_warehouse@OData.Community.Display.V1.FormattedValue'] || (r.cr714_warehouse && r.cr714_warehouse.length < 30 ? r.cr714_warehouse : 'N/A')).replace(/LOR\s*-\s*VA/g, 'LOR-VA').trim(),
-                        route: r.cr714_route || 'TBD',
-                        status: r['cr714_disposition@OData.Community.Display.V1.FormattedValue'] || r.cr714_disposition || 'Pending',
-                        owner: ownerRaw,
-                        submitRep: r['cr714_rep@OData.Community.Display.V1.FormattedValue'] || r.cr714_rep || r.cr714_submitrep || 'Unknown',
-                        notes: "", // Field not used as per user
-                        otherNotes: otherNotes.join('\n\n'),
-                        // Explicitly mapping the long Dataverse names to simple keys for the Excel export
-                        warehouseNotes: (r.cr714_receivedemailfromwarehousenotes || '').trim(),
-                        driverNotes: (r.cr714_receivedtextfromdrivernotes || '').trim(),
-                        issue: r['cr714_issue@OData.Community.Display.V1.FormattedValue'] || r.cr714_issue || 'Generic Issue',
-                        description: r.cr714_description || r.cr714_issue_description || 'No detailed description provided by the requestor.',
-                        item: "",
-                        date: targetDate ? new Date(targetDate).toLocaleDateString('en-CA') : '',
-                        timestamp: targetDate ? new Date(targetDate).getTime() : 0,
-                        timeWindow: timeWindowStr,
-                        modifiedOn: r.modifiedon ? new Date(r.modifiedon).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A',
-                        zip3: zipExtracted,
-                        lat: lat,
-                        lng: lng,
-                        isCoaching: (r.cr714_coachingopp === true || r.cr714_coachingopp === 1 || r['cr714_coachingopp@OData.Community.Display.V1.FormattedValue'] === 'Yes' || r.cr714_coachingopportunity === true || r.cr714_coachingopportunity === 1 || r['cr714_coachingopportunity@OData.Community.Display.V1.FormattedValue'] === 'Yes') || false,
-                        coachingNotes: r.cr714_coachingfeedback || '',
-                        searchString: searchValues.join(' '),
-                        repEmailDate: parseEmailDate(r.cr714_repemaildatestamp),
-                        whEmailDate: parseEmailDate(r.cr714_warehouseemaildatestamp),
-                        mgrEmailDate: parseEmailDate(r.cr714_managerappemailtimestamp)
-                    };
-                });
-
-                if (type === 'PARSE') {
-                    globalDb = parsed;
-                } else if (type === 'MERGE') {
-                    const newItems = [];
-                    parsed.forEach(p => {
-                        const idx = globalDb.findIndex(g => g.guid === p.guid);
-                        if(idx > -1) globalDb[idx] = p; 
-                        else newItems.push(p); 
-                    });
-                    globalDb = [...newItems, ...globalDb].sort((a,b) => b.timestamp - a.timestamp);
-                }
-
-                const orderMap = {};
-                globalDb.forEach(t => {
-                    if(t.order !== 'N/A' && t.order.trim() !== '') {
-                        if(!orderMap[t.order]) orderMap[t.order] = [];
-                        orderMap[t.order].push(t);
-                    }
-                });
-
-                const conflicts = [];
-                const autoResolvable = [];
-
-                Object.keys(orderMap).forEach(ord => {
-                    const group = orderMap[ord];
-                    if(group.length > 1) {
-                        const activeRecords = group.filter(x => x.owner !== 'Unassigned' && x.owner !== 'Unknown');
-                        const activeOwners = [...new Set(activeRecords.map(x=>x.owner))];
-                        
-                        // Expanded protection: Do not auto-sync if ANY record in the group is escalated or assigned to management
-                        const hasExclusion = group.some(x => 
-                            (x.owner || '').toLowerCase().includes('holly') || 
-                            (x.owner || '').toLowerCase().includes('wayne') || 
-                            (x.owner || '').toLowerCase().includes('kari') || 
-                            (x.status || '').toLowerCase().includes('holly') || 
-                            (x.status || '').toLowerCase().includes('wayne') || 
-                            (x.status || '').toLowerCase().includes('kari') || 
-                            (x.status || '').toLowerCase().includes('escalated') || 
-                            (x.issue || '').toLowerCase().includes('furniture')
-                        );
-                        
-                        if (activeOwners.length > 1) {
-                            // If there are different owners, and ANY are escalated, push to MANUAL resolve (the red button)
-                            const isSensitive = group.some(x => 
-                                x.status.toLowerCase().includes('escalated')
-                            );
-                            
-                            if (isSensitive || hasExclusion) {
-                                conflicts.push(group); // This forces the "Resolve Duplicates" button to appear
-                            } else {
-                                const sortedGroup = [...group].sort((a,b) => a.timestamp - b.timestamp);
-                                const oldestOwner = sortedGroup.find(x => x.owner !== 'Unassigned' && x.owner !== 'Unknown')?.owner || activeOwners[0];
-                                
-                                const toUpdate = group.filter(x => x.owner !== oldestOwner);
-                                if (toUpdate.length > 0) {
-                                    autoResolvable.push({ order: ord, owner: oldestOwner, records: toUpdate });
-                                }
-                            }
-                        } else if (activeOwners.length === 1) {
-                            const unassignedRecords = group.filter(x => x.owner === 'Unassigned' || x.owner === 'Unknown');
-                            if (unassignedRecords.length > 0) {
-                                if (!hasExclusion) {
-                                    autoResolvable.push({ order: ord, owner: activeOwners[0], records: unassignedRecords });
-                                } else {
-                                    conflicts.push(group);
-                                }
-                            }
-                        }
-                    }
-                });
-
+            if(type === 'INIT') {
+                globalDb = payload.data;
                 const whsList = [...new Set(globalDb.map(x=>x.whs).filter(x=>x))].sort();
                 const statusList = [...new Set(globalDb.map(x=>x.status).filter(x=>x))].sort();
                 const ownerList = ["Unassigned", "Tier 2", ...new Set(globalDb.map(x=>x.owner).filter(x=>x!=="Unassigned" && x!=="Tier 2"))].sort();
                 
-                self.postMessage({ type: 'RENDER', data: globalDb, whsList, statusList, ownerList, conflicts, autoResolvable });
+                self.postMessage({ type: 'RENDER', data: globalDb, whsList, statusList, ownerList, conflicts: [], autoResolvable: [] });
             }
             else if(type === 'FILTER') {
                 const { search, whArr, statusArr, ownerArr, sortFilter, fullData, mine, user, timeFrame, dateRange, hideFurniture, showFurnOnly } = payload;
@@ -806,7 +620,7 @@
                     const matchWh = whArr.length === 0 || whArr.includes(t.whs);
                     const matchStatus = statusArr.length === 0 || statusArr.includes(t.status);
                     const matchOwner = ownerArr.length === 0 || ownerArr.includes(t.owner);
-                    const matchMine = !mine || t.owner === normalizeRep(user);
+                    const matchMine = !mine || t.owner === user;
                     const matchTime = t.date >= minDate && t.date <= maxDate;
                     
                     let matchFurn = true;
@@ -841,29 +655,21 @@
     </script>
 
     <script>
-        const ENV_DATA = "https://org23279050.crm.dynamics.com";
-        const ENV_D365 = "https://wbmasonco.crm.dynamics.com";
-        const DATA_API = `${ENV_DATA}/api/data/v9.2`;
-        const D365_API = `${ENV_D365}/api/data/v9.2`;
-        const ENTITY_SET = "cr714_logisticslog_2s"; 
-        
-        const msalInstance = new msal.PublicClientApplication({ auth: { clientId: "afe649b6-9c70-4b1a-8592-78588284c8ee", authority: "https://login.microsoftonline.com/9a7c474b-f702-4ae4-a2f9-b72a1e117401", redirectUri: "https://WB-DT.github.io/daytona-utility/" } });
         const worker = new Worker(URL.createObjectURL(new Blob([document.getElementById('worker-script').textContent], { type: "text/javascript" })));
         
-        let fullData = [], filteredData = [], currentId = null, userProfile = { name: "Guest Rep", id: null, email: "" }, globalReps = [];
-        let empHierarchyMap = {};
-        let mapInstance = null, mapLayerGroup = null, chartInstances = {}, showMine = false, activeTimeFrame = 'today';
+        let fullData = [], filteredData = [], currentId = null, userProfile = { name: "Anslee Erickson", id: "12345", email: "anslee.erickson@wbmason.com" }, globalReps = [];
+        let empHierarchyMap = {
+            "pepper potts": { manager: "Tony Stark", status: "Active" },
+            "happy hogan": { manager: "Tony Stark", status: "Active" },
+            "lucius fox": { manager: "Bruce Wayne", status: "Active" }
+        };
+        let mapInstance = null, mapLayerGroup = null, chartInstances = {}, showMine = false, activeTimeFrame = 'all';
         let isSilentUpdate = false;
-        let isFetchingBackground = false;
         let hideFurniture = false;
         let showFurnOnly = false;
-        let msalAccount = null;
         let activeConflicts = [];
         let ignoredConflicts = new Set();
         
-        let totalRecordsToFetch = 0;
-        let recordsFetched = 0;
-
         let assignLimit = 100;
         let kanbanLimits = {};
         
@@ -876,29 +682,75 @@
 
         Chart.register(ChartDataLabels);
 
-        async function getToken(envUrl) {
-            const request = { scopes: [`${envUrl}/user_impersonation`] };
-            const accounts = msalInstance.getAllAccounts();
-            if (accounts.length > 0) {
-                msalAccount = accounts[0];
-                userProfile.email = msalAccount.username;
-                msalInstance.setActiveAccount(msalAccount);
-                try { return (await msalInstance.acquireTokenSilent(request)).accessToken; } 
-                catch (e) { return (await msalInstance.acquireTokenPopup(request)).accessToken; }
-            } else {
-                const loginResponse = await msalInstance.loginPopup(request);
-                msalAccount = loginResponse.account;
-                userProfile.email = msalAccount.username;
-                msalInstance.setActiveAccount(msalAccount);
-                return loginResponse.accessToken;
+        // --- MOCK DATASET ---
+        const todayStr = new Date().toLocaleDateString('en-CA');
+        const yesterdayStr = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+        
+        const mockDataset = [
+            {
+                id: "L-1001", guid: "g1001", order: "W9990001", accountNum: "100200", company: "Wayne Enterprises",
+                address: "1007 Mountain Drive, Gotham NJ 07020", whs: "NJ-WH", route: "G1", status: "Pending", owner: "Unassigned",
+                submitRep: "Lucius Fox", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Missing Items", description: "Short 2 cases of standard copy paper.", item: "WBM21200",
+                date: todayStr, timestamp: Date.now(), timeWindow: "Started: 08:00 AM", modifiedOn: "N/A",
+                zip3: "070", lat: 40.8, lng: -74.2, isCoaching: false, coachingNotes: "", searchString: "wayne enterprises w9990001 missing items",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1002", guid: "g1002", order: "W9990002", accountNum: "100201", company: "Stark Industries",
+                address: "10880 Malibu Point, Malibu CA 90265", whs: "LAX", route: "A1", status: "Working on", owner: "Anslee Erickson",
+                submitRep: "Pepper Potts", notes: "Checking with warehouse on ETA.", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "ETA", description: "Customer is asking when the delivery will arrive today.", item: "N/A",
+                date: todayStr, timestamp: Date.now() - 3600000, timeWindow: "No Window Data", modifiedOn: todayStr,
+                zip3: "902", lat: 34.0, lng: -118.2, isCoaching: false, coachingNotes: "", searchString: "stark industries w9990002 eta",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1003", guid: "g1003", order: "W9990003", accountNum: "100202", company: "Daily Planet",
+                address: "344 Clinton St, Metropolis NY 10001", whs: "NY-WH", route: "NY3", status: "Escalated - Wayne", owner: "Wayne Rendt",
+                submitRep: "Lois Lane", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Closing Returns", description: "Customer returning 10 damaged chairs.", item: "HON10589",
+                date: yesterdayStr, timestamp: Date.now() - 86400000, timeWindow: "Started: 09:15 AM", modifiedOn: yesterdayStr,
+                zip3: "100", lat: 40.7, lng: -74.0, isCoaching: true, coachingNotes: "Make sure to ask for photo proof of damage before escalating next time.", searchString: "daily planet w9990003 closing returns",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1004", guid: "g1004", order: "W9990004", accountNum: "100203", company: "Oscorp",
+                address: "Oscorp Tower, New York NY 10010", whs: "NY-WH", route: "NY1", status: "Completed", owner: "Holly Evans",
+                submitRep: "Harry Osborn", notes: "Resolved delivery issue.", otherNotes: "", warehouseNotes: "Swapped product at dock.", driverNotes: "Delivered correct item.",
+                issue: "Wrong Delivery Location", description: "Delivered to 2nd floor instead of 10th floor.", item: "N/A",
+                date: yesterdayStr, timestamp: Date.now() - 172800000, timeWindow: "Completed: 14:20 PM", modifiedOn: yesterdayStr,
+                zip3: "100", lat: 40.7, lng: -73.9, isCoaching: false, coachingNotes: "", searchString: "oscorp w9990004 wrong delivery location",
+                repEmailDate: "Yes", whEmailDate: null, mgrEmailDate: null
+            },
+            {
+                id: "L-1005", guid: "g1005", order: "W9990005", accountNum: "100204", company: "Avengers Facility",
+                address: "Upstate New York", whs: "NY-WH", route: "NY5", status: "Pending", owner: "Anslee Erickson",
+                submitRep: "Happy Hogan", notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Need installation of 5 conference tables.", item: "SAF9988",
+                date: todayStr, timestamp: Date.now() - 7200000, timeWindow: "No Window Data", modifiedOn: "N/A",
+                zip3: "120", lat: 42.7, lng: -74.0, isCoaching: false, coachingNotes: "", searchString: "avengers facility w9990005 furniture",
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
             }
-        }
+        ];
+        // ----------------------
 
         document.addEventListener('DOMContentLoaded', () => { 
             if(localStorage.getItem('theme')) setTheme(localStorage.getItem('theme'));
-            // Explicitly pass '3mo' to ensure the speed-cap is active on launch
-            refreshData(false, '3mo'); 
-            identifyUser(); fetchEmployeeData(); renderSnippets();
+            
+            setTimeout(() => {
+                document.getElementById('progress-fill').style.width = '100%';
+                document.getElementById('progress-text').innerText = 'Initializing Mock Sandbox...';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        worker.postMessage({ type: 'INIT', payload: { data: mockDataset } });
+                    }, 300);
+                }, 500);
+            }, 800);
+
+            renderSnippets();
             
             flatpickr("#filter-date", { 
                 mode: "range", 
@@ -914,8 +766,6 @@
                     }
                 } 
             });
-
-            setInterval(() => { if(!isFetchingBackground) refreshData(true); }, 60000);
         });
 
         function closeAllDropdowns(e) {
@@ -991,147 +841,14 @@
             applyFilters();
         }
 
-        async function identifyUser() {
-            try { 
-                const token = await getToken(ENV_D365);
-                const r = await fetch(`${D365_API}/WhoAmI`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const d = await r.json(); 
-                userProfile.id = d.UserId;
-                const userReq = await fetch(`${D365_API}/systemusers(${d.UserId})?$select=fullname`, { headers: { 'Authorization': `Bearer ${token}` }});
-                const userRes = await userReq.json();
-                if(userRes.fullname) { userProfile.name = userRes.fullname; document.getElementById('user-display-name').innerText = userRes.fullname; }
-            } catch(e){}
-        }
-
-        async function fetchEmployeeData() {
-            try {
-                const token = await getToken(ENV_DATA);
-                const r = await fetch(`${DATA_API}/cr714_employeeinformation1s`, { 
-                    headers: { 'Authorization': `Bearer ${token}`, 'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"' }
-                });
-                if(r.ok) {
-                    const data = await r.json();
-                    data.value.forEach(emp => {
-                        if(emp.cr714_employeename) {
-                            const val = (field) => emp[`_${field}_value@OData.Community.Display.V1.FormattedValue`] || emp[`${field}@OData.Community.Display.V1.FormattedValue`] || emp[field] || 'N/A';
-                            empHierarchyMap[emp.cr714_employeename.toLowerCase().trim()] = {
-                                manager: val('cr714_managerassigned') !== 'N/A' ? val('cr714_managerassigned') : val('cr714_secondarymanager'),
-                                status: val('cr714_status') !== 'N/A' ? val('cr714_status') : val('statecode')
-                            };
-                        }
-                    });
-                }
-            } catch(e) { console.warn("Failed to load employee roster map"); }
-        }
-
-        function updateLoadingProgress() {
-            const pct = totalRecordsToFetch > 0 ? Math.min(100, Math.round((recordsFetched / totalRecordsToFetch) * 100)) : 100;
-            const fill = document.getElementById('progress-fill');
-            const txt = document.getElementById('progress-text');
-            if(fill) fill.style.width = `${pct}%`;
-            if(txt) txt.innerText = `Loaded ${recordsFetched} of ${totalRecordsToFetch} records (${pct}%)`;
-        }
-
-        async function refreshData(silent = false) {
-            if (silent) {
-                const active = document.activeElement;
-                if (active && (active.tagName === 'SELECT' || active.tagName === 'INPUT') && (active.closest('#assign-tbody') || active.closest('.kanban-board') || active.closest('#history-table-body'))) return; 
-            }
-
-            isSilentUpdate = silent;
-            if (!silent) {
-                document.getElementById('loading-screen').style.display = 'flex';
-                document.getElementById('progress-fill').style.width = '0%';
-                document.getElementById('progress-text').innerText = 'Initializing...';
-            }
-            
-            try { 
-                const token = await getToken(ENV_DATA);
-                const headers = { 
-                    'Authorization': `Bearer ${token}`, 
-                    'Accept': 'application/json', 
-                    'OData-MaxVersion': '4.0', 
-                    'OData-Version': '4.0',
-                    'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"'
-                };
-                
-                // 1. Define Scoped Filter Parameters using the active UI state
-                let fQuery = "Microsoft.Dynamics.CRM.LastXMonths(PropertyName='createdon',PropertyValue=3)";
-                if (activeTimeFrame === '1y') fQuery = "Microsoft.Dynamics.CRM.LastXMonths(PropertyName='createdon',PropertyValue=12)";
-                if (activeTimeFrame === 'all') fQuery = ""; 
-                const fParam = fQuery ? `&$filter=${fQuery}` : "";
-
-                // 2. Build the URL and Fetch Initial Batch
-                // Added cr714_warehouse and cr714_route to select fields
-                const selectFields = "$select=createdon,cr714_disposition,cr714_logisticsowner,cr714_salesordernumber,cr714_companyordeliveryname,cr714_shippingaddress,cr714_accountnumber,cr714_warehouse,cr714_route,cr714_issue,cr714_description,cr714_receivedemailfromwarehousenotes,cr714_receivedtextfromdrivernotes,cr714_repemaildatestamp,cr714_warehouseemaildatestamp,cr714_managerappemailtimestamp,modifiedon";
-                
-                const initUrl = `${DATA_API}/${ENTITY_SET}?$count=true&$top=500000${fParam}&${selectFields}&$orderby=createdon desc`;
-                
-                const r = await fetch(initUrl, { headers, cache: 'no-store' });
-                if(!r.ok) throw new Error("Dataverse API Error");
-                const j = await r.json();
-                
-                totalRecordsToFetch = j['@odata.count'] || 500000;
-                recordsFetched = j.value ? j.value.length : 0;
-                if (!silent) updateLoadingProgress();
-
-                let allData = j.value || [];
-                let nextLink = j['@odata.nextLink'];
-
-                // 3. Background Pagination with Speed Cap
-                if (nextLink) {
-                    isFetchingBackground = true;
-                    let currentLink = nextLink;
-                    
-                    while (currentLink) {
-                        // Use activeTimeFrame to determine the speed cap
-                        if (activeTimeFrame === 'today' && allData.length >= 80000) break;
-
-                        try {
-                            let pr = await fetch(currentLink, { headers, cache: 'no-store' });
-                            if (!pr.ok) break;
-                            let pj = await pr.json();
-                            if (pj.value && pj.value.length > 0) {
-                                allData.push(...pj.value);
-                                recordsFetched += pj.value.length;
-                                if (!silent) updateLoadingProgress();
-                            }
-                            currentLink = pj['@odata.nextLink'] ? pj['@odata.nextLink'] : null;
-                        } catch(e) { break; }
-                    }
-                    isFetchingBackground = false;
-                }
-
-                worker.postMessage({ type: silent ? 'MERGE' : 'PARSE', payload: { data: allData } });
-
-                if (!silent) {
-                    setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; }, 500);
-                }
-
-            } catch(e){ 
-                if (!silent) { 
-                    document.getElementById('progress-text').innerText = "API Error. Retrying..."; 
-                    setTimeout(() => refreshData(false), 3000); 
+        function processAutoResolves(autoResolvable) {
+            for (let group of autoResolvable) {
+                for (let r of group.records) {
+                    const idx = fullData.findIndex(x => x.guid === r.guid);
+                    if (idx > -1) fullData[idx].owner = group.owner;
                 }
             }
-        }
-
-        async function processAutoResolves(autoResolvable) {
-            try {
-                const token = await getToken(ENV_DATA);
-                for (let group of autoResolvable) {
-                    for (let r of group.records) {
-                        await fetch(`${DATA_API}/${ENTITY_SET}(${r.guid})`, {
-                            method: 'PATCH',
-                            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ "cr714_logisticsowner": group.owner })
-                        });
-                        const idx = fullData.findIndex(x => x.guid === r.guid);
-                        if (idx > -1) fullData[idx].owner = group.owner;
-                    }
-                }
-                applyFilters(); 
-            } catch(e) { console.warn("Auto-resolve failed", e); }
+            applyFilters(); 
         }
 
         worker.onmessage = (e) => {
@@ -1140,24 +857,6 @@
                 fullData = data; 
                 filteredData = data; 
                 globalReps = ownerList || [];
-
-                const todayStr = new Date().toLocaleDateString('en-CA');
-                data.forEach(async (t) => {
-                    // Critical: Must check repEmailDate (cr714_repemaildatestamp)
-                    // If this date exists, the 'One-Way Valve' is closed and we do nothing.
-                    const isBrandNew = !t.repEmailDate || t.repEmailDate === 'Never' || t.repEmailDate === 'N/A';
-
-                    if (t.owner === "Tier 2" && t.date === todayStr && isBrandNew) {
-                        try {
-                            const token = await getToken(ENV_DATA);
-                            await fetch(`${DATA_API}/${ENTITY_SET}(${t.guid})`, {
-                                method: 'PATCH',
-                                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ "cr714_logisticsowner": "Tier 2" })
-                            });
-                        } catch(e) { console.error("Auto-sync failed", e); }
-                    }
-                });
 
                 populateCheckboxDropdown('dd-wh', whsList, 'cb-wh', 'btn-lbl-wh', 'All Warehouses');
                 populateCheckboxDropdown('dd-status', statusList, 'cb-status', 'btn-lbl-status', 'All Statuses');
@@ -1222,15 +921,10 @@
 
         const getRepOptions = (currentRep) => globalReps.map(r => `<option value="${r}" class="bg-[var(--bg-deep)]" ${r===currentRep?'selected':''}>${r}</option>`).join('');
 
-        async function inlineReassign(guid, newRep) {
+        function inlineReassign(guid, newRep) {
             const t = fullData.find(x => x.guid === guid);
             if (!t) return;
             
-            // TRIGGER: If changed to Furniture, fire the email logic
-            if (newRep === "Furniture" && t.owner !== "Furniture") {
-                triggerFurnitureEmail(t);
-            }
-
             const related = fullData.filter(x => x.order === t.order && t.order !== 'N/A' && x.order.trim() !== '');
             let guidsToUpdate = [guid];
             
@@ -1240,93 +934,54 @@
                 }
             }
 
-            Toastify({text:`Reassigning ${guidsToUpdate.length} record(s)...`, style:{background:"#fbbf24"}}).showToast();
-            try {
-                const token = await getToken(ENV_DATA);
-                const oldRep = t.owner; // Save the old rep's name for the email
-                
-                for (let g of guidsToUpdate) {
-                    await fetch(`${DATA_API}/${ENTITY_SET}(${g})`, {
-                        method: 'PATCH', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ "cr714_logisticsowner": newRep })
-                    });
-                }
-                Toastify({text:"Reassigned Successfully", style:{background:"#10b981"}}).showToast(); 
-                refreshData(true); 
-                
-                // Send Single Audit Email
-                sendAuditEmail(
-                    `Audit Log: Single Reassignment (${t.order})`,
-                    `<h3>Reassignment Executed</h3>
-                    <p><b>Performed by:</b> ${userProfile.name}</p>
-                    <p><b>Sales Order:</b> ${t.order}</p>
-                    <p><b>Customer:</b> ${t.company}</p>
-                    <p><b>Changed From:</b> ${oldRep}</p>
-                    <p><b>Changed To:</b> ${newRep}</p>`
-                );
-            } catch(e) { Toastify({text:"Reassign Failed", style:{background:"#ef4444"}}).showToast(); }
+            guidsToUpdate.forEach(g => {
+                const rec = fullData.find(x => x.guid === g);
+                if(rec) rec.owner = newRep;
+            });
+
+            Toastify({text:"Reassigned Successfully", style:{background:"#10b981"}}).showToast(); 
+            applyFilters(); 
         }
 
-        async function inlineStatusUpdate(guid, newStatus) {
-            Toastify({text:`Updating Status...`, style:{background:"#fbbf24"}}).showToast();
-            try {
-                const token = await getToken(ENV_DATA);
-                await fetch(`${DATA_API}/${ENTITY_SET}(${guid})`, {
-                    method: 'PATCH', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "cr714_disposition": newStatus })
-                });
-                Toastify({text:"Status Updated", style:{background:"#10b981"}}).showToast(); 
-                refreshData(true); 
-            } catch(e) { Toastify({text:"Status Update Failed", style:{background:"#ef4444"}}).showToast(); }
+        function inlineStatusUpdate(guid, newStatus) {
+            const t = fullData.find(x => x.guid === guid);
+            if (!t) return;
+            t.status = newStatus;
+            Toastify({text:"Status Updated", style:{background:"#10b981"}}).showToast(); 
+            applyFilters(); 
         }
         
-        async function inlineIssueUpdate(guid, newIssue) {
-            Toastify({text:`Updating Issue Type...`, style:{background:"#fbbf24"}}).showToast();
-            try {
-                const token = await getToken(ENV_DATA);
-                await fetch(`${DATA_API}/${ENTITY_SET}(${guid})`, {
-                    method: 'PATCH', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "cr714_issue": newIssue })
-                });
-                Toastify({text:"Issue Updated", style:{background:"#10b981"}}).showToast(); 
-                refreshData(true); 
-            } catch(e) { Toastify({text:"Issue Update Failed", style:{background:"#ef4444"}}).showToast(); }
+        function inlineIssueUpdate(guid, newIssue) {
+            const t = fullData.find(x => x.guid === guid);
+            if (!t) return;
+            t.issue = newIssue;
+            Toastify({text:"Issue Updated", style:{background:"#10b981"}}).showToast(); 
+            applyFilters(); 
         }
 
         let galSearchTimeout;
-        async function searchGAL(inputElement, dropdownId) {
+        function searchGAL(inputElement, dropdownId) {
             clearTimeout(galSearchTimeout);
             const query = inputElement.value;
             const dropdown = document.getElementById(dropdownId);
             
             if (query.length < 3) { dropdown.style.display = 'none'; return; }
             
-            galSearchTimeout = setTimeout(async () => {
-                try {
-                    const tokenResponse = await msalInstance.acquireTokenSilent({ scopes: ["User.ReadBasic.All"], account: msalAccount }).catch(e => null);
-                    if (!tokenResponse) return;
-                    
-                    const qClean = query.split(',').pop().trim();
-                    if(qClean.length < 3) return;
-
-                    const res = await fetch(`https://graph.microsoft.com/v1.0/users?$filter=startswith(displayName,'${qClean}') or startswith(mail,'${qClean}')&$select=displayName,mail&$top=5`, { 
-                        headers: { 'Authorization': `Bearer ${tokenResponse.accessToken}` } 
-                    });
-                    const data = await res.json();
-                    
-                    if (data.value && data.value.length > 0) {
-                        dropdown.innerHTML = data.value.map(u => `
-                            <div class="gal-item flex flex-col" onclick="selectGALEmail('${inputElement.id}', '${dropdownId}', '${u.mail}')">
-                                <span class="font-bold text-[var(--text-main)] leading-none">${u.displayName}</span>
-                                <span class="text-[9px] text-[var(--text-dim)]">${u.mail}</span>
-                            </div>
-                        `).join('');
-                        dropdown.style.display = 'block';
-                    } else {
-                        dropdown.style.display = 'none';
-                    }
-                } catch(e) { console.warn("GAL Search failed", e); }
-            }, 300);
+            galSearchTimeout = setTimeout(() => {
+                const mockUsers = [
+                    { displayName: "Wayne Rendt", mail: "wayne.rendt@wbmason.com" },
+                    { displayName: "Holly Evans", mail: "holly.evans@wbmason.com" },
+                    { displayName: "Kari Westervelt", mail: "kari.westervelt@wbmason.com" }
+                ];
+                
+                dropdown.innerHTML = mockUsers.map(u => `
+                    <div class="gal-item flex flex-col" onclick="selectGALEmail('${inputElement.id}', '${dropdownId}', '${u.mail}')">
+                        <span class="font-bold text-[var(--text-main)] leading-none">${u.displayName}</span>
+                        <span class="text-[9px] text-[var(--text-dim)]">${u.mail}</span>
+                    </div>
+                `).join('');
+                dropdown.style.display = 'block';
+            }, 200);
         }
 
         window.selectGALEmail = function(inputId, dropdownId, email) {
@@ -1380,28 +1035,20 @@
                 closeConflictModal();
                 document.getElementById('btn-conflict-header').classList.add('hidden');
             } else {
-                openConflictModal(); // Re-renders the modal to remove the ignored item
+                openConflictModal(); 
                 document.getElementById('btn-conflict-header').innerHTML = `<i class="fa fa-triangle-exclamation text-white"></i> Resolve Escalated Duplicates (${activeConflicts.length})`;
             }
             Toastify({text:`Ignored conflict for Order #${orderNum}`, style:{background:"#64748b"}}).showToast();
         }
 
-        async function resolveConflict(orderNum, selectId) {
+        function resolveConflict(orderNum, selectId) {
             const newRep = document.getElementById(selectId).value;
             const records = fullData.filter(x => x.order === orderNum);
-            Toastify({text:`Syncing ${records.length} records to ${newRep}...`, style:{background:"#fbbf24"}}).showToast();
-            try {
-                const token = await getToken(ENV_DATA);
-                for(let r of records) {
-                    await fetch(`${DATA_API}/${ENTITY_SET}(${r.guid})`, {
-                        method: 'PATCH', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ "cr714_logisticsowner": newRep })
-                    });
-                }
-                Toastify({text:"Conflict Resolved", style:{background:"#10b981"}}).showToast(); 
-                refreshData(true);
-                closeConflictModal();
-            } catch(e) { Toastify({text:"Resolve Failed", style:{background:"#ef4444"}}).showToast(); }
+            records.forEach(r => r.owner = newRep);
+            
+            Toastify({text:"Conflict Resolved", style:{background:"#10b981"}}).showToast(); 
+            closeConflictModal();
+            applyFilters();
         }
 
         function toggleCheck(e, guid) {
@@ -1502,18 +1149,11 @@
                     <td class="p-3 truncate max-w-[150px] font-bold cursor-pointer" onclick="openDetail('${t.id}')">${t.company}</td>
                     <td class="p-3">
                         <select class="input-dark h-8 py-1 text-[10px] w-full min-w-[180px] font-bold bg-black/40 border-none outline-none focus:ring-0 ${isEsc ? 'text-[var(--danger)]' : 'text-white'}" onchange="inlineIssueUpdate('${t.guid}', this.value)" onclick="event.stopPropagation()">
-                            <option value="Shipping and Packing Items" ${t.issue==='Shipping and Packing Items'?'selected':''}>Shipping and Packing Items</option>
-                            <option value="Pre-Approved Short & Reorder" ${t.issue==='Pre-Approved Short & Reorder'?'selected':''}>Pre-Approved Short & Reorder</option>
-                            <option value="Furniture (If your item is furniture, you MUST choose this option!)" ${t.issue==='Furniture (If your item is furniture, you MUST choose this option!)'?'selected':''}>Furniture</option>
-                            <option value="Schools & Municipalities (Release Review)" ${t.issue==='Schools & Municipalities (Release Review)'?'selected':''}>Schools & Municipalities</option>
-                            <option value="Closing Returns" ${t.issue==='Closing Returns'?'selected':''}>Closing Returns</option>
+                            <option value="Missing Items" ${t.issue==='Missing Items'?'selected':''}>Missing Items</option>
                             <option value="ETA" ${t.issue==='ETA'?'selected':''}>ETA</option>
+                            <option value="Closing Returns" ${t.issue==='Closing Returns'?'selected':''}>Closing Returns</option>
                             <option value="Wrong Delivery Location" ${t.issue==='Wrong Delivery Location'?'selected':''}>Wrong Delivery Location</option>
-                            <option value="Missing Item(s) No Answer from Driver (Include Item # in description)" ${t.issue==='Missing Item(s) No Answer from Driver (Include Item # in description)'?'selected':''}>Missing Items</option>
-                            <option value="Text-a-Driver" ${t.issue==='Text-a-Driver'?'selected':''}>Text-a-Driver</option>
-                            <option value="Route Update (Must provide current route, new route, and the contact from the branch requesting the change)" ${t.issue==='Route Update (Must provide current route, new route, and the contact from the branch requesting the change)'?'selected':''}>Route Update</option>
-                            <option value="ASAP (Mgr Approved)" ${t.issue==='ASAP (Mgr Approved)'?'selected':''}>ASAP (Mgr Approved)</option>
-                            <option value="On going Driver/Delivery Issue" ${t.issue==='On going Driver/Delivery Issue'?'selected':''}>On going Driver/Issue</option>
+                            <option value="Furniture (If your item is furniture, you MUST choose this option!)" ${t.issue==='Furniture (If your item is furniture, you MUST choose this option!)'?'selected':''}>Furniture</option>
                         </select>
                     </td>
                     <td class="p-3 text-[10px] truncate max-w-[200px] opacity-60 cursor-pointer" title="${t.address}" onclick="openDetail('${t.id}')">${t.address}</td>
@@ -1529,7 +1169,6 @@
                             <option value="Sent Back" ${t.status==='Sent Back'?'selected':''}>Sent Back</option>
                             <option value="Completed" ${t.status==='Completed'?'selected':''}>Completed</option>
                             <option value="Completed Escalated" ${t.status==='Completed Escalated'?'selected':''}>Completed Escalated</option>
-                            <option value="Escalation Sent" ${t.status==='Escalation Sent'?'selected':''}>Escalation Sent</option>
                         </select>
                     </td>
                 </tr>`;
@@ -1547,9 +1186,6 @@
                             <td colspan="9" class="p-20 text-center">
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="opacity-30 text-xs uppercase font-black tracking-widest text-white">No matching records found</div>
-                                    <div class="text-[10px] text-[var(--text-accent)] font-bold uppercase italic mt-2 bg-orange-500/10 px-4 py-2 rounded border border-orange-500/20">
-                                        <i class="fa fa-clock-rotate-left mr-1"></i> Not seeing the record? Try expanding the time frame to "1YR" or "ALL"
-                                    </div>
                                 </div>
                             </td>
                         </tr>`;
@@ -1611,107 +1247,24 @@
                 </tr>`;
             }).join('');
             
-            document.getElementById('container-dmreport').innerHTML = `
-                <div class="p-3 border-b border-[var(--border)] glass-panel flex gap-4 items-center z-10 relative">
-                    <div class="flex items-center gap-2 pl-3">
-                        <input type="checkbox" class="w-4 h-4 cursor-pointer accent-[var(--brand)] pointer-events-auto" id="select-all-dm" onclick="toggleSelectAllDM(this)">
-                        <span class="text-[9px] font-black uppercase text-[var(--text-dim)]">Select All Filtered</span>
-                    </div>
-                    <div class="w-px h-6 bg-[var(--border)] mx-2"></div>
-                    <button onclick="sendDMReport()" class="px-6 py-2 bg-[var(--text-accent)] text-black text-[9px] font-black uppercase rounded hover:brightness-110 shadow-sm transition flex items-center gap-2">
-                        <i class="fas fa-paper-plane"></i> Send Selected Report to My Inbox
-                    </button>
-                </div>
-                <div class="flex-1 overflow-auto bg-[var(--bg-deep)]">
-                    <table class="bulk-assign-table w-full">
-                        <thead><tr><th class="w-12 text-center"><i class="fa fa-check text-[var(--text-dim)] opacity-50"></i></th><th>Date</th><th>Warehouse</th><th>Order #</th><th>Customer</th><th>Issue</th><th>Address</th><th>Status</th></tr></thead>
-                        <tbody id="dm-tbody">${rows || '<tr><td colspan="8" class="p-8 text-center opacity-30 italic">No records found.</td></tr>'}</tbody>
-                    </table>
-                </div>`;
+            document.getElementById('dm-tbody').innerHTML = rows || '<tr><td colspan="8" class="p-8 text-center opacity-30 italic">No records found.</td></tr>';
         }
 
-        async function sendDMReport() {
+        function sendDMReport() {
             const selected = fullData.filter(t => dmSelectedGuids.has(t.guid));
             if(selected.length === 0) { Toastify({text:"No records selected", style:{background:"#ef4444"}}).showToast(); return; }
-            
-            if(!userProfile.email) { Toastify({text:"User Email Not Found. Try relogging.", style:{background:"#ef4444"}}).showToast(); return; }
-
-            Toastify({text:"Compiling & Sending Email...", style:{background:"#fbbf24"}}).showToast();
-
-            const grouped = {};
-            selected.forEach(t => {
-                const wh = t.whs || 'Unknown Warehouse';
-                if(!grouped[wh]) grouped[wh] = [];
-                grouped[wh].push(t);
-            });
-
-            const firstT = selected[0];
-            let ext = selected.length > 1 ? ` (+${selected.length - 1} more)` : '';
-            let subjectStr = `Escalations not answered (${firstT.whs}) ${firstT.accountNum} and ${firstT.order}${ext}`;
-
-            let bodyHtml = `<div style="font-family: Arial, sans-serif; color: #000; line-height: 1.4;">
-                <h2 style="color: #d32f2f;">Unresolved Logistics Items Report</h2>
-                <p>The following items require attention from District / Warehouse Management:</p>`;
-
-            Object.keys(grouped).sort().forEach(wh => {
-                bodyHtml += `<h3 style="background: #f1f5f9; padding: 10px; border-left: 4px solid #2dd4bf; margin-top: 30px; margin-bottom: 15px;">Warehouse: ${wh}</h3>`;
-                grouped[wh].forEach(t => {
-                    bodyHtml += `
-                    <div style="margin-bottom: 24px; padding: 20px; background-color: #f8fafc; border: 1px solid #cbd5e1; border-left: 6px solid #2dd4bf; border-radius: 6px;">
-                        <div style="font-size: 16px; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px;">Order Number: ${t.order}</div>
-                        <strong>Account Number:</strong> ${t.accountNum}<br>
-                        <strong>Account Name:</strong> ${t.company}<br>
-                        <strong>Contact Info:</strong> N/A<br>
-                        <strong>Delivery Address:</strong> ${t.address}<br>
-                        <strong>Route & Warehouse:</strong> ${t.route} / ${t.whs}<br><br>
-                        <div style="margin-top: 10px; padding: 12px; background-color: #ffffff; border-radius: 4px; border: 1px solid #e2e8f0;">
-                            <strong style="color: #d32f2f;">Issue: ${t.issue}</strong><br><br>
-                            <strong>Description:</strong><br>
-                            <span style="white-space: pre-wrap; font-family: monospace; font-size: 12px;">${t.description || 'No description provided.'}</span>
-                        </div>
-                    </div>`;
-                });
-            });
-            bodyHtml += `<br><p style="font-size: 10px; color: gray;">Generated via LogiLeap System.</p></div>`;
-
-            try {
-                const tokenResponse = await msalInstance.acquireTokenSilent({ scopes: ["Mail.Send"], account: msalAccount })
-                    .catch(async () => await msalInstance.acquireTokenPopup({ scopes: ["Mail.Send"] }));
-                
-                const payload = {
-                    message: {
-                        subject: subjectStr,
-                        body: { contentType: "HTML", content: bodyHtml },
-                        toRecipients: [{ emailAddress: { address: userProfile.email } }]
-                    },
-                    saveToSentItems: "true"
-                };
-
-                const res = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if(!res.ok) throw new Error("Graph API error");
-                
-                Toastify({text:"Email Sent to your Inbox!", style:{background:"#10b981"}}).showToast();
-                dmSelectedGuids.clear();
-                renderView(false);
-            } catch(e) {
-                console.error(e);
-                Toastify({text:"Failed to send email. Ensure permissions.", style:{background:"#ef4444"}}).showToast();
-            }
+            Toastify({text:"Mock Report Sent to Inbox!", style:{background:"#10b981"}}).showToast();
+            dmSelectedGuids.clear();
+            renderView(false);
         }
 
-        async function runBulkAssign() {
+        function runBulkAssign() {
             const rrTeam = getCheckedValues('cb-rr');
             if(rrTeam.length === 0) return alert("Select at least one representative for Round Robin assignments.");
 
             const guids = Array.from(selectedGuids);
             if(guids.length === 0) return alert("Select records first.");
             
-            // --- NEW IDIOT CHECK & COUNT LOGIC ---
             let ownerCounts = {};
             for (const guid of guids) {
                 const t = fullData.find(x => x.guid === guid);
@@ -1724,21 +1277,15 @@
             }
             confirmMsg += `\nThese will be distributed among: ${rrTeam.join(', ')}\n\nAre you sure you want to proceed?`;
 
-            // This pops up the browser alert box. If they click Cancel, the function stops.
             if (!confirm(confirmMsg)) return; 
-            // -------------------------------------
 
-            Toastify({text:`Analyzing and updating records...`, style:{background:"#fbbf24"}}).showToast();
-            const token = await getToken(ENV_DATA);
-            
-            let rrIndex = parseInt(localStorage.getItem('logileap_rr_index') || '0');
+            let rrIndex = 0;
             const processedOrders = new Set(); 
 
             for(const guid of guids) {
                 const t = fullData.find(x => x.guid === guid);
                 if (!t || processedOrders.has(t.order)) continue;
                 
-                // EXCLUSION TRAP: Skip Holly, Wayne, Furniture if doing Round Robin
                 const isExcluded = 
                     (t.owner || '').toLowerCase().includes('holly') || 
                     (t.owner || '').toLowerCase().includes('wayne') || 
@@ -1746,42 +1293,25 @@
                     (t.status || '').toLowerCase().includes('wayne') || 
                     (t.issue || '').toLowerCase().includes('furniture');
                 
-                if (isExcluded) {
-                    Toastify({text:`Skipped ${t.order} (Excluded from Round Robin)`, style:{background:"#f97316"}}).showToast();
-                    continue; 
-                }
+                if (isExcluded) continue; 
 
                 processedOrders.add(t.order);
-                let assignedRep = "Unassigned";
                 
-                const existingRecord = fullData.find(x => x.order === t.order && x.owner !== 'Unassigned' && x.owner !== 'Unknown');
-                if (existingRecord && rrTeam.includes(existingRecord.owner)) {
-                    assignedRep = existingRecord.owner;
-                } else {
-                    assignedRep = rrTeam[rrIndex % rrTeam.length];
-                    rrIndex++;
-                }
+                let assignedRep = rrTeam[rrIndex % rrTeam.length];
+                rrIndex++;
 
                 const linked = fullData.filter(x => x.order === t.order && t.order !== 'N/A' && t.order.trim() !== '');
                 const guidsToUpdate = linked.length > 0 ? linked.map(x => x.guid) : [guid];
 
-                for (const g of guidsToUpdate) {
-                    await fetch(`${DATA_API}/${ENTITY_SET}(${g})`, {
-                        method: 'PATCH',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ "cr714_logisticsowner": assignedRep })
-                    });
-                }
+                guidsToUpdate.forEach(g => {
+                    const rec = fullData.find(x => x.guid === g);
+                    if(rec) rec.owner = assignedRep;
+                });
             }
 
-            localStorage.setItem('logileap_rr_index', rrIndex);
-            selectedGuids.clear(); Toastify({text:"Bulk Update Complete", style:{background:"#10b981"}}).showToast(); refreshData(true);
-            
-            // Send Bulk Audit Email
-            let auditBody = `<h3>Bulk Reassignment Executed</h3><p><b>Performed by:</b> ${userProfile.name}</p><p><b>Total Selected:</b> ${guids.length}</p><ul>`;
-            for (const [owner, count] of Object.entries(ownerCounts)) { auditBody += `<li>${owner}: ${count}</li>`; }
-            auditBody += `</ul><p><b>Distributed to:</b> ${rrTeam.join(', ')}</p>`;
-            sendAuditEmail("Audit Log: Bulk Reassignment", auditBody);
+            selectedGuids.clear(); 
+            Toastify({text:"Bulk Update Complete", style:{background:"#10b981"}}).showToast(); 
+            applyFilters();
         }
 
         function renderKanbanCard(t) {
@@ -1870,9 +1400,6 @@
                 document.getElementById('kanban-wrapper').innerHTML = `
                     <div class="w-full h-96 flex flex-col items-center justify-center">
                         <div class="opacity-20 text-xl font-black uppercase tracking-widest text-white">Board Empty</div>
-                        <div class="text-[10px] text-[var(--text-accent)] font-black uppercase italic mt-2 bg-orange-500/10 px-4 py-2 rounded border border-orange-500/20">
-                            <i class="fa fa-clock-rotate-left mr-1"></i> Not seeing the record? Try expanding the time frame to "1YR" or "ALL"
-                        </div>
                     </div>`;
             } else {
                 document.getElementById('kanban-wrapper').innerHTML = html;
@@ -2024,7 +1551,6 @@
                              </td>`;
                 });
 
-                // Calculate their personal overall completion percentage
                 const overallRepPct = data.total > 0 ? ((data.completed / data.total) * 100).toFixed(1) : 0;
                 const oColor = overallRepPct >= 90 ? 'bg-green-500' : overallRepPct >= 70 ? 'bg-orange-500' : 'bg-red-500';
                 const oTxt = overallRepPct >= 90 ? 'text-green-400' : overallRepPct >= 70 ? 'text-orange-400' : 'text-red-400';
@@ -2116,16 +1642,7 @@
 
         function closeDrilldownModal() { 
             document.getElementById('drilldown-modal').classList.remove('active'); 
-            // Reset the export button visibility for other drilldown types
             document.getElementById('btn-drilldown-export').classList.add('hidden');
-        }
-
-        // --- COACHING VIEW ENGINE ---
-        function openEmailTo(email) {
-            if(!email || email === 'N/A') return;
-            openEmailModal();
-            document.getElementById('em-to').value = email + ', ';
-            document.getElementById('em-subject').focus();
         }
 
         function renderCoaching() {
@@ -2162,11 +1679,7 @@
                 if(!h) { const key = Object.keys(empHierarchyMap).find(k => k.includes(reqName) || reqName.includes(k)); if(key) h = empHierarchyMap[key]; }
                 
                 let mgrName = h ? h.manager : 'Unassigned / Unknown';
-                let mgrEmail = "N/A";
-                if (mgrName !== 'Unassigned / Unknown' && mgrName !== 'N/A') {
-                    mgrEmail = mgrName.replace(/ /g, '.').toLowerCase() + "@wbmason.com";
-                }
-
+                
                 html += `
                 <div class="glass-card rounded-xl p-4 flex flex-col hover:border-[var(--text-accent)] transition-colors">
                     <div class="flex justify-between items-start mb-2 cursor-pointer" onclick="openDetail('${t.id}')">
@@ -2175,7 +1688,7 @@
                     </div>
                     <div class="text-[9px] uppercase tracking-widest opacity-80 mb-3 space-y-1">
                         <div><i class="fa fa-sitemap mr-1 text-[var(--text-dim)]"></i> Mgr: 
-                            <a href="javascript:void(0)" onclick="openEmailTo('${mgrEmail}')" class="font-bold text-[var(--brand)] hover:underline" title="Email Manager">${mgrName}</a>
+                            <span class="font-bold text-[var(--brand)]">${mgrName}</span>
                         </div>
                     </div>
                     
@@ -2299,13 +1812,7 @@
             }
 
             if (h) {
-                let mgrName = h.manager;
-                let mgrEmail = "N/A";
-                if (mgrName !== 'Unassigned / Unknown' && mgrName !== 'N/A') {
-                    mgrEmail = mgrName.replace(/ /g, '.').toLowerCase() + "@wbmason.com";
-                }
-                document.getElementById('d-h-mgr').innerHTML = `<a href="javascript:void(0)" onclick="openEmailTo('${mgrEmail}')" class="text-[var(--brand)] hover:underline" title="Email Manager">${mgrName}</a>`;
-                
+                document.getElementById('d-h-mgr').innerText = h.manager;
                 const statEl = document.getElementById('d-h-status');
                 statEl.innerText = h.status;
                 if(h.status.toLowerCase().includes('inactive') || h.status.toLowerCase().includes('term')) {
@@ -2313,7 +1820,6 @@
                 } else {
                     statEl.className = "text-white px-2 py-0.5 rounded bg-black/60 border border-[var(--border)] text-[8px] shadow-inner";
                 }
-
                 document.getElementById('d-hierarchy-box').classList.remove('hidden');
             } else {
                 document.getElementById('d-h-mgr').innerText = 'N/A';
@@ -2331,81 +1837,32 @@
             renderView(false); 
         }
 
-        async function fetchD365Details(orderNumber, accountNum, guid) {
+        function fetchD365Details(orderNumber, accountNum, guid) {
             const el = document.getElementById('d-order-date');
             const delPanel = document.getElementById('d365-delivery-panel');
             const delContent = document.getElementById('d365-delivery-content');
 
-            if(el) el.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Checking D365...`;
+            if(el) el.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Loading Mock Details...`;
             delPanel.classList.add('hidden');
             delContent.innerHTML = '';
             
-            let soId = null;
-
-            try {
-                const token = await getToken(ENV_D365);
+            setTimeout(() => {
+                if(el) el.innerHTML = `<i class="fas fa-calendar-check mr-1 text-[var(--brand)]"></i> Ordered: 2026-05-01 @ 08:00 AM`;
                 
-                if(orderNumber && orderNumber !== 'N/A') {
-                    const res = await fetch(`${D365_API}/salesorders?$filter=ordernumber eq '${orderNumber.trim()}'&$select=createdon,salesorderid`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    const data = await res.json();
-                    if(data.value && data.value.length > 0) {
-                        const dt = new Date(data.value[0].createdon);
-                        soId = data.value[0].salesorderid;
-                        if(el) el.innerHTML = `<i class="fas fa-calendar-check mr-1 text-[var(--brand)]"></i> Ordered: ${dt.toLocaleDateString('en-CA')} @ ${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                    } else {
-                        if(el) el.innerHTML = `<i class="fas fa-exclamation-circle text-[var(--text-accent)] mr-1"></i> Order not found in D365`;
-                    }
-                } else {
-                    if(el) el.innerHTML = "";
-                }
+                const t = fullData.find(x => x.guid === guid);
+                const coordHtml = (t && t.lat && t.lng)
+                    ? `<a href="javascript:void(0)" onclick="zoomToMap(${t.lat}, ${t.lng}, '${currentId}')" class="hover:underline text-[var(--brand)] flex items-center gap-1"><i class="fa fa-map-marker-alt"></i> ${t.lat}, ${t.lng}</a>`
+                    : 'Not Mapped';
 
-                if(accountNum && accountNum !== 'N/A') {
-                    const cleanAcc = accountNum.replace(/'/g, "''").trim();
-                    const accRes = await fetch(`${D365_API}/accounts?$filter=accountnumber eq '${cleanAcc}'&$select=name,address1_composite,address1_telephone1,creditonhold,address1_latitude,address1_longitude,statecode`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    const accData = await accRes.json();
-                    if(accData.value && accData.value.length > 0) {
-                        const acc = accData.value[0];
-                        const lat = acc.address1_latitude;
-                        const lng = acc.address1_longitude;
-                        
-                        const coordHtml = (lat && lng)
-                            ? `<a href="javascript:void(0)" onclick="zoomToMap(${lat}, ${lng}, '${currentId}')" class="hover:underline text-[var(--brand)] flex items-center gap-1"><i class="fa fa-map-marker-alt"></i> ${lat}, ${lng}</a>`
-                            : 'Not Mapped';
-
-                        delContent.innerHTML = `
-                            <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Account Name</span><span class="font-bold">${acc.name || 'N/A'}</span></div>
-                            <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Delivery Phone</span><span class="font-mono">${acc.address1_telephone1 || 'N/A'}</span></div>
-                            <div class="col-span-2"><span class="opacity-50 text-[9px] uppercase block tracking-widest">Full Delivery Address</span><span class="font-bold text-xs">${(acc.address1_composite || '').replace(/\\n/g, ', ')}</span></div>
-                            <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Credit Hold Status</span><span class="font-bold ${acc.creditonhold ? 'text-red-500' : 'text-green-500'}">${acc.creditonhold ? 'ON HOLD' : 'Clear'}</span></div>
-                            <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Coordinates</span><span class="font-mono text-xs text-[var(--brand)]">${coordHtml}</span></div>
-                        `;
-                        delPanel.classList.remove('hidden');
-                    }
-                }
-                
-                if (soId) {
-                    try {
-                        const picRes = await fetch(`${D365_API}/annotations?$filter=_objectid_value eq '${soId}' and isdocument eq true and startswith(mimetype, 'image/')&$select=documentbody,mimetype&$top=1`, { headers: { 'Authorization': `Bearer ${token}` } });
-                        if(picRes.ok) {
-                            const picData = await picRes.json();
-                            if(picData.value && picData.value.length > 0) {
-                                const img = picData.value[0];
-                                delContent.innerHTML += `
-                                    <div class="col-span-2 mt-3 pt-3 border-t border-[var(--border)]">
-                                        <span class="opacity-50 text-[9px] uppercase block tracking-widest mb-2"><i class="fa fa-camera text-[var(--brand)]"></i> Proof of Delivery / Attachment</span>
-                                        <img src="data:${img.mimetype};base64,${img.documentbody}" class="max-w-full h-auto rounded-xl border border-[var(--border)] shadow-lg" style="max-height: 400px; object-fit: contain;" />
-                                    </div>
-                                `;
-                                delPanel.classList.remove('hidden');
-                            }
-                        }
-                    } catch(e) {
-                        console.warn("No picture found or failed to fetch", e);
-                    }
-                }
-            } catch(e) {
-                if(el) el.innerText = "";
-            }
+                delContent.innerHTML = `
+                    <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Account Name</span><span class="font-bold">${t ? t.company : 'N/A'}</span></div>
+                    <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Delivery Phone</span><span class="font-mono">555-0199</span></div>
+                    <div class="col-span-2"><span class="opacity-50 text-[9px] uppercase block tracking-widest">Full Delivery Address</span><span class="font-bold text-xs">${t ? t.address : 'N/A'}</span></div>
+                    <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Credit Hold Status</span><span class="font-bold text-green-500">Clear</span></div>
+                    <div><span class="opacity-50 text-[9px] uppercase block tracking-widest">Coordinates</span><span class="font-mono text-xs text-[var(--brand)]">${coordHtml}</span></div>
+                `;
+                delPanel.classList.remove('hidden');
+            }, 600);
         }
 
         function refreshDetailHistory() {
@@ -2451,11 +1908,8 @@
         
         function closeEmailModal() { document.getElementById('email-modal').classList.remove('active'); }
 
-        async function confirmEmailLog() { 
+        function confirmEmailLog() { 
             const to = document.getElementById('em-to').value;
-            const cc = document.getElementById('em-cc').value;
-            const subject = document.getElementById('em-subject').value;
-            const body = document.getElementById('em-body').value;
             const t = fullData.find(x => x.id === currentId);
             
             if (!to) { Toastify({text:"Recipient Required", style:{background:"#ef4444"}}).showToast(); return; }
@@ -2464,88 +1918,18 @@
             btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> SENDING...`;
             btn.disabled = true;
 
-            const parseEmails = (str) => str.split(/[,;]/).map(e => e.trim()).filter(e => e).map(e => ({ emailAddress: { address: e } }));
-            const toRecipients = parseEmails(to);
-            const ccRecipients = parseEmails(cc);
-
-            Toastify({text:"Sending Email & Logging to Account Timeline...", style:{background:"#fbbf24"}}).showToast(); 
-            try {
-                const tokenResponse = await msalInstance.acquireTokenSilent({ scopes: ["Mail.Send"], account: msalAccount })
-                    .catch(async () => await msalInstance.acquireTokenPopup({ scopes: ["Mail.Send"] }));
-
-                const emailPayload = { 
-                    message: { 
-                        subject: subject, 
-                        body: { contentType: "HTML", content: body }, 
-                        toRecipients: toRecipients,
-                        ccRecipients: ccRecipients 
-                    }, 
-                    saveToSentItems: "true" 
-                };
-
-                const res = await fetch("https://graph.microsoft.com/v1.0/me/sendMail", { 
-                    method: "POST", 
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Content-Type": "application/json" }, 
-                    body: JSON.stringify(emailPayload) 
-                });
-
-                if (!res.ok) throw new Error("Graph API error");
-
-                const dToken = await getToken(ENV_D365);
-                const parties = [];
-                if(userProfile.id) parties.push({ "participationtypemask": 1, "partyid_systemuser@odata.bind": `/systemusers(${userProfile.id})` });
-                toRecipients.forEach(p => parties.push({ "participationtypemask": 2, "addressused": p.emailAddress.address }));
-                ccRecipients.forEach(p => parties.push({ "participationtypemask": 3, "addressused": p.emailAddress.address }));
-
-                const logPayload = { subject: subject, description: body, directioncode: true, email_activity_parties: parties };
-                let bound = false;
-
-                if(t.order && t.order !== 'N/A') {
-                    try {
-                        const soRes = await fetch(`${D365_API}/salesorders?$filter=ordernumber eq '${t.order.trim()}'&$select=salesorderid`, { headers: { 'Authorization': `Bearer ${dToken}` } });
-                        if(soRes.ok) {
-                            const soData = await soRes.json();
-                            if(soData.value && soData.value.length > 0) { logPayload[`regardingobjectid_salesorder@odata.bind`] = `/salesorders(${soData.value[0].salesorderid})`; bound = true; }
-                        }
-                    } catch(e) { console.warn("SO Read Denied."); }
-                }
-
-                if(!bound && t.accountNum && t.accountNum !== 'N/A') {
-                    try {
-                        const cleanAcc = t.accountNum.replace(/'/g, "''");
-                        const accRes = await fetch(`${D365_API}/accounts?$filter=accountnumber eq '${cleanAcc}'&$select=accountid`, { headers: { 'Authorization': `Bearer ${dToken}` } });
-                        if(accRes.ok) {
-                            const accData = await accRes.json();
-                            if(accData.value && accData.value.length > 0) { logPayload[`regardingobjectid_account@odata.bind`] = `/accounts(${accData.value[0].accountid})`; bound = true; }
-                        }
-                    } catch(e) { console.warn("Account fallback failed."); }
-                }
-
-                await fetch(`${D365_API}/emails`, { method: 'POST', headers: { 'Authorization': `Bearer ${dToken}`, 'Content-Type': 'application/json', 'OData-MaxVersion': '4.0', 'OData-Version': '4.0' }, body: JSON.stringify(logPayload) });
-                
-                try {
-                    const dataToken = await getToken(ENV_DATA);
-                    const nowIso = new Date().toISOString();
-                    await fetch(`${DATA_API}/${ENTITY_SET}(${t.guid})`, {
-                        method: 'PATCH',
-                        headers: { 'Authorization': `Bearer ${dataToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ "cr714_repemaildatestamp": nowIso })
-                    });
-                    t.mgrEmailDate = parseEmailDate(nowIso);
-                } catch(e) { console.warn("Failed to patch Dataverse timestamp", e); }
-                
-                Toastify({text:"Email Sent, Timestamped, & Logged to Timeline!", style:{background:"#10b981"}}).showToast(); 
+            setTimeout(() => {
+                const nowIso = new Date().toISOString();
+                t.mgrEmailDate = new Date(nowIso).toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' ' + new Date(nowIso).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+                Toastify({text:"Mock Email Sent, Timestamped, & Logged!", style:{background:"#10b981"}}).showToast(); 
                 closeEmailModal();
-                refreshData(true); 
-            } catch (err) { Toastify({text:`Error: ${err.message}`, style:{background:"#ef4444"}}).showToast(); 
-            } finally {
-                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Send via Outlook & Log to D365`;
+                btn.innerHTML = `<i class="fas fa-paper-plane"></i> Mock Send`;
                 btn.disabled = false;
-            }
+                applyFilters();
+            }, 800);
         }
 
         function updateDashboard(s, data) {
-            // Update Dashboard Timestamp
             const timeEl = document.getElementById('dash-last-update');
             if(timeEl) timeEl.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
@@ -2558,13 +1942,11 @@
                 repData[d.owner] = (repData[d.owner]||0)+1;
                 issData[d.issue || 'Generic'] = (issData[d.issue || 'Generic']||0)+1;
 
-                // Track Open Closing Returns specifically (Excluding completed and sent back statuses)
                 const isClosingReturn = (d.issue || '').includes('Closing Return');
                 const isClosedStatus = ['Completed', 'Sent Back', 'Completed - Escalated'].includes(d.status);
 
                 if (isClosingReturn && !isClosedStatus) {
                     const wh = d.whs || 'Unknown';
-                    // Only count if it's a real name (prevents GUIDs from showing in dashboard)
                     if (wh !== 'N/A' && wh.length < 30) {
                         closingReturnWhData[wh] = (closingReturnWhData[wh] || 0) + 1;
                     }
@@ -2577,7 +1959,6 @@
                 openReportDrilldown(type, label, '1900-01-01', '2100-01-01');
             };
 
-            // Helper function to sort data from highest to lowest
             const sortData = (obj) => {
                 const sortedArray = Object.entries(obj).sort((a, b) => b[1] - a[1]);
                 return {
@@ -2595,7 +1976,6 @@
             const totalEl = document.getElementById('total-open-returns');
             if(totalEl) totalEl.innerText = `${totalReturns} Total`;
 
-            // Restored layout: Diagonal labels to prevent smooshing with numbers on top
             const barOps = { 
                 maintainAspectRatio: false, 
                 plugins: { 
@@ -2615,8 +1995,8 @@
                         ticks: { 
                             color: '#94a3b8', 
                             font: { size: 9 }, 
-                            maxRotation: 45, // Restore diagonal tilt
-                            minRotation: 45, // Restore diagonal tilt
+                            maxRotation: 45, 
+                            minRotation: 45, 
                             autoSkip: false
                         },
                         grid: { display: false }
@@ -2676,7 +2056,6 @@
                 } 
             });
 
-            // Horizontal-specific options for long Issue names
             const issueBarOps = { 
                 indexAxis: 'y', 
                 maintainAspectRatio: false, 
@@ -2717,41 +2096,32 @@
             });
         }
 
-        async function saveRecord(autoNext = false) {
+        function saveRecord(autoNext = false) {
             const guid = document.getElementById('sys-guid').innerText;
             const newOwner = document.getElementById('m-owner').value;
-            const payload = { "cr714_disposition": document.getElementById('m-status').value, "cr714_logisticsowner": newOwner, "cr714_logisticsnotes": document.getElementById('m-notes').value };
+            const newStatus = document.getElementById('m-status').value;
             
-            // This is the correct place for the trigger
             const currentRecord = fullData.find(x => x.guid === guid);
-            if (newOwner === "Furniture" && currentRecord.owner !== "Furniture") {
-                triggerFurnitureEmail(currentRecord);
+            if (currentRecord) {
+                currentRecord.owner = newOwner;
+                currentRecord.status = newStatus;
+                currentRecord.notes = document.getElementById('m-notes').value;
             }
-            try {
-                const token = await getToken(ENV_DATA);
-                const res = await fetch(`${DATA_API}/${ENTITY_SET}(${guid})`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'OData-MaxVersion': '4.0', 'OData-Version': '4.0' }, body: JSON.stringify(payload) });
-                if(res.ok) {
-                    Toastify({text:"Record Saved Instantly", style:{background:"#10b981"}}).showToast();
-                    if(autoNext) { const idx = filteredData.findIndex(x => x.id === currentId); if(filteredData[idx+1]) openDetail(filteredData[idx+1].id); }
-                    else { refreshData(true); }
-                } else throw new Error();
-            } catch(e) { Toastify({text:"Save Failed", style:{background:"#ef4444"}}).showToast(); }
+
+            Toastify({text:"Record Saved Locally", style:{background:"#10b981"}}).showToast();
+            if(autoNext) { 
+                const idx = filteredData.findIndex(x => x.id === currentId); 
+                if(filteredData[idx+1]) openDetail(filteredData[idx+1].id); 
+            } else { 
+                applyFilters(); 
+            }
         }
 
         function exportClosingReturns(scope = 'all', whName = '') {
             const dataToExport = fullData.filter(t => {
-                // 1. Normalize strings for comparison
                 const issue = (t.issue || '').toLowerCase();
                 const status = (t.status || '').toLowerCase().trim();
-                
-                // 2. Define exactly what should be EXCLUDED (Open Returns ONLY)
-                const excludedStatuses = [
-                    'completed', 
-                    'sent back', 
-                    'completed escalated', 
-                    'completed - escalated',
-                    'escalated - completed'
-                ];
+                const excludedStatuses = ['completed', 'sent back', 'completed escalated', 'completed - escalated', 'escalated - completed'];
                 
                 const isClosingReturn = issue.includes('closing return');
                 const isOpen = !excludedStatuses.includes(status);
@@ -2765,18 +2135,10 @@
                 return;
             }
 
-            // Map to clean data columns for the Excel sheet
             const excelData = dataToExport.map(r => ({
-                Date: r.date,
-                Warehouse: r.whs,
-                'Account #': r.accountNum,
-                Order: r.order,
-                Customer: r.company,
-                Status: r.status,
-                Owner: r.owner,
-                Issue: r.issue,
-                'Warehouse Notes': r.warehouseNotes,
-                'Driver Notes': r.driverNotes
+                Date: r.date, Warehouse: r.whs, 'Account #': r.accountNum, Order: r.order,
+                Customer: r.company, Status: r.status, Owner: r.owner, Issue: r.issue,
+                'Warehouse Notes': r.warehouseNotes, 'Driver Notes': r.driverNotes
             }));
 
             const fileName = whName ? `Closing_Returns_${whName.replace(/ /g, '_')}.xlsx` : `All_Open_Closing_Returns.xlsx`;
@@ -2811,22 +2173,9 @@
         function debouncedSearch() { applyFilters(); }
         function toggleMyTickets() { showMine = !showMine; document.getElementById('mine-check').classList.toggle('hidden'); applyFilters(); }
         
-        async function setTimeFrame(tf) { 
+        function setTimeFrame(tf) { 
             document.getElementById('filter-date')._flatpickr.clear();
             activeTimeFrame = tf; 
-            
-            // Check if history needs to be pulled from the server
-            const needsDeepFetch = (tf === '1y' || tf === 'all');
-            const hasHistoryLoaded = fullData.some(t => {
-                const recordYear = new Date(t.date).getFullYear();
-                return recordYear < new Date().getFullYear();
-            });
-
-            if (needsDeepFetch && !hasHistoryLoaded) {
-                Toastify({text: "Fetching historical records...", style: {background: "#3b82f6"}}).showToast();
-                await refreshData(true, tf); // true = silent (no loading screen)
-            }
-
             document.querySelectorAll('.time-btn').forEach(b => {
                 b.classList.remove('dimmed');
                 b.classList.toggle('active', b.id === `tf-${tf}`); 
@@ -2840,7 +2189,6 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === `nav-${v}`)); 
             document.querySelectorAll('.view-section').forEach(s => s.classList.toggle('hidden', s.id !== `container-${v}`)); 
             
-            // Auto-switch to 30D when entering the Dashboard
             if (v === 'scorecard' && activeTimeFrame !== '30d') {
                 setTimeFrame('30d');
             }
@@ -2878,13 +2226,13 @@
             const colors = { 'Escalated': '#ef4444', 'Escalation Sent': '#ef4444', 'Sent Back': '#ef4444', 'Completed': '#10b981', 'Working on': '#3b82f6', 'Pending': '#fbbf24' };
 
             points.forEach(p => { 
-                let col = '#2dd4bf'; // Default
+                let col = '#2dd4bf';
                 for(let key in colors) { if(p.status.includes(key)) { col = colors[key]; break; } }
                 L.circleMarker([p.lat, p.lng], { color: col, fillColor: col, fillOpacity: 0.6, radius: 6 }).bindPopup(`<b>Ticket #${p.id}</b><br>${p.status}`).addTo(mapLayerGroup); 
             }); 
         }
         
-        async function createNew() {
+        function createNew() {
             const so = prompt("Enter Sales Order #:"); if(!so) return;
             
             let assignedOwner = "Unassigned";
@@ -2895,99 +2243,30 @@
                 }
             }
 
-            const token = await getToken(ENV_DATA);
-            try {
-                const res = await fetch(`${DATA_API}/${ENTITY_SET}`, { 
-                    method: 'POST', 
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        "cr714_salesordernumber": so, 
-                        "cr714_companyordeliveryname": "New Entry", 
-                        "cr714_disposition": "Pending",
-                        "cr714_logisticsowner": assignedOwner
-                    }) 
-                });
-                if(res.ok) { Toastify({text:"Ticket Created", style:{background:"#10b981"}}).showToast(); refreshData(true); }
-            } catch(e){}
+            const newTicket = {
+                id: "L-" + Math.floor(Math.random() * 90000 + 10000), guid: "g-new-" + Date.now(), order: so, accountNum: "NewAcc", company: "New Entry",
+                address: "N/A", whs: "TBD", route: "TBD", status: "Pending", owner: assignedOwner,
+                submitRep: userProfile.name, notes: "", otherNotes: "", warehouseNotes: "", driverNotes: "",
+                issue: "Generic Issue", description: "Created Manually", item: "N/A",
+                date: new Date().toLocaleDateString('en-CA'), timestamp: Date.now(), timeWindow: "No Window Data", modifiedOn: "N/A",
+                zip3: "000", lat: null, lng: null, isCoaching: false, coachingNotes: "", searchString: `new entry ${so} generic issue`,
+                repEmailDate: null, whEmailDate: null, mgrEmailDate: null
+            };
+
+            fullData.unshift(newTicket);
+            Toastify({text:"Ticket Created Locally", style:{background:"#10b981"}}).showToast(); 
+            applyFilters();
         }
 
-        async function deleteRecord() {
+        function deleteRecord() {
             if(!confirm("Delete permanently?")) return;
             const guid = document.getElementById('sys-guid').innerText;
-            const token = await getToken(ENV_DATA);
-            try {
-                const res = await fetch(`${DATA_API}/${ENTITY_SET}(${guid})`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-                if(res.ok) { Toastify({text:"Record Deleted", style:{background:"#ef4444"}}).showToast(); closeDetail(); refreshData(true); }
-            } catch(e){}
+            fullData = fullData.filter(t => t.guid !== guid);
+            Toastify({text:"Mock Record Deleted", style:{background:"#ef4444"}}).showToast(); 
+            closeDetail(); 
+            applyFilters();
         }
 
-        async function sendAuditEmail(subject, bodyHtml) {
-            if (!userProfile.email) return; 
-            try {
-                // Silently grab token
-                const tokenResponse = await msalInstance.acquireTokenSilent({ scopes: ["Mail.Send"], account: msalAccount }).catch(e => null);
-                if (!tokenResponse) return;
-
-                const payload = {
-                    message: {
-                        subject: subject,
-                        body: { contentType: "HTML", content: bodyHtml },
-                        toRecipients: [{ emailAddress: { address: "anslee.laroche@wbmason.com" } }] // Sends the audit receipt to whoever clicked the button
-                    },
-                    saveToSentItems: "false" // Set to false so it doesn't clutter their Outbox
-                };
-
-                // Fire and forget (No await so the UI stays fast)
-                fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-            } catch(e) { console.warn("Failed to send audit email", e); }
-        }
-
-        async function triggerFurnitureEmail(t) {
-            try {
-                const tokenResponse = await msalInstance.acquireTokenSilent({ scopes: ["Mail.Send"], account: msalAccount })
-                    .catch(async () => await msalInstance.acquireTokenPopup({ scopes: ["Mail.Send"] }));
-
-                const emailPayload = {
-                    message: {
-                        subject: `New Furniture Request in Logistics: ${t.company} [${t.order}]`,
-                        body: { 
-                            contentType: "HTML", 
-                            content: `<div style="font-family: Arial; border-left: 4px solid #2dd4bf; padding: 15px;">
-                                <h2 style="color: #2dd4bf;">Furniture Assignment Notice</h2>
-                                <p>A record has been assigned to the Furniture in the LogiLog!</p>
-                                <hr>
-                                <b>Customer:</b> ${t.company}<br>
-                                <b>Order #:</b> ${t.order}<br>
-                                <b>Issue:</b> ${t.issue}<br>
-                                <b>Description:</b> ${t.description}</div>` 
-                        },
-                        toRecipients: [
-    { emailAddress: { address: "anslee.Laroche@wbmason.com" } },
-    { emailAddress: { address: "cassandra.lester@wbmason.com" } },
-    { emailAddress: { address: "bailey.lewis@wbmason.com" } }
-    ]
-                    }
-                };
-
-                await fetch("https://graph.microsoft.com/v1.0/me/sendMail", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${tokenResponse.accessToken}`, "Content-Type": "application/json" },
-                    body: JSON.stringify(emailPayload)
-                });
-                
-                // Patch Dataverse so we know the notification for this specific assignment event is done
-                const dToken = await getToken(ENV_DATA);
-                await fetch(`${DATA_API}/${ENTITY_SET}(${t.guid})`, {
-                    method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${dToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "cr714_managerappemailtimestamp": new Date().toISOString() })
-                });
-            } catch(e) { console.error("Furniture notification failed", e); }
-        }
     </script>
 </body>
 </html>
