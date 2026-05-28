@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anslee Erickson - Resume Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .dashboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 2.5em;
+        }
+        .contact-info {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #555;
+        }
+        .contact-info span {
+            margin: 0 10px;
+        }
+        h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .experience-item, .education-item {
+            margin-bottom: 25px;
+        }
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+        }
+        .job-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #34495e;
+        }
+        .company {
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+        .date {
+            color: #95a5a6;
+            font-size: 0.95em;
+        }
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+        }
+        .skills-list li {
+            background: #3498db;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Anslee Erickson[cite: 1]</h1>
+            <div class="contact-info">
+                <span>386-589-3306[cite: 1]</span> | 
+                <span>1983 Magnolia Avenue, South Daytona, FL 32119[cite: 1]</span>
+            </div>
+        </header>
+
+        <section class="profile">
+            <h2>Professional Profile</h2>
+            <p>Results-driven Data Analyst[cite: 1] with over five years of dedicated experience at W.B. Mason. Transitioned into data analytics to spearhead custom app development, database management, and process automation. Highly proficient in utilizing tools like Power Apps, Power Automate, and Excel to design robust solutions (such as logistics reassignment applications) that streamline operations and improve team workflows.</p>
+        </section>
+
+        <section class="experience">
+            <h2>Professional Experience</h2>
+
+            <div class="experience-item">
+                <div class="job-header">
+                    <div>
+                        <span class="job-title">Data Analyst[cite: 1]</span> | <span class="company">W.B. Mason[cite: 1]</span>
+                    </div>
+                    <span class="date">February 2024 &ndash; Present</span>
+                </div>
+                <ul>
+                    <li>Lead departmental app development and automation initiatives to optimize internal workflows and efficiency.</li>
+                    <li>Design, build, and maintain custom applications (including the LogiLog reassignment tool and customer service search widgets) utilizing Power Apps and Power Automate.</li>
+                    <li>Oversee database management to ensure data integrity, streamline reporting processes, and enhance overall operational capabilities.</li>
+                </ul>
+            </div>
+
+            <div class="experience-item">
+                <div class="job-header">
+                    <div>
+                        <span class="job-title">[Previous Role]</span> | <span class="company">W.B. Mason[cite: 1]</span>
+                    </div>
+                    <span class="date">2021 &ndash; January 2024[cite: 1]</span>
+                </div>
+                <ul>
+                    <li>[Summarize key responsibilities and achievements from the initial years at the company here.][cite: 1]</li>
+                </ul>
+            </div>
+
+            <div class="experience-item">
+                <div class="job-header">
+                    <div>
+                        <span class="job-title">Digital Asset Elevator[cite: 1]</span> | <span class="company">[Company Name]</span>
+                    </div>
+                    <span class="date">2019 &ndash; 2021[cite: 1]</span>
+                </div>
+                <ul>
+                    <li>[Highlight key learnings and achievements in this role.][cite: 1]</li>
+                </ul>
+            </div>
+
+            <div class="experience-item">
+                <div class="job-header">
+                    <div>
+                        <span class="job-title">Associate Store Manager[cite: 1]</span> | <span class="company">T-Mobile[cite: 1]</span>
+                    </div>
+                    <span class="date">2017 &ndash; 2019[cite: 1]</span>
+                </div>
+                <ul>
+                    <li>Managed daily store operations in New Smyrna Beach, FL[cite: 1], driving sales growth and maintaining high customer satisfaction.[cite: 1]</li>
+                    <li>Achieved measurable accomplishments resulting in profitability increases.[cite: 1]</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="skills">
+            <h2>Technical Skills</h2>
+            <ul class="skills-list">
+                <li>Data Analysis</li>
+                <li>Database Management</li>
+                <li>Process Automation</li>
+                <li>App Development</li>
+                <li>Power Apps</li>
+                <li>Power Automate</li>
+                <li>Microsoft Excel</li>
+                <li>3D Modeling</li>
+            </ul>
+        </section>
+
+        <section class="education">
+            <h2>Education</h2>
+            <div class="education-item">
+                <div class="job-header">
+                    <div>
+                        <span class="job-title">University of Central Florida (UCF)</span>
+                    </div>
+                </div>
+                <ul>
+                    <li>Coursework focused on 3D Modeling, including spatial design and lighting controls.</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
