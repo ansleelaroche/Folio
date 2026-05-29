@@ -170,6 +170,7 @@
                 <div class="flex flex-col items-center">
                     <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none whitespace-nowrap">0 / 0 (0%)</span>
                 </div>
+                <div class="progress-container hidden xl:block w-24 lg:w-32"><div id="header-progress-fill" class="progress-fill"></div></div>
             </div>
             <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap shrink-0">
                 <i class="fa fa-user-circle"></i>
@@ -528,7 +529,7 @@
                 id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
                 shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
                 submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
-                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
+                status: "Pending", issue: "Route Update", description: "Need to change delivery day to Tuesday.", 
                 item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
                 fullStamp: todayStr + " | 14:00 PM", completionTime: null,
                 date: todayStr, timestamp: Date.now() - 5000000, 
@@ -564,14 +565,17 @@
             setMode('active');
             
             setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    db = [...mockDataset];
-                    orderCounts = db.reduce((acc, t) => { if(t.order !== 'N/A') acc[t.order] = (acc[t.order] || 0) + 1; return acc; }, {});
-                    setupRepView();
-                    render(true);
-                }, 300);
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        db = [...mockDataset];
+                        orderCounts = db.reduce((acc, t) => { if(t.order !== 'N/A') acc[t.order] = (acc[t.order] || 0) + 1; return acc; }, {});
+                        setupRepView();
+                        render(true);
+                    }, 300);
+                }
             }, 800); 
         };
 
@@ -879,9 +883,9 @@
             if (inputElement.value.length < 3) { document.getElementById(dropdownId).style.display = 'none'; return; }
             galSearchTimeout = setTimeout(() => {
                 const mockUsers = [
-                    { displayName: "William Bradley", mail: "william.bradley@company.com" },
-                    { displayName: "Helen Edwards", mail: "helen.edwards@company.com" },
-                    { displayName: "Karen Williams", mail: "karen.williams@company.com" }
+                    { displayName: "Wayne Bow", mail: "wayne.rendt@company.com" },
+                    { displayName: "Holly Evans", mail: "holly.evans@company.com" },
+                    { displayName: "Kari Westervelt", mail: "kari.westervelt@company.com" }
                 ];
                 
                 document.getElementById(dropdownId).innerHTML = mockUsers.map(u => 
