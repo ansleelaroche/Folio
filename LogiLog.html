@@ -24,11 +24,19 @@
             --text-accent: #b45309; --border: #e2e8f0; --input-bg: #ffffff; --danger: #dc2626;
         }
 
-        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; margin: 0; transition: background 0.3s ease; display: flex; flex-direction: column; }
-        .app-container { flex: 1; min-height: 0; display: flex; width: 100%; position: relative; }
+        /* Strict Flexbox Layout to confine scrolling */
+        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100dvh; width: 100vw; overflow: hidden; margin: 0; display: flex; flex-direction: column; }
         
-        aside#main-gallery { width: 400px; min-width: 400px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
-        main { flex-grow: 1; overflow-y: auto; overflow-x: hidden; background-color: var(--bg-deep); display: flex; flex-direction: column; position: relative; }
+        header { flex: 0 0 auto; z-index: 20; }
+        
+        .app-container { flex: 1 1 auto; display: flex; width: 100%; overflow: hidden; position: relative; }
+        
+        aside#main-gallery { flex: 0 0 400px; width: 400px; min-width: 400px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; overflow: hidden; }
+        
+        main#main-scroller { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; background-color: var(--bg-deep); display: flex; flex-direction: column; position: relative; -webkit-overflow-scrolling: touch; }
+
+        #ticket-list { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
         #account-rail { width: 400px; min-width: 400px; background: var(--bg-surface); border-left: 1px solid var(--border); overflow-y: auto; padding: 15px 0; display: none; }
         #account-rail.is-visible { display: flex !important; flex-direction: column; }
 
@@ -104,19 +112,18 @@
         /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
-            aside#main-gallery { width: 100% !important; min-width: 100% !important; border-right: none; }
+            aside#main-gallery { flex: 1 1 auto; width: 100% !important; min-width: 100% !important; border-right: none; height: 100%; }
             
             /* View Toggle Logic */
             .app-container.show-detail aside#main-gallery { display: none !important; }
             .app-container:not(.show-detail) main#main-scroller { display: none !important; }
             
-            /* Inputs and UI Scale */
             .gallery-dropdown { width: 100%; }
             #detail-wrapper { padding: 20px !important; }
             
-            /* History Rail shifts to bottom of detail flow */
-            .app-container.show-detail { overflow-y: auto; display: block; }
-            .app-container.show-detail main#main-scroller { overflow: visible; height: auto; }
+            /* Force details container to take full height and scroll internally */
+            .app-container.show-detail main#main-scroller { display: flex !important; flex-direction: column; flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            
             #account-rail { width: 100% !important; min-width: 100% !important; height: auto; max-height: none; border-left: none; border-top: 2px solid var(--border); }
             #account-rail.is-visible { display: block !important; }
         }
@@ -125,7 +132,7 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body data-theme="midnight">
+<body data-theme="midnight" onclick="closeAllDropdowns(event)">
 
     <div id="loading-screen">
         <div class="cyber-loader"><i class="fa-solid fa-satellite-dish pulse-icon"></i></div>
@@ -134,13 +141,14 @@
 
     <div id="toast-container"></div>
 
-    <header class="bg-[var(--bg-surface)] border-b border-[var(--border)] flex flex-wrap items-center justify-between p-3 md:px-6 shadow-sm z-20 relative gap-3 min-h-[60px]">
-        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+    <header class="bg-[var(--bg-surface)] border-b border-[var(--border)] flex flex-wrap md:flex-nowrap items-center justify-between p-3 md:px-6 shadow-sm relative gap-3 w-full shrink-0">
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start shrink-0">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-frog frog-mascot text-xl md:text-2xl"></i>
                 <div class="text-lg md:text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1 hidden lg:inline">v106.29</span></div>
             </div>
             
+            <!-- Controls block for mobile layout stacking -->
             <div class="flex items-center gap-3 md:hidden">
                 <div id="user-display-mobile" class="user-badge flex items-center gap-2">
                     <i class="fa fa-user-circle"></i>
@@ -149,28 +157,28 @@
             </div>
         </div>
         
-        <div class="flex-1 w-full md:w-auto md:max-w-xl mx-auto order-3 md:order-none mt-2 md:mt-0 flex gap-3 items-center">
+        <div class="flex-1 w-full md:w-auto min-w-[200px] flex gap-3 items-center">
             <input type="text" id="global-search" oninput="render(true)" placeholder="Deep Omni-Search (Order, Item, Address...)" class="w-full bg-black/5 border border-[var(--border)] p-2 text-xs rounded text-[var(--text-main)] outline-none focus:border-[var(--brand)] transition-colors">
-            <div class="hidden xl:block text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span></div>
+            <div class="hidden xl:block text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner shrink-0">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span></div>
         </div>
         
         <div class="hidden md:flex items-center gap-3 lg:gap-5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide shrink-0">
-            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-2 lg:px-3 py-1.5 rounded-full border border-[var(--border)] whitespace-nowrap">
+            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-2 lg:px-3 py-1.5 rounded-full border border-[var(--border)] whitespace-nowrap shrink-0">
                 <span class="text-[8px] font-black uppercase tracking-widest text-[var(--text-accent)] hidden lg:inline">Admin Bypass</span>
                 <label class="switch" style="transform: scale(0.8);"><input type="checkbox" id="admin-bypass-toggle" checked><span class="slider"></span></label>
             </div>
-            <div class="items-center gap-2 lg:gap-4 hidden lg:flex">
+            <div class="items-center gap-2 lg:gap-4 hidden lg:flex shrink-0">
                 <div class="flex flex-col items-center">
                     <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none whitespace-nowrap">0 / 0 (0%)</span>
                 </div>
                 <div class="progress-container hidden xl:block w-24 lg:w-32"><div id="header-progress-fill" class="progress-fill"></div></div>
             </div>
-            <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap">
+            <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap shrink-0">
                 <i class="fa fa-user-circle"></i>
                 <span id="user-name-text" class="mr-1 hidden lg:inline">Anslee Erickson</span>
                 <select id="rep-view-filter" class="rep-view-selector" onchange="syncRepFilters(this.value); render(true)"><option value="ALL">ALL LOGISTICS</option></select>
             </div>
-            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-2 lg:px-3 py-1.5 rounded-full whitespace-nowrap">Links</button>
+            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-2 lg:px-3 py-1.5 rounded-full whitespace-nowrap shrink-0">Links</button>
             <div class="flex items-center gap-1 lg:gap-2 bg-black/5 p-1 lg:p-1.5 rounded-full border border-[var(--border)] shrink-0">
                 <div onclick="setTheme('midnight')" class="theme-dot bg-[#0f172a] text-white"><i class="fa fa-moon"></i></div>
                 <div onclick="setTheme('light')" class="theme-dot bg-[#f8fafc] text-[#0f172a]"><i class="fa fa-sun"></i></div>
@@ -205,12 +213,12 @@
                     </select>
                 </div>
             </div>
-            <div id="ticket-list" class="overflow-y-auto flex-grow h-full bg-black/10" onscroll="handleSidebarScroll(this)"></div>
+            <div id="ticket-list" class="bg-black/10" onscroll="handleSidebarScroll(this)"></div>
         </aside>
 
         <main id="main-scroller">
             
-            <div id="mobile-back-btn" class="md:hidden flex items-center gap-2 p-4 bg-black/20 border-b border-[var(--border)] cursor-pointer hover:bg-black/40 text-[var(--brand)] font-black uppercase text-[10px] tracking-widest sticky top-0 z-50 backdrop-blur-md" onclick="closeMobileDetail()">
+            <div id="mobile-back-btn" class="md:hidden flex items-center gap-2 p-4 bg-black/20 border-b border-[var(--border)] cursor-pointer hover:bg-black/40 text-[var(--brand)] font-black uppercase text-[10px] tracking-widest sticky top-0 z-50 backdrop-blur-md shrink-0" onclick="closeMobileDetail()">
                 <i class="fa fa-arrow-left"></i> Back to Ticket Gallery
             </div>
 
@@ -219,7 +227,7 @@
                 <p class="font-black uppercase tracking-widest text-xl">Select a Record</p>
             </div>
             
-            <div id="detail-content" class="hidden flex-grow overflow-y-auto relative">
+            <div id="detail-content" class="hidden flex-grow flex-col relative h-full">
                 <div id="detail-wrapper" class="p-8 space-y-8 pb-40 detail-wrapper">
                     
                     <div class="flex flex-col md:flex-row justify-between items-start border-b border-[var(--border)] pb-8 gap-6 md:gap-0">
@@ -522,7 +530,7 @@
                 id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
                 shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
                 submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
-                status: "Pending", issue: "Route Update", description: "Need to change delivery day to Tuesday.", 
+                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
                 item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
                 fullStamp: todayStr + " | 14:00 PM", completionTime: null,
                 date: todayStr, timestamp: Date.now() - 5000000, 
@@ -558,14 +566,18 @@
             setMode('active');
             
             setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 500);
-                
-                db = [...mockDataset];
-                orderCounts = db.reduce((acc, t) => { if(t.order !== 'N/A') acc[t.order] = (acc[t.order] || 0) + 1; return acc; }, {});
-                
-                setupRepView();
-                render(true);
+                document.getElementById('progress-fill').style.width = '100%';
+                document.getElementById('progress-text').innerText = 'Initializing Mock Sandbox...';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        db = [...mockDataset];
+                        orderCounts = db.reduce((acc, t) => { if(t.order !== 'N/A') acc[t.order] = (acc[t.order] || 0) + 1; return acc; }, {});
+                        setupRepView();
+                        render(true);
+                    }, 300);
+                }, 500);
             }, 800); 
         };
 
@@ -577,7 +589,8 @@
 
         function syncRepFilters(val) {
             document.getElementById('rep-view-filter').value = val;
-            document.getElementById('rep-view-filter-mobile').value = val;
+            const mobileDropdown = document.getElementById('rep-view-filter-mobile');
+            if (mobileDropdown) mobileDropdown.value = val;
         }
 
         function setMode(m) { 
@@ -669,7 +682,10 @@
             currentTicketId = id;
             const t = db.find(x => x.id === id); if(!t) return; render(false);
             
-            document.getElementById('empty-state').classList.add('hidden'); document.getElementById('detail-content').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden'); 
+            document.getElementById('detail-content').classList.remove('hidden');
+            document.getElementById('detail-content').style.display = 'flex'; // Ensure flex applies
+            
             document.getElementById('d-company').innerText = t.company;
             document.getElementById('d-order').innerText = t.order; 
             document.getElementById('d-full-time').innerText = t.fullStamp; 
@@ -705,9 +721,10 @@
             fetchDeliveryReport(t.order);
             
             document.getElementById('main-app-content').classList.add('show-detail');
-            document.getElementById('main-scroller').scrollTop = 0;
+            
             if(window.innerWidth <= 768) {
-                document.getElementById('main-app-content').scrollTop = 0;
+                // For mobile, scroll the detail wrapper to top
+                document.getElementById('main-scroller').scrollTop = 0;
             }
         }
 
