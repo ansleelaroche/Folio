@@ -37,7 +37,7 @@
 
         #ticket-list { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 
-        #account-rail { width: 400px; min-width: 400px; background: var(--bg-surface); border-left: 1px solid var(--border); overflow-y: auto; padding: 15px 0; display: none; }
+        #account-rail { flex: 0 0 400px; width: 400px; min-width: 400px; background: var(--bg-surface); border-left: 1px solid var(--border); overflow-y: auto; padding: 15px 0; display: none; }
         #account-rail.is-visible { display: flex !important; flex-direction: column; }
 
         .detail-wrapper { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; max-width: 56rem; margin-left: auto; margin-right: auto; }
@@ -132,7 +132,7 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body data-theme="midnight" onclick="closeAllDropdowns(event)">
+<body data-theme="midnight">
 
     <div id="loading-screen">
         <div class="cyber-loader"><i class="fa-solid fa-satellite-dish pulse-icon"></i></div>
@@ -148,7 +148,6 @@
                 <div class="text-lg md:text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1 hidden lg:inline">v106.29</span></div>
             </div>
             
-            <!-- Controls block for mobile layout stacking -->
             <div class="flex items-center gap-3 md:hidden">
                 <div id="user-display-mobile" class="user-badge flex items-center gap-2">
                     <i class="fa fa-user-circle"></i>
@@ -188,7 +187,7 @@
 
     <div class="app-container" id="main-app-content">
         <aside id="main-gallery">
-            <div class="p-4 flex flex-col gap-3 border-b border-[var(--border)] bg-black/5">
+            <div class="p-4 flex flex-col gap-3 border-b border-[var(--border)] bg-black/5 shrink-0">
                 <div class="flex gap-2">
                     <button onclick="setMode('active')" id="btn-active" class="flex-1 py-2 rounded font-black text-[11px] uppercase transition-all shadow-lg bg-[var(--brand)] text-black">Active</button>
                     <button onclick="setMode('all')" id="btn-all" class="flex-1 py-2 rounded font-black text-[11px] uppercase transition-all bg-black/20 border border-[var(--border)] text-[var(--text-dim)] hover:text-white">History</button>
@@ -530,7 +529,7 @@
                 id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
                 shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
                 submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
-                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
+                status: "Pending", issue: "Route Update", description: "Need to change delivery day to Tuesday.", 
                 item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
                 fullStamp: todayStr + " | 14:00 PM", completionTime: null,
                 date: todayStr, timestamp: Date.now() - 5000000, 
@@ -661,8 +660,10 @@
 
         function handleSidebarScroll(el) {
             if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
-                renderLimit += 100;
-                render(false);
+                if (renderLimit < db.length) {
+                    renderLimit += 100;
+                    render(false);
+                }
             }
         }
 
@@ -684,7 +685,7 @@
             
             document.getElementById('empty-state').classList.add('hidden'); 
             document.getElementById('detail-content').classList.remove('hidden');
-            document.getElementById('detail-content').style.display = 'flex'; // Ensure flex applies
+            document.getElementById('detail-content').style.display = 'flex';
             
             document.getElementById('d-company').innerText = t.company;
             document.getElementById('d-order').innerText = t.order; 
@@ -723,7 +724,6 @@
             document.getElementById('main-app-content').classList.add('show-detail');
             
             if(window.innerWidth <= 768) {
-                // For mobile, scroll the detail wrapper to top
                 document.getElementById('main-scroller').scrollTop = 0;
             }
         }
@@ -878,7 +878,6 @@
             toast.style.opacity = '1'; setTimeout(() => { toast.style.opacity = '0'; }, 2000);
         }
         
-        // Mock GAL Search
         let galSearchTimeout;
         function searchGAL(inputElement, dropdownId) {
             clearTimeout(galSearchTimeout);
