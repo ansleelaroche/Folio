@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anslee LaRoche - Portfolio Dashboard</title>
+    <title>Anslee Erickson - Portfolio Dashboard</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
@@ -287,12 +287,13 @@
             .dashboard-container { padding: 30px 20px; }
             h1 { font-size: 2.2em; }
             .contact-info span { display: block; margin: 5px 0; }
+            /* Give a little more room on mobile where tabs stack */
+            .app-wrapper { height: calc(100vh - 180px); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation Tabs -->
     <nav class="tab-nav animate delay-1">
         <button class="tab-btn active" onclick="openTab('resume')">Resume</button>
         <button class="tab-btn" onclick="openTab('logi-leap')">LogiLeap</button>
@@ -301,11 +302,10 @@
         <button class="tab-btn" onclick="openTab('fancy-pantry')">Fancy Pantry</button>
     </nav>
 
-    <!-- Resume Tab Content -->
     <div id="resume" class="tab-content active">
         <div class="dashboard-container">
             <header class="animate delay-1">
-                <h1>Anslee LaRoche</h1>
+                <h1>Anslee Erickson</h1>
                 <div class="contact-info">
                     <span>386-589-3306</span> &bull; 
                     <span>1983 Magnolia Avenue, South Daytona, FL 32119</span>
@@ -409,35 +409,30 @@
         </div>
     </div>
 
-    <!-- LogiLeap App Tab Content -->
     <div id="logi-leap" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/LogiLeap.html" class="iframe-container" title="LogiLeap App"></iframe>
         </div>
     </div>
 
-    <!-- LogiLog App Tab Content -->
     <div id="logi-log" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/LogiLog.html" class="iframe-container" title="LogiLog App"></iframe>
         </div>
     </div>
 
-    <!-- Service Tracker App Tab Content -->
     <div id="service-tracker" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/ServiceTracker.html" class="iframe-container" title="Service Tracker App"></iframe>
         </div>
     </div>
 
-    <!-- Fancy Pantry App Tab Content -->
     <div id="fancy-pantry" class="tab-content">
         <div class="app-wrapper">
             <iframe src="https://ansleelaroche.github.io/Folio/FancyPantry.html" class="iframe-container" title="Fancy Pantry App"></iframe>
         </div>
     </div>
 
-    <!-- JavaScript for Tab Switching and Responsive Iframe Scaling -->
     <script>
         function openTab(tabName) {
             // Hide all tab content
@@ -468,8 +463,18 @@
             const iframe = activeWrapper.querySelector('.iframe-container');
             if (!iframe) return;
 
+            // --- MOBILE CHECK ---
+            // If the user is on a phone or small tablet, turn off the desktop scaling trick 
+            // so the iframe acts like a native mobile viewport and triggers the app's media queries.
+            if (window.innerWidth <= 768) {
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.transform = 'none';
+                return;
+            }
+
+            // --- DESKTOP SCALING LOGIC ---
             // This is the ideal "desktop width" your apps were designed for. 
-            // The iframe will act like a monitor of this exact width, then shrink down to fit the page.
             const targetDesktopWidth = 1536; 
 
             // Get the actual space available on the user's screen
