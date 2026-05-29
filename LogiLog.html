@@ -58,8 +58,8 @@
         .theme-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; }
         #email-modal-overlay, #coaching-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center; padding: 5vh 20px; }
         
-        .modal-container { background: var(--bg-surface); border: 1px solid var(--border); width: 90%; max-width: 800px; height: 90vh; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
-        .coaching-modal-container { background: var(--bg-surface); border: 1px solid var(--border); width: 100%; max-width: 650px; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .modal-container { background: var(--bg-surface); border: 1px solid var(--border); width: 95%; max-width: 800px; height: 90vh; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
+        .coaching-modal-container { background: var(--bg-surface); border: 1px solid var(--border); width: 95%; max-width: 650px; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
 
         #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; }
         .toast { pointer-events: auto; min-width: 280px; padding: 16px 20px; border-radius: 8px; background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); animation: toast-slide 0.3s ease-out; border-left: 4px solid var(--brand); transition: all 0.3s ease; }
@@ -100,6 +100,29 @@
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(0.8); } }
         .gallery-dropdown { width: 100%; background: var(--bg-card); border: 1px solid var(--border); padding: 10px; font-size: 10px; font-weight: 900; text-transform: uppercase; border-radius: 6px; color: var(--text-main); outline: none; cursor: pointer; }
         .gallery-dropdown:focus { border-color: var(--brand); }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; height: calc(100vh - 120px); }
+            aside#main-gallery { width: 100% !important; min-width: 100% !important; border-right: none; }
+            
+            /* View Toggle Logic */
+            .app-container.show-detail aside#main-gallery { display: none !important; }
+            .app-container:not(.show-detail) main#main-scroller { display: none !important; }
+            
+            /* Inputs and UI Scale */
+            .gallery-dropdown { width: 100%; }
+            #detail-wrapper { padding: 20px !important; }
+            
+            /* History Rail shifts to bottom of detail flow */
+            .app-container.show-detail { overflow-y: auto; display: block; }
+            .app-container.show-detail main#main-scroller { overflow: visible; height: auto; }
+            #account-rail { width: 100% !important; min-width: 100% !important; height: auto; max-height: none; border-left: none; border-top: 2px solid var(--border); }
+            #account-rail.is-visible { display: block !important; }
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body data-theme="midnight">
@@ -111,35 +134,43 @@
 
     <div id="toast-container"></div>
 
-    <header class="h-[60px] bg-[var(--bg-surface)] border-b border-[var(--border)] flex items-center justify-between px-6 shadow-sm z-20 relative">
-        <div class="flex items-center gap-6">
+    <header class="min-h-[60px] h-auto bg-[var(--bg-surface)] border-b border-[var(--border)] flex flex-wrap items-center justify-between p-3 md:px-6 shadow-sm z-20 relative gap-3">
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
             <div class="flex items-center gap-3">
-                <i class="fa-solid fa-frog frog-mascot"></i>
-                <div class="text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1">v106.20</span></div>
+                <i class="fa-solid fa-frog frog-mascot text-xl md:text-2xl"></i>
+                <div class="text-lg md:text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1 hidden md:inline">v106.20</span></div>
             </div>
-            <div class="flex items-center gap-3">
-                <input type="text" id="global-search" oninput="render(true)" placeholder="Deep Omni-Search (Order, Item, Address, Description...)" class="w-96 bg-black/5 border border-[var(--border)] p-2 text-xs rounded text-[var(--text-main)] outline-none focus:border-[var(--brand)] transition-colors">
-                <div class="text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span> Records</div>
+            
+            <div class="flex items-center gap-3 md:hidden">
+                <div id="user-display-mobile" class="user-badge flex items-center gap-2">
+                    <i class="fa fa-user-circle"></i>
+                    <select id="rep-view-filter-mobile" class="rep-view-selector bg-transparent" onchange="syncRepFilters(this.value); render(true)"><option value="ALL">ALL LOGISTICS</option></select>
+                </div>
             </div>
         </div>
         
-        <div class="flex items-center gap-5">
-            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-3 py-1.5 rounded-full border border-[var(--border)]">
+        <div class="flex items-center gap-3 w-full md:w-auto order-3 md:order-none mt-2 md:mt-0 md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
+            <input type="text" id="global-search" oninput="render(true)" placeholder="Deep Omni-Search (Order, Item, Address...)" class="w-full md:w-96 bg-black/5 border border-[var(--border)] p-2 text-xs rounded text-[var(--text-main)] outline-none focus:border-[var(--brand)] transition-colors">
+            <div class="hidden md:block text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span></div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-5 ml-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-3 py-1.5 rounded-full border border-[var(--border)] whitespace-nowrap">
                 <span class="text-[8px] font-black uppercase tracking-widest text-[var(--text-accent)]">Admin Bypass</span>
                 <label class="switch" style="transform: scale(0.8);"><input type="checkbox" id="admin-bypass-toggle" checked><span class="slider"></span></label>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex flex-col items-center">
-                    <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none">0 / 0 (0%)</span>
+                    <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none whitespace-nowrap">0 / 0 (0%)</span>
                 </div>
-                <div class="progress-container"><div id="header-progress-fill" class="progress-fill"></div></div>
+                <div class="progress-container hidden lg:block"><div id="header-progress-fill" class="progress-fill"></div></div>
             </div>
-            <div id="user-display" class="user-badge flex items-center gap-2">
+            <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap">
                 <i class="fa fa-user-circle"></i>
                 <span id="user-name-text" class="mr-1">Anslee Erickson</span>
-                <select id="rep-view-filter" class="rep-view-selector" onchange="render(true)"><option value="ALL">ALL LOGISTICS</option></select>
+                <select id="rep-view-filter" class="rep-view-selector" onchange="syncRepFilters(this.value); render(true)"><option value="ALL">ALL LOGISTICS</option></select>
             </div>
-            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-3 py-1.5 rounded-full">Quick Links</button>
+            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-3 py-1.5 rounded-full whitespace-nowrap">Quick Links</button>
             <div class="flex items-center gap-2 bg-black/5 p-1.5 rounded-full border border-[var(--border)]">
                 <div onclick="setTheme('midnight')" class="theme-dot bg-[#0f172a] text-white"><i class="fa fa-moon"></i></div>
                 <div onclick="setTheme('light')" class="theme-dot bg-[#f8fafc] text-[#0f172a]"><i class="fa fa-sun"></i></div>
@@ -178,13 +209,20 @@
         </aside>
 
         <main id="main-scroller">
+            
+            <div id="mobile-back-btn" class="md:hidden flex items-center gap-2 p-4 bg-black/20 border-b border-[var(--border)] cursor-pointer hover:bg-black/40 text-[var(--brand)] font-black uppercase text-[10px] tracking-widest sticky top-0 z-50 backdrop-blur-md" onclick="closeMobileDetail()">
+                <i class="fa fa-arrow-left"></i> Back to Ticket Gallery
+            </div>
+
             <div id="empty-state" class="flex-grow flex flex-col items-center justify-center opacity-10 text-[var(--text-dim)] h-full">
                 <i class="fa-solid fa-frog text-9xl mb-4"></i>
                 <p class="font-black uppercase tracking-widest text-xl">Select a Record</p>
             </div>
+            
             <div id="detail-content" class="hidden flex-grow overflow-y-auto relative">
                 <div id="detail-wrapper" class="p-8 space-y-8 pb-40 detail-wrapper">
-                    <div class="flex justify-between items-start border-b border-[var(--border)] pb-8">
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-start border-b border-[var(--border)] pb-8 gap-6 md:gap-0">
                         <div class="flex-grow space-y-4">
                             <h2 id="d-company" class="text-[var(--text-main)] uppercase tracking-tight text-3xl font-extrabold leading-none"></h2>
                             <div class="flex items-start gap-2 text-[13px] text-[var(--text-dim)] opacity-80"><i class="fa fa-location-dot mt-1 text-[var(--brand)]"></i><span id="d-shipping-address" class="font-medium"></span></div>
@@ -198,20 +236,21 @@
                                 <div class="flex items-center gap-2 text-[12px]"><i class="fa fa-user-shield text-[var(--text-accent)] w-4 text-center"></i><span class="font-black uppercase tracking-widest opacity-40 text-[10px]">Logistics:</span><span id="d-logistics-owner" class="font-bold uppercase text-[var(--text-main)]"></span></div>
                             </div>
                         </div>
-                        <div class="flex flex-col items-end w-[350px] gap-3">
-                            <div class="w-fit group relative text-right">
+                        
+                        <div class="flex flex-col items-start md:items-end w-full md:w-[350px] gap-3">
+                            <div class="w-full md:w-fit group relative text-left md:text-right">
                                 <p id="d-full-time" class="time-label-detail mb-1 text-[var(--text-dim)] text-[11px]"></p>
                                 <p id="d-completion-time" class="time-label-detail mb-1 text-[var(--brand)] text-[11px] font-bold hidden"></p>
                                 <p id="d-order" onclick="copyToClipboard('d-order')" class="text-4xl font-black italic text-[var(--text-main)] leading-none hover:text-[var(--brand)] transition-colors cursor-pointer"></p>
-                                <div id="d-order-date" class="text-[10px] text-[var(--brand)] font-mono uppercase tracking-widest mt-2 flex items-center justify-end gap-1 opacity-80 h-4"></div>
+                                <div id="d-order-date" class="text-[10px] text-[var(--brand)] font-mono uppercase tracking-widest mt-2 flex items-center justify-start md:justify-end gap-1 opacity-80 h-4"></div>
                                 <div id="d-account" onclick="copyToClipboard('d-account')" class="text-sm font-bold opacity-40 uppercase tracking-widest mt-1 hover:text-[var(--brand)] transition-colors cursor-pointer"></div>
                                 <span id="copy-toast" class="absolute -top-7 right-0 text-[10px] bg-[var(--brand)] text-black px-2 py-1 rounded font-black opacity-0 transition-opacity uppercase">Copied</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-black/10 px-4 py-2 rounded-lg border border-[var(--border)] mt-1">
+                            <div class="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 bg-black/10 px-4 py-2 rounded-lg border border-[var(--border)] mt-1">
                                 <span class="text-[10px] font-black uppercase tracking-widest text-[var(--text-accent)]">Coaching Opportunity</span>
                                 <label class="switch"><input type="checkbox" id="d-coaching-toggle" onchange="handleCoachingToggle()"><span class="slider"></span></label>
                             </div>
-                            <select id="d-disposition" onchange="autoSaveDisposition()" class="w-56 bg-[var(--bg-surface)] border border-[var(--brand)] text-[10px] font-black uppercase px-3 py-3 rounded text-[var(--brand)] outline-none cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all shadow-lg">
+                            <select id="d-disposition" onchange="autoSaveDisposition()" class="w-full md:w-56 bg-[var(--bg-surface)] border border-[var(--brand)] text-[10px] font-black uppercase px-3 py-3 rounded text-[var(--brand)] outline-none cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all shadow-lg">
                                 <option value="">Select Status...</option>
                                 <option value="Working on">Working on</option>
                                 <option value="Follow-up">Follow-up</option>
@@ -226,11 +265,13 @@
                             </select>
                         </div>
                     </div>
+                    
                     <div class="bg-black/5 border-l-4 border-[var(--text-accent)] p-6 rounded-r-lg">
-                        <div class="flex justify-between items-start mb-2"><label id="d-issue-label" class="text-[11px] font-black text-[var(--text-accent)] uppercase block tracking-wider"></label><span class="text-[10px] font-mono opacity-50 uppercase tracking-widest">Item: <span id="d-item" class="text-white font-bold"></span></span></div>
+                        <div class="flex flex-col md:flex-row justify-between items-start mb-2 gap-2"><label id="d-issue-label" class="text-[11px] font-black text-[var(--text-accent)] uppercase block tracking-wider"></label><span class="text-[10px] font-mono opacity-50 uppercase tracking-widest">Item: <span id="d-item" class="text-white font-bold"></span></span></div>
                         <p id="d-description" class="font-medium text-[var(--text-main)] text-sm leading-relaxed bg-black/20 p-4 rounded border border-[var(--border)] shadow-inner"></p>
                     </div>
-                    <div class="grid grid-cols-2 gap-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="flex flex-col gap-3">
                             <label class="text-[11px] font-black uppercase opacity-50 tracking-widest">Warehouse Updates</label>
                             <textarea id="d-warehouse-input" class="h-56 bg-black/20 border border-[var(--border)] p-4 rounded text-sm outline-none focus:border-[var(--brand)] text-[var(--text-main)] leading-relaxed shadow-inner"></textarea>
@@ -240,16 +281,17 @@
                             <textarea id="d-driver-input" class="h-56 bg-black/20 border border-[var(--border)] p-4 rounded text-sm outline-none focus:border-[var(--brand)] text-[var(--text-main)] leading-relaxed shadow-inner"></textarea>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <div class="flex-1 flex flex-col">
+                    
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 flex flex-col w-full">
                             <button onclick="openWarehouseEmail()" class="w-full py-4 border-2 border-[var(--text-accent)] text-[var(--text-accent)] rounded font-black uppercase text-sm tracking-[0.2em] hover:bg-[var(--text-accent)] hover:text-black transition-all">Email Warehouse</button>
                             <div id="d-warehouse-stamp" class="text-[9px] font-bold opacity-40 mt-1 uppercase text-center h-3"></div>
                         </div>
-                        <div class="flex-1 flex flex-col">
+                        <div class="flex-1 flex flex-col w-full">
                             <button id="rep-update-btn" onclick="openDraftModal()" class="w-full py-4 border-2 border-[var(--brand)] text-[var(--brand)] rounded font-black uppercase text-sm tracking-[0.2em] hover:bg-[var(--brand)] hover:text-black transition-all">Send Rep Update</button>
                             <div id="d-rep-stamp" class="text-[9px] font-bold opacity-40 mt-1 uppercase text-center h-3"></div>
                         </div>
-                        <div class="flex-[1.5] flex flex-col">
+                        <div class="flex-[1.5] flex flex-col w-full">
                             <button id="save-btn" onclick="saveRecord()" class="w-full py-4 bg-[var(--brand)] text-black rounded font-black uppercase text-sm tracking-[0.2em] hover:brightness-110 shadow-[0_0_15px_rgba(45,212,191,0.3)] transition-all">Save Logistics Update</button>
                             <div class="h-3"></div>
                         </div>
@@ -258,6 +300,7 @@
                 <div id="d-system-guid" class="system-debug-footer"></div>
             </div>
         </main>
+        
         <aside id="account-rail">
             <h3 class="text-[12px] font-black uppercase tracking-widest text-[var(--danger)] mb-4 border-b border-[var(--border)] pb-3 text-center mx-3 flex items-center justify-center gap-2">
                 <i class="fa fa-history"></i> Linked History
@@ -291,7 +334,7 @@
                 <span class="font-black uppercase text-xs tracking-widest text-[var(--brand)] flex items-center gap-2"><i class="fab fa-microsoft"></i> Email Dispatch (Mocked)</span>
                 <button onclick="closeDraftModal()" class="text-[var(--text-dim)] hover:text-[var(--danger)] transition-colors"><i class="fa fa-times text-xl"></i></button>
             </div>
-            <div class="p-6 space-y-4 relative shrink-0">
+            <div class="p-6 space-y-4 relative shrink-0 overflow-y-auto">
                 <div class="relative">
                     <div class="grid grid-cols-[60px_1fr] items-center gap-2">
                         <span class="text-[10px] font-black uppercase opacity-40">To:</span>
@@ -314,10 +357,10 @@
                 </div>
             </div>
             
-            <div id="m-body" contenteditable="true" class="outlook-editor border-t border-[var(--border)]"></div>
+            <div id="m-body" contenteditable="true" class="outlook-editor border-t border-[var(--border)] min-h-[150px]"></div>
             
-            <div class="p-6 flex gap-4 bg-black/5 border-t border-[var(--border)] shrink-0">
-                <button onclick="closeDraftModal()" class="flex-1 py-3 text-[10px] font-black uppercase opacity-50 hover:opacity-100 transition-opacity">Discard</button>
+            <div class="p-6 flex flex-col md:flex-row gap-4 bg-black/5 border-t border-[var(--border)] shrink-0">
+                <button onclick="closeDraftModal()" class="flex-1 py-3 text-[10px] font-black uppercase opacity-50 hover:opacity-100 transition-opacity border border-[var(--border)] rounded">Discard</button>
                 <button id="confirm-send-btn" onclick="sendMockEmail()" class="flex-[2] py-4 bg-[var(--brand)] text-black rounded font-black uppercase text-xs tracking-[0.2em] hover:brightness-110 shadow-lg flex items-center justify-center gap-2">
                     <i class="fas fa-paper-plane"></i> Mock Send
                 </button>
@@ -479,7 +522,7 @@
                 id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
                 shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
                 submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
-                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
+                status: "Pending", issue: "Route Update", description: "Need to change delivery day to Tuesday.", 
                 item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
                 fullStamp: todayStr + " | 14:00 PM", completionTime: null,
                 date: todayStr, timestamp: Date.now() - 5000000, 
@@ -525,6 +568,17 @@
                 render(true);
             }, 800); 
         };
+
+        function closeMobileDetail() {
+            document.getElementById('main-app-content').classList.remove('show-detail');
+            currentTicketId = null;
+            render(false);
+        }
+
+        function syncRepFilters(val) {
+            document.getElementById('rep-view-filter').value = val;
+            document.getElementById('rep-view-filter-mobile').value = val;
+        }
 
         function setMode(m) { 
             currentMode = m;
@@ -649,6 +703,12 @@
 
             updateSidebar(t.order);
             fetchDeliveryReport(t.order);
+            
+            document.getElementById('main-app-content').classList.add('show-detail');
+            document.getElementById('main-scroller').scrollTop = 0;
+            if(window.innerWidth <= 768) {
+                document.getElementById('main-app-content').scrollTop = 0;
+            }
         }
 
         function fetchDeliveryReport(orderNumber) {
@@ -783,7 +843,12 @@
                 showToast("Saved successfully"); 
                 btn.innerText = "Save Logistics Update"; 
                 btn.disabled = false; 
-                render(false); 
+                
+                if (window.innerWidth <= 768) {
+                    closeMobileDetail();
+                } else {
+                    render(false); 
+                }
             }, 600);
         }
 
@@ -926,6 +991,11 @@
             if(!s) return; const val = s.value; s.innerHTML = '<option value="ALL">ALL LOGISTICS</option>';
             Object.values(NAME_MAP).sort().forEach(n => { const o = document.createElement('option'); o.value = n; o.innerText = n; s.appendChild(o); });
             if (Array.from(s.options).some(o => o.value === val)) s.value = val; 
+            
+            const sMobile = document.getElementById('rep-view-filter-mobile');
+            if(!sMobile) return; const valMobile = sMobile.value; sMobile.innerHTML = '<option value="ALL">ALL LOGISTICS</option>';
+            Object.values(NAME_MAP).sort().forEach(n => { const o = document.createElement('option'); o.value = n; o.innerText = n; sMobile.appendChild(o); });
+            if (Array.from(sMobile.options).some(o => o.value === valMobile)) sMobile.value = valMobile; 
         }
 
         function showToast(m, t = 'success') { 
