@@ -24,8 +24,8 @@
             --text-accent: #b45309; --border: #e2e8f0; --input-bg: #ffffff; --danger: #dc2626;
         }
 
-        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; margin: 0; transition: background 0.3s ease; }
-        .app-container { display: flex; height: calc(100vh - 60px); width: 100%; overflow: hidden; position: relative; }
+        body { background-color: var(--bg-deep); color: var(--text-main); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; margin: 0; transition: background 0.3s ease; display: flex; flex-direction: column; }
+        .app-container { flex: 1; min-height: 0; display: flex; width: 100%; position: relative; }
         
         aside#main-gallery { width: 400px; min-width: 400px; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
         main { flex-grow: 1; overflow-y: auto; overflow-x: hidden; background-color: var(--bg-deep); display: flex; flex-direction: column; position: relative; }
@@ -83,7 +83,7 @@
 
         .outlook-editor { flex-grow: 1; background: var(--bg-card); color: var(--text-main); padding: 1.5rem; outline: none; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.5; overflow-y: auto; font-size: 14px; }
         [data-theme='midnight'] .outlook-editor, [data-theme='midnight'] .outlook-editor * { color: var(--text-main) !important; }
-        .progress-container { width: 180px; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; }
+        .progress-container { width: 100%; height: 10px; background: rgba(0,0,0,0.1); border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .progress-fill { height: 100%; width: 0%; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -103,7 +103,7 @@
 
         /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 768px) {
-            .app-container { flex-direction: column; height: calc(100vh - 120px); }
+            .app-container { flex-direction: column; }
             aside#main-gallery { width: 100% !important; min-width: 100% !important; border-right: none; }
             
             /* View Toggle Logic */
@@ -134,11 +134,11 @@
 
     <div id="toast-container"></div>
 
-    <header class="min-h-[60px] h-auto bg-[var(--bg-surface)] border-b border-[var(--border)] flex flex-wrap items-center justify-between p-3 md:px-6 shadow-sm z-20 relative gap-3">
+    <header class="bg-[var(--bg-surface)] border-b border-[var(--border)] flex flex-wrap items-center justify-between p-3 md:px-6 shadow-sm z-20 relative gap-3 min-h-[60px]">
         <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-frog frog-mascot text-xl md:text-2xl"></i>
-                <div class="text-lg md:text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1 hidden md:inline">v106.20</span></div>
+                <div class="text-lg md:text-xl font-black uppercase tracking-tighter text-[var(--brand)]">LOGILOG <span class="text-[10px] opacity-40 ml-1 hidden lg:inline">v106.29</span></div>
             </div>
             
             <div class="flex items-center gap-3 md:hidden">
@@ -149,29 +149,29 @@
             </div>
         </div>
         
-        <div class="flex items-center gap-3 w-full md:w-auto order-3 md:order-none mt-2 md:mt-0 md:absolute md:left-1/2 md:transform md:-translate-x-1/2">
-            <input type="text" id="global-search" oninput="render(true)" placeholder="Deep Omni-Search (Order, Item, Address...)" class="w-full md:w-96 bg-black/5 border border-[var(--border)] p-2 text-xs rounded text-[var(--text-main)] outline-none focus:border-[var(--brand)] transition-colors">
-            <div class="hidden md:block text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span></div>
+        <div class="flex-1 w-full md:w-auto md:max-w-xl mx-auto order-3 md:order-none mt-2 md:mt-0 flex gap-3 items-center">
+            <input type="text" id="global-search" oninput="render(true)" placeholder="Deep Omni-Search (Order, Item, Address...)" class="w-full bg-black/5 border border-[var(--border)] p-2 text-xs rounded text-[var(--text-main)] outline-none focus:border-[var(--brand)] transition-colors">
+            <div class="hidden xl:block text-[9px] font-mono text-[var(--text-dim)] uppercase tracking-widest bg-[var(--bg-deep)] px-3 py-1.5 rounded border border-[var(--border)] whitespace-nowrap shadow-inner">Showing <span id="count-display" class="text-[var(--brand)] font-black text-xs">0</span></div>
         </div>
         
-        <div class="hidden md:flex items-center gap-5 ml-auto overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
-            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-3 py-1.5 rounded-full border border-[var(--border)] whitespace-nowrap">
-                <span class="text-[8px] font-black uppercase tracking-widest text-[var(--text-accent)]">Admin Bypass</span>
+        <div class="hidden md:flex items-center gap-3 lg:gap-5 overflow-x-auto pb-1 md:pb-0 scrollbar-hide shrink-0">
+            <div id="admin-toggle-container" class="flex items-center gap-2 bg-black/5 px-2 lg:px-3 py-1.5 rounded-full border border-[var(--border)] whitespace-nowrap">
+                <span class="text-[8px] font-black uppercase tracking-widest text-[var(--text-accent)] hidden lg:inline">Admin Bypass</span>
                 <label class="switch" style="transform: scale(0.8);"><input type="checkbox" id="admin-bypass-toggle" checked><span class="slider"></span></label>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="items-center gap-2 lg:gap-4 hidden lg:flex">
                 <div class="flex flex-col items-center">
                     <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none whitespace-nowrap">0 / 0 (0%)</span>
                 </div>
-                <div class="progress-container hidden lg:block"><div id="header-progress-fill" class="progress-fill"></div></div>
+                <div class="progress-container hidden xl:block w-24 lg:w-32"><div id="header-progress-fill" class="progress-fill"></div></div>
             </div>
             <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap">
                 <i class="fa fa-user-circle"></i>
-                <span id="user-name-text" class="mr-1">Anslee Erickson</span>
+                <span id="user-name-text" class="mr-1 hidden lg:inline">Anslee Erickson</span>
                 <select id="rep-view-filter" class="rep-view-selector" onchange="syncRepFilters(this.value); render(true)"><option value="ALL">ALL LOGISTICS</option></select>
             </div>
-            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-3 py-1.5 rounded-full whitespace-nowrap">Quick Links</button>
-            <div class="flex items-center gap-2 bg-black/5 p-1.5 rounded-full border border-[var(--border)]">
+            <button onclick="toggleLinkSidebar()" class="wh-label cursor-pointer hover:bg-[var(--brand)] hover:text-black transition-all bg-black/20 border-none px-2 lg:px-3 py-1.5 rounded-full whitespace-nowrap">Links</button>
+            <div class="flex items-center gap-1 lg:gap-2 bg-black/5 p-1 lg:p-1.5 rounded-full border border-[var(--border)] shrink-0">
                 <div onclick="setTheme('midnight')" class="theme-dot bg-[#0f172a] text-white"><i class="fa fa-moon"></i></div>
                 <div onclick="setTheme('light')" class="theme-dot bg-[#f8fafc] text-[#0f172a]"><i class="fa fa-sun"></i></div>
             </div>
