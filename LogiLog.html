@@ -170,7 +170,6 @@
                 <div class="flex flex-col items-center">
                     <span id="header-progress-text" class="text-[10px] font-black text-[var(--brand)] leading-none whitespace-nowrap">0 / 0 (0%)</span>
                 </div>
-                <div class="progress-container hidden xl:block w-24 lg:w-32"><div id="header-progress-fill" class="progress-fill"></div></div>
             </div>
             <div id="user-display" class="user-badge flex items-center gap-2 whitespace-nowrap shrink-0">
                 <i class="fa fa-user-circle"></i>
@@ -200,9 +199,9 @@
                         <option value="Follow-up">Follow-up</option>
                         <option value="Sent Back">Sent Back</option>
                         <option value="Completed">Completed</option>
-                        <option value="Escalated - Holly">Escalated - Holly</option>
-                        <option value="Escalated - Kari">Escalated - Kari</option>
-                        <option value="Escalated - Wayne">Escalated - Wayne</option>
+                        <option value="Escalated - Helen">Escalated - Helen</option>
+                        <option value="Escalated - Karen">Escalated - Karen</option>
+                        <option value="Escalated - William">Escalated - William</option>
                         <option value="Escalated - Working On" class="admin-opt">Escalated - Working On</option>
                         <option value="Escalated - Completed" class="admin-opt">Escalated - Completed</option>
                         <option value="Route Update - Logistics">Route Update - Logistics</option>
@@ -263,9 +262,9 @@
                                 <option value="Follow-up">Follow-up</option>
                                 <option value="Sent Back">Sent Back</option>
                                 <option value="Completed">Completed</option>
-                                <option value="Escalated - Holly">Escalated - Holly</option>
-                                <option value="Escalated - Kari">Escalated - Kari</option>
-                                <option value="Escalated - Wayne">Escalated - Wayne</option>
+                                <option value="Escalated - Helen">Escalated - Helen</option>
+                                <option value="Escalated - Karen">Escalated - Karen</option>
+                                <option value="Escalated - William">Escalated - William</option>
                                 <option value="Escalated - Working On" class="admin-opt">Escalated - Working On</option>
                                 <option value="Escalated - Completed" class="admin-opt">Escalated - Completed</option>
                                 <option value="Route Update - Logistics">Route Update - Logistics</option>
@@ -328,7 +327,7 @@
                 <a href="https://www.dhl.com/en/express/tracking.html" target="_blank" class="link-item"><i class="fa-solid fa-globe"></i> DHL Express</a>
                 
                 <div class="link-category">System Tools</div>
-                <a href="https://www.wbmason.com" target="_blank" class="link-item"><i class="fa-solid fa-building"></i> WB Mason Portal</a>
+                <a href="https://www.company.com" target="_blank" class="link-item"><i class="fa-solid fa-building"></i> Company Portal</a>
             </div>
         </aside>
     </div>
@@ -376,15 +375,16 @@
     </div>
 
     <script>
+        // Standalone Mock Configuration
         let db = []; 
         let orderCounts = {}; 
         let currentMode = 'active'; 
         let currentTicketId = null;
-        let currentUser = { name: "Anslee Erickson", email: "anslee.erickson@wbmason.com", id: "12345" };
+        let currentUser = { name: "Anslee Erickson", email: "anslee.erickson@company.com", id: "12345" };
         let renderLimit = 100;
         let activeEmailType = ''; 
 
-        const NAME_MAP = { "Kari": "Kari Westervelt", "Holly": "Holly Evans", "Courtney": "Courtney Youngblood", "Jewel": "Jewel Jenkins", "Noah": "Noah Comans", "Wayne": "Wayne Bow", "Tobbitha": "Tobbitha Bishoff", "Paula": "Paula Bowen", "Furniture": "Furniture", "Tier 2": "Tier 2" };
+        const NAME_MAP = { "Karen": "Karen Williams", "Helen": "Helen Edwards", "Chloe": "Chloe Young", "Jessica": "Jessica Jones", "Nathan": "Nathan Carter", "William": "William Bradley", "Tara": "Tara Bishop", "Peter": "Peter Bowen", "Furniture": "Furniture", "Tier 2": "Tier 2" };
 
         const todayStr = new Date().toLocaleDateString('en-CA');
         const yesterdayStr = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
@@ -417,8 +417,8 @@
             {
                 id: "T-8944", guid: "g1003", order: "W9990003", company: "Daily Planet", account: "100202",
                 shippingAddress: "344 Clinton St, Metropolis NY 10001", contactInfo: "Clark K. - 555-9999", 
-                submitRep: "Lois Lane", logisticsOwner: "Wayne Bow", driverInfo: "Jimmy - Route NY3", 
-                status: "Escalated - Wayne", issue: "Closing Returns", description: "Customer returning 10 damaged chairs.", 
+                submitRep: "Lois Lane", logisticsOwner: "William Bradley", driverInfo: "Jimmy - Route NY3", 
+                status: "Escalated - William", issue: "Closing Returns", description: "Customer returning 10 damaged chairs.", 
                 item: "HON10589", warehouse: "NY-WH", route: "NY3", warehouseNotes: "", driverNotes: "", 
                 fullStamp: yesterdayStr + " | 14:20 PM", completionTime: null,
                 date: yesterdayStr, timestamp: Date.now() - 86400000, 
@@ -428,7 +428,7 @@
             {
                 id: "T-8945", guid: "g1004", order: "W9990004", company: "Oscorp", account: "100203",
                 shippingAddress: "Oscorp Tower, New York NY 10010", contactInfo: "Norman O. - 555-0000", 
-                submitRep: "Harry Osborn", logisticsOwner: "Holly Evans", driverInfo: "Flint - Route NY1", 
+                submitRep: "Harry Osborn", logisticsOwner: "Helen Edwards", driverInfo: "Flint - Route NY1", 
                 status: "Completed", issue: "Wrong Delivery Location", description: "Delivered to 2nd floor instead of 10th floor.", 
                 item: "N/A", warehouse: "NY-WH", route: "NY1", warehouseNotes: "Swapped product at dock.", driverNotes: "Delivered correct item.", 
                 fullStamp: yesterdayStr + " | 11:00 AM", completionTime: yesterdayStr + " | 10:00 AM",
@@ -450,7 +450,7 @@
             {
                 id: "T-8947", guid: "g1006", order: "W9990006", company: "Dunder Mifflin", account: "100205",
                 shippingAddress: "1725 Slough Ave, Scranton PA 18505", contactInfo: "Pam B. - 555-4321", 
-                submitRep: "Jim Halpert", logisticsOwner: "Kari Westervelt", driverInfo: "Dwight - Route PA2", 
+                submitRep: "Jim Halpert", logisticsOwner: "Karen Williams", driverInfo: "Dwight - Route PA2", 
                 status: "Working on", issue: "Wrong Delivery Location", description: "Paper dropped off at the wrong building.", 
                 item: "WBM21200", warehouse: "PA-WH", route: "PA2", warehouseNotes: "", driverNotes: "Nobody at dock.", 
                 fullStamp: todayStr + " | 10:30 AM", completionTime: null,
@@ -483,8 +483,8 @@
             {
                 id: "T-8950", guid: "g1009", order: "W9990009", company: "Monsters Inc", account: "100208",
                 shippingAddress: "Monstropolis, New York NY 10021", contactInfo: "Sulley - 555-3333", 
-                submitRep: "Mike Wazowski", logisticsOwner: "Holly Evans", driverInfo: "George - Route NY1", 
-                status: "Escalated - Holly", issue: "Missing Items", description: "Missing 3 boxes of Keurig coffee pods.", 
+                submitRep: "Mike Wazowski", logisticsOwner: "Helen Edwards", driverInfo: "George - Route NY1", 
+                status: "Escalated - Helen", issue: "Missing Items", description: "Missing 3 boxes of Keurig coffee pods.", 
                 item: "KCU123", warehouse: "NY-WH", route: "NY1", warehouseNotes: "We do not have any more in stock.", driverNotes: "", 
                 fullStamp: olderStr + " | 09:00 AM", completionTime: null,
                 date: olderStr, timestamp: Date.now() - 259200000, 
@@ -494,7 +494,7 @@
             {
                 id: "T-8951", guid: "g1010", order: "W9990010", company: "Umbrella Corp", account: "100209",
                 shippingAddress: "Raccoon City, South Daytona FL 32119", contactInfo: "Jill V. - 555-7777", 
-                submitRep: "Albert Wesker", logisticsOwner: "Kari Westervelt", driverInfo: "Chris - Route FL1", 
+                submitRep: "Albert Wesker", logisticsOwner: "Karen Williams", driverInfo: "Chris - Route FL1", 
                 status: "Completed", issue: "Wrong Delivery Location", description: "Breakroom supplies left in the lobby.", 
                 item: "BKM444", warehouse: "CFL", route: "FL1", warehouseNotes: "", driverNotes: "Dropped off at back door.", 
                 fullStamp: oldStr + " | 08:30 AM", completionTime: oldStr + " | 10:00 AM",
@@ -505,7 +505,7 @@
             {
                 id: "T-8952", guid: "g1011", order: "W9990011", company: "Globex", account: "100210",
                 shippingAddress: "Cypress Creek, South Daytona FL 32119", contactInfo: "Homer S. - 555-6666", 
-                submitRep: "Hank Scorpio", logisticsOwner: "Wayne Bow", driverInfo: "Moe - Route FL2", 
+                submitRep: "Hank Scorpio", logisticsOwner: "William Bradley", driverInfo: "Moe - Route FL2", 
                 status: "Sent Back", issue: "Furniture (If your item is furniture, you MUST choose this option!)", description: "Chairs are the wrong color.", 
                 item: "HON4444", warehouse: "CFL", route: "FL2", warehouseNotes: "", driverNotes: "", 
                 fullStamp: yesterdayStr + " | 13:00 PM", completionTime: null,
@@ -528,7 +528,7 @@
                 id: "T-8954", guid: "g1013", order: "W9990013", company: "Weyland-Yutani", account: "100212",
                 shippingAddress: "Bldg 4, San Francisco CA 94016", contactInfo: "Bishop - 555-5555", 
                 submitRep: "Ellen Ripley", logisticsOwner: "Tier 2", driverInfo: "Hicks - Route S1", 
-                status: "Pending", issue: "Route Update", description: "Need to change delivery day to Tuesday.", 
+                status: "Pending", issue: "Route Update - Logistics", description: "Need to change delivery day to Tuesday.", 
                 item: "N/A", warehouse: "SFO", route: "S1", warehouseNotes: "", driverNotes: "", 
                 fullStamp: todayStr + " | 14:00 PM", completionTime: null,
                 date: todayStr, timestamp: Date.now() - 5000000, 
@@ -538,7 +538,7 @@
             {
                 id: "T-8955", guid: "g1014", order: "W9990014", company: "Wonka Industries", account: "100213",
                 shippingAddress: "Factory St, Scranton PA 18501", contactInfo: "Willy W. - 555-1111", 
-                submitRep: "Charlie Bucket", logisticsOwner: "Kari Westervelt", driverInfo: "Oompa - Route PA1", 
+                submitRep: "Charlie Bucket", logisticsOwner: "Karen Williams", driverInfo: "Oompa - Route PA1", 
                 status: "Completed", issue: "ETA", description: "Where is my candy shipment?", 
                 item: "SNK999", warehouse: "PA-WH", route: "PA1", warehouseNotes: "", driverNotes: "Delivered to front desk.", 
                 fullStamp: olderStr + " | 08:00 AM", completionTime: olderStr + " | 11:30 AM",
@@ -631,7 +631,7 @@
 
             let filtered = db.filter(t => { 
                 const matchSearch = !search || t.searchString.includes(search) || t.id.toLowerCase().includes(search) || t.order.toLowerCase().includes(search); 
-                const isActive = ['Pending', 'Working on', 'Follow-up', 'Escalated', 'Escalated - Holly', 'Escalated - Kari', 'Escalated - Wayne', 'Escalated - Working On', 'Route Update - Logistics'].includes(t.status);
+                const isActive = ['Pending', 'Working on', 'Follow-up', 'Escalated', 'Escalated - Helen', 'Escalated - Karen', 'Escalated - William', 'Escalated - Working On', 'Route Update - Logistics'].includes(t.status);
                 const modeFilter = currentMode === 'active' ? isActive : !isActive; 
                 const ownershipMatch = (repFilterValue === "ALL" || t.logisticsOwner === repFilterValue); 
                 const statusMatch = (dispoVal === "ALL" || t.status === dispoVal); 
@@ -785,9 +785,9 @@
             let ownerToPass = t.logisticsOwner === "Tier 2" ? "Tier 2" : (t.logisticsOwner?.split(' ')[0] || "");
             let dispoToSave = newDispo;
 
-            if (newDispo === "Escalated - Holly") { ownerToPass = "Holly"; t.logisticsOwner = "Holly Evans"; } 
-            else if (newDispo === "Escalated - Wayne") { ownerToPass = "Wayne"; t.logisticsOwner = "Wayne Bow"; }
-            else if (newDispo === "Escalated - Kari") { ownerToPass = "Kari"; t.logisticsOwner = "Kari Westervelt"; } 
+            if (newDispo === "Escalated - Helen") { ownerToPass = "Helen"; t.logisticsOwner = "Helen Edwards"; } 
+            else if (newDispo === "Escalated - William") { ownerToPass = "William"; t.logisticsOwner = "William Bradley"; }
+            else if (newDispo === "Escalated - Karen") { ownerToPass = "Karen"; t.logisticsOwner = "Karen Williams"; } 
             else if (newDispo === "Route Update - Logistics") { 
                 ownerToPass = ""; 
                 t.logisticsOwner = "Unassigned"; 
@@ -879,9 +879,9 @@
             if (inputElement.value.length < 3) { document.getElementById(dropdownId).style.display = 'none'; return; }
             galSearchTimeout = setTimeout(() => {
                 const mockUsers = [
-                    { displayName: "Wayne Bow", mail: "wayne.rendt@wbmason.com" },
-                    { displayName: "Holly Evans", mail: "holly.evans@wbmason.com" },
-                    { displayName: "Kari Westervelt", mail: "kari.westervelt@wbmason.com" }
+                    { displayName: "William Bradley", mail: "william.bradley@company.com" },
+                    { displayName: "Helen Edwards", mail: "helen.edwards@company.com" },
+                    { displayName: "Karen Williams", mail: "karen.williams@company.com" }
                 ];
                 
                 document.getElementById(dropdownId).innerHTML = mockUsers.map(u => 
@@ -910,10 +910,10 @@
             let c = wh ? `<strong>Warehouse Update:</strong><br>${wh.replace(/\n/g, '<br>')}<br><br>` : ""; 
             c += dr ? `<strong>Driver Feedback:</strong><br>${dr.replace(/\n/g, '<br>')}<br><br>` : "";
             
-            document.getElementById('m-to-address').value = `${t.submitRep.toLowerCase().replace(/\s+/g, '.')}@wbmason.com, `; 
-            document.getElementById('m-cc-address').value = "Wayne.Rendt@wbmason.com, Holly.Evans@wbmason.com";
+            document.getElementById('m-to-address').value = `${t.submitRep.toLowerCase().replace(/\s+/g, '.')}@company.com, `; 
+            document.getElementById('m-cc-address').value = "william.bradley@company.com, helen.edwards@company.com";
             document.getElementById('m-subject').value = `${t.order} / ${t.company} / ${t.issue} / Logistics Update`;
-            document.getElementById('m-body').innerHTML = `<div style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">Hello,<br><br><strong>Order Number:</strong> #${t.order}<br><strong>Account Number:</strong> ${t.account}<br><strong>Account Name:</strong> ${t.company}<br><strong>Contact Info:</strong> ${t.contactInfo}<br><strong>Delivery Address:</strong> ${t.shippingAddress}<br>${t.warehouse} / ${t.route}<br><br><strong>Issue:</strong> ${t.issue}<br><strong>Description:</strong> ${t.description}<br><strong>Item:</strong> ${t.item}<br><br>${c || "[LOGISTICS NOTES HERE]<br><br>"}Sincerely, <br><strong>${currentUser.name}</strong><br>W.B. MASON CO, INC.<br>Data Analyst<br>${p}<br>Email: ${currentUser.email} | Website: <a href="https://www.wbmason.com" style="color:#0b66c3; text-decoration:none;">WWW.WBMASON.COM</a></div>`; 
+            document.getElementById('m-body').innerHTML = `<div style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">Hello,<br><br><strong>Order Number:</strong> #${t.order}<br><strong>Account Number:</strong> ${t.account}<br><strong>Account Name:</strong> ${t.company}<br><strong>Contact Info:</strong> ${t.contactInfo}<br><strong>Delivery Address:</strong> ${t.shippingAddress}<br>${t.warehouse} / ${t.route}<br><br><strong>Issue:</strong> ${t.issue}<br><strong>Description:</strong> ${t.description}<br><strong>Item:</strong> ${t.item}<br><br>${c || "[LOGISTICS NOTES HERE]<br><br>"}Sincerely, <br><strong>${currentUser.name}</strong><br>COMPANY, INC.<br>Data Analyst<br>${p}<br>Email: ${currentUser.email} | Website: <a href="https://www.company.com" style="color:#0b66c3; text-decoration:none;">WWW.COMPANY.COM</a></div>`; 
             document.getElementById('email-modal-overlay').style.display = 'flex';
         }
 
@@ -922,7 +922,7 @@
             if(!t) return; activeEmailType = 'warehouse';
             let p = "(508) 436 - 1234";
             
-            document.getElementById('m-to-address').value = ""; document.getElementById('m-cc-address').value = "Wayne.Rendt@wbmason.com, Holly.Evans@wbmason.com";
+            document.getElementById('m-to-address').value = ""; document.getElementById('m-cc-address').value = "william.bradley@company.com, helen.edwards@company.com";
             document.getElementById('m-subject').value = `${t.company} / ${t.order} / ${t.warehouse} / ${t.issue} / ${t.route}`;
             document.getElementById('m-body').innerHTML = `<div style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">Hello,<br><br><strong>Order Number:</strong> #${t.order}<br><strong>Account Number:</strong> ${t.account}<br><strong>Account Name:</strong> ${t.company}<br><strong>Contact Info:</strong> ${t.contactInfo}<br><strong>Delivery Address:</strong> ${t.shippingAddress}<br>${t.warehouse} / ${t.route}<br><br><strong>Issue:</strong> ${t.issue}<br><strong>Description:</strong> ${t.description}<br><strong>Item:</strong> ${t.item}<br><br>Thank you,<br><strong>${currentUser.name}</strong><br>Data Analyst<br>${p}</div>`;
             document.getElementById('email-modal-overlay').style.display = 'flex'; 
