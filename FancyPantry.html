@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kodchasan:wght@300;400;500;600;700&display=swap');
         
@@ -51,9 +50,6 @@
 
     <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
-    const supabaseUrl = 'https://jqvuqfqedzlegxuvudag.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxdnVxZnFlZHpsZWd4dXZ1ZGFnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTk3NDQsImV4cCI6MjA5MDk3NTc0NH0.kj2jjfHxZNLr6EHQgRrEJMYJpsqM5Nefi-51Lb1mqWw'; 
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     // Optimized Core 11 Categories with Exact Color Mapping
     const META = {
@@ -82,6 +78,35 @@
         "Baking Essentials": ["flour", "baking powder", "baking soda", "extract", "vanilla", "olive oil", "chicken bouillon", "blue agave", "sea salt", "black pepper", "kosher salt", "sugar", "salt", "pepper", "cinnamon"],
         "Household & Pet": ["shampoo", "wash", "foil", "cat", "kibble", "soap", "clean", "trash", "paper", "napkin", "dog", "walker"]
     };
+
+    // MOCK DATA GENERATOR
+    const mockInventory = [
+        { id: 1, name: "Organic Honeycrisp Apples", qty: "6", room: "Fridge", category: "Produce" },
+        { id: 2, name: "Whole Milk", qty: "1", room: "Fridge", category: "Dairy & Eggs" },
+        { id: 3, name: "Chicken Breasts", qty: "4", room: "Fridge", category: "Meat & Proteins" },
+        { id: 4, name: "Heinz Ketchup", qty: "1", room: "Fridge", category: "Condiments & Spreads" },
+        { id: 5, name: "DiGiorno Pizza Rolls", qty: "2", room: "Freezer", category: "Frozen Foods" },
+        { id: 6, name: "Vanilla Ice Cream", qty: "0", room: "Freezer", category: "Frozen Foods" },
+        { id: 7, name: "LaCroix Sparkling Water", qty: "12", room: "Fridge", category: "Beverages" },
+        { id: 8, name: "Lays Potato Chips", qty: "2", room: "Dry Goods", category: "Snacks" },
+        { id: 9, name: "Sourdough Bread", qty: "1", room: "Dry Goods", category: "Bakery & Breads" },
+        { id: 10, name: "All-Purpose Flour", qty: "1", room: "Dry Goods", category: "Baking Essentials" },
+        { id: 11, name: "Bounty Paper Towels", qty: "4", room: "Dry Goods", category: "Household & Pet" },
+        { id: 12, name: "Purina Dog Food", qty: "0", room: "Dry Goods", category: "Household & Pet" },
+        { id: 13, name: "Extra Virgin Olive Oil", qty: "1", room: "Dry Goods", category: "Baking Essentials" },
+        { id: 14, name: "Baby Carrots", qty: "1", room: "Fridge", category: "Produce" },
+        { id: 15, name: "Large Brown Eggs", qty: "12", room: "Fridge", category: "Dairy & Eggs" },
+        { id: 16, name: "Eggo Waffles", qty: "0", room: "Freezer", category: "Frozen Foods" },
+        { id: 17, name: "Jasmine Rice", qty: "2", room: "Dry Goods", category: "Pantry Staples" },
+        { id: 18, name: "Black Beans", qty: "3", room: "Dry Goods", category: "Pantry Staples" },
+        { id: 19, name: "Glad Trash Bags", qty: "1", room: "Dry Goods", category: "Household & Pet" },
+        { id: 20, name: "Salted Butter", qty: "2", room: "Fridge", category: "Dairy & Eggs" },
+        { id: 21, name: "Ranch Dressing", qty: "1", room: "Fridge", category: "Condiments & Spreads" },
+        { id: 22, name: "Blueberries", qty: "0", room: "Fridge", category: "Produce" },
+        { id: 23, name: "Ground Beef", qty: "2", room: "Freezer", category: "Meat & Proteins" },
+        { id: 24, name: "Tortilla Chips", qty: "1", room: "Dry Goods", category: "Snacks" },
+        { id: 25, name: "Cinnamon Sugar", qty: "1", room: "Dry Goods", category: "Baking Essentials" }
+    ];
 
     const toTitleCase = (str) => {
         if (!str) return '';
@@ -150,13 +175,16 @@
         const [modalRoom, setModalRoom] = useState("Fridge");
         const [modalCat, setModalCat] = useState("Pantry Staples");
 
-        useEffect(() => { fetchItems(); }, []);
-        useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [items, activeRoom, editingId, isModalOpen, isMobileMenuOpen]);
-
-        async function fetchItems() {
-            const { data } = await supabase.from('FancyPantry').select('*').order('name');
-            if (data) setItems(data || []);
-        }
+        // Load Mock Data
+        useEffect(() => { 
+            setTimeout(() => {
+                setItems(mockInventory);
+            }, 300); // Small artificial delay to simulate loading
+        }, []);
+        
+        useEffect(() => { 
+            if (window.lucide) window.lucide.createIcons(); 
+        }, [items, activeRoom, editingId, isModalOpen, isMobileMenuOpen]);
 
         const handleNameChange = (val) => {
             setNewName(val);
@@ -166,9 +194,30 @@
             }
         };
 
-        const handleUpdate = async (id) => {
-            await supabase.from('FancyPantry').update({ name: toTitleCase(editValue), qty: editQty }).eq('id', id);
-            setEditingId(null); fetchItems();
+        const handleUpdate = (id) => {
+            setItems(prev => prev.map(i => i.id === id ? { ...i, name: toTitleCase(editValue), qty: editQty } : i));
+            setEditingId(null);
+        };
+
+        const handleDelete = (id) => {
+            if(window.confirm("Discard product line?")) {
+                setItems(prev => prev.filter(i => i.id !== id));
+            }
+        };
+
+        const handleAdd = (e) => {
+            e.preventDefault();
+            const newItem = {
+                id: Date.now(), // Generate a unique mock ID
+                name: toTitleCase(newName),
+                qty: newQty || "1",
+                room: modalRoom,
+                category: modalCat
+            };
+            setItems(prev => [...prev, newItem]);
+            setIsModalOpen(false); 
+            setNewName("");
+            setNewQty("");
         };
 
         const grouped = useMemo(() => {
@@ -260,7 +309,7 @@
                                                     x{item.qty}
                                                 </span>
                                                 <button 
-                                                    onClick={(e) => { e.stopPropagation(); if(confirm("Discard product line?")) supabase.from('FancyPantry').delete().eq('id', item.id).then(fetchItems); }}
+                                                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
                                                     className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 text-xs transition-opacity"
                                                 >
                                                     ✕
@@ -364,11 +413,7 @@
                                 <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white text-sm">✕</button>
                             </div>
 
-                            <form onSubmit={async e => {
-                                e.preventDefault();
-                                await supabase.from('FancyPantry').insert([{ name: toTitleCase(newName), qty: newQty || "1", room: modalRoom, category: modalCat }]);
-                                setIsModalOpen(false); setNewName(""); fetchItems();
-                            }} className="space-y-5">
+                            <form onSubmit={handleAdd} className="space-y-5">
                                 <div className="space-y-2">
                                     <label className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Target Repository</label>
                                     <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
