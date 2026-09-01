@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaiser GMC | Live Service Board</title>
-    <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -44,7 +42,7 @@
 <body class="bg-slate-950 text-[10px] font-sans antialiased h-screen overflow-hidden flex flex-col text-slate-300" style="color-scheme: dark;">
 
     <!-- LOGIN SCREEN OVERLAY -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-950 flex flex-col justify-center items-center z-[100]">
+    <div id="login-screen" class="fixed inset-0 bg-slate-950 flex flex-col justify-center items-center z-[100] transition-opacity duration-500">
         <div class="bg-slate-900 p-8 rounded-xl shadow-2xl border border-slate-800 w-full max-w-sm text-center">
             <h1 class="text-2xl font-bold text-white mb-1">Kaiser GMC</h1>
             <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-8">Service Dispatch Login</p>
@@ -478,16 +476,30 @@
     </div>
 
     <script>
-        const supabaseUrl = 'https://bnnqzijvmsezjlpocpvz.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJubnF6aWp2bXNlempscG9jcHZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjczNzMsImV4cCI6MjA5MzgwMzM3M30.UJHZXunhE1gy28pYE_39HIOrFnm4C0laeME9lE19frs';
-        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const mockDataset = [
+            { id: 1, assigned_user: "Frank LaRoche", ro_number: "65489", customer_name: "Bruce Wayne", phone_number: "(555) 123-4567", vehicle_desc: "23 Yukon Denali", hat: "04", issue_description: "Customer states AC is blowing warm air.", is_waiting: "Waiting", intake_date: new Date(Date.now() - 3600000).toISOString(), tech: "1166", status: "In Shop", completed_date: null },
+            { id: 2, assigned_user: "Matt Cannoy", ro_number: "65490", customer_name: "Clark Kent", phone_number: "(555) 987-6543", vehicle_desc: "21 Sierra 1500", hat: "12", issue_description: "Oil change and tire rotation. Check brakes.", is_waiting: "Drop Off", intake_date: new Date(Date.now() - 86400000).toISOString(), tech: "1915", status: "Pending", completed_date: null },
+            { id: 3, assigned_user: "Michael Macmillian", ro_number: "65491", customer_name: "Diana Prince", phone_number: "(555) 555-0199", vehicle_desc: "19 Acadia", hat: "22", issue_description: "Check engine light is on. Runs rough.", is_waiting: "Loaner", intake_date: new Date(Date.now() - 172800000).toISOString(), tech: "2107", status: "Parts Hold", completed_date: null },
+            { id: 4, assigned_user: "Michael Burch", ro_number: "65492", customer_name: "Barry Allen", phone_number: "(555) 555-0188", vehicle_desc: "24 Canyon", hat: "08", issue_description: "Transmission slipping in 3rd gear.", is_waiting: "Tow In", intake_date: new Date(Date.now() - 43200000).toISOString(), tech: "1956", status: "In Shop", completed_date: null },
+            { id: 5, assigned_user: "Frank LaRoche", ro_number: "65493", customer_name: "Arthur Curry", phone_number: "(555) 555-0177", vehicle_desc: "20 Terrain", hat: "15", issue_description: "Recall #N212328800. Needs software update.", is_waiting: "Waiting", intake_date: new Date(Date.now() - 1800000).toISOString(), tech: "1197", status: "Completed", completed_date: new Date().toISOString() },
+            { id: 6, assigned_user: "Matt Cannoy", ro_number: "65494", customer_name: "Victor Stone", phone_number: "(555) 555-0166", vehicle_desc: "22 Savana", hat: "02", issue_description: "Replace cabin and engine air filters.", is_waiting: "Waiting", intake_date: new Date(Date.now() - 7200000).toISOString(), tech: "2116", status: "In Shop", completed_date: null },
+            { id: 7, assigned_user: "Michael Macmillian", ro_number: "65495", customer_name: "Hal Jordan", phone_number: "(555) 555-0155", vehicle_desc: "18 Sierra 2500HD", hat: "19", issue_description: "Diesel fuel filter replacement.", is_waiting: "Drop Off", intake_date: new Date(Date.now() - 259200000).toISOString(), tech: "1915", status: "Pending", completed_date: null },
+            { id: 8, assigned_user: "Frank LaRoche", ro_number: "65496", customer_name: "Oliver Queen", phone_number: "(555) 555-0144", vehicle_desc: "23 Yukon XL", hat: "11", issue_description: "Brakes grinding when stopping.", is_waiting: "Drop Off", intake_date: new Date(Date.now() - 345600000).toISOString(), tech: "1166", status: "Parts Hold", completed_date: null }
+        ];
 
+        let fullData = [...mockDataset];
         let currentUser = '';
         let viewFilter = ''; 
         let showCompleted = false;
         let isReportsView = false;
         let cachedReportTasks = [];
         let currentBoardTasks = [];
+
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('login-screen').classList.remove('opacity-0');
+            }, 100);
+        };
 
         function formatSafeDate(dateStr) {
             if (!dateStr) return '';
@@ -621,47 +633,28 @@
             setTimeout(() => toast.classList.add('opacity-0'), 2000);
         }
 
-        async function getTasks() {
+        function getTasks() {
             if (!currentUser || isReportsView) return;
 
             if (document.activeElement && (document.activeElement.classList.contains('editable-cell') || document.activeElement.id.startsWith('new_') || document.activeElement.id === 'search-bar')) {
                 return;
             }
 
-            let allFetched = [];
-            let fetchMore = true;
-            let startRow = 0;
-            const limit = 1000;
+            let filtered = fullData.filter(t => {
+                const isCompleted = (t.status === 'Completed' || t.status === 'completed' || t.status === 'COMPLETED');
+                if (!showCompleted && isCompleted) return false;
+                if (viewFilter !== 'ALL' && t.assigned_user !== viewFilter) return false;
+                return true;
+            });
 
-            while (fetchMore) {
-                let query = _supabase.from('servicetracker').select('*').range(startRow, startRow + limit - 1);
+            filtered.sort((a, b) => {
+                let dateA = a.intake_date ? new Date(a.intake_date).getTime() : Infinity;
+                let dateB = b.intake_date ? new Date(b.intake_date).getTime() : Infinity;
+                if (dateA !== dateB) return dateA - dateB;
+                return a.id - b.id;
+            });
 
-                if (!showCompleted) {
-                    query = query.neq('status', 'Completed').neq('status', 'completed').neq('status', 'COMPLETED');
-                }
-
-                if (viewFilter !== 'ALL') {
-                    query = query.eq('assigned_user', viewFilter);
-                }
-
-                query = query.order('intake_date', { ascending: true, nullsLast: true }).order('created_at', { ascending: true });
-
-                const { data, error } = await query;
-                if (error) { 
-                    console.error('Error fetching:', error.message); 
-                    break;
-                }
-
-                allFetched = allFetched.concat(data);
-
-                if (data.length < limit) {
-                    fetchMore = false;
-                } else {
-                    startRow += limit;
-                }
-            }
-
-            currentBoardTasks = allFetched;
+            currentBoardTasks = filtered;
             filterBoard();
         }
 
@@ -684,46 +677,40 @@
             renderTasks(filtered);
         }
 
-        async function updateField(taskId, column, value) {
+        function updateField(taskId, column, value) {
             let payloadValue = value === "" ? null : value;
-            const payload = {};
 
             if (column === 'intake_date' && payloadValue) {
                 payloadValue = new Date(payloadValue).toISOString();
             }
 
-            payload[column] = payloadValue;
+            const taskIndex = fullData.findIndex(t => t.id === taskId);
+            if (taskIndex === -1) return;
+
+            fullData[taskIndex][column] = payloadValue;
 
             if (column === 'status') {
                 if (value === 'Completed') {
                     const offset = new Date().getTimezoneOffset() * 60000;
-                    payload['completed_date'] = new Date(Date.now() - offset).toISOString().split('T')[0];
+                    fullData[taskIndex]['completed_date'] = new Date(Date.now() - offset).toISOString().split('T')[0];
                 } else {
-                    payload['completed_date'] = null; 
+                    fullData[taskIndex]['completed_date'] = null; 
                 }
             }
 
-            const { error } = await _supabase.from('servicetracker').update(payload).eq('id', taskId);
-
-            if (error) alert('Error saving data: ' + error.message);
-            else {
-                flashSuccess();
-                if (column === 'is_waiting' || column === 'status' || column === 'assigned_user' || column === 'intake_date') {
-                    getTasks();
-                }
+            flashSuccess();
+            if (['is_waiting', 'status', 'assigned_user', 'intake_date'].includes(column)) {
+                getTasks();
+                if(isReportsView) generateReports();
             }
         }
 
-        async function deleteTask(taskId) {
+        function deleteTask(taskId) {
             if (!confirm("Are you sure you want to completely delete this RO? This cannot be undone.")) return;
-
-            const { error } = await _supabase.from('servicetracker').delete().eq('id', taskId);
-
-            if (error) alert('Database Error: ' + error.message);
-            else {
-                flashSuccess(); 
-                getTasks();
-            }
+            fullData = fullData.filter(t => t.id !== taskId);
+            flashSuccess(); 
+            getTasks();
+            if(isReportsView) generateReports();
         }
 
         function renderTasks(tasks) {
@@ -842,7 +829,7 @@
             }
         }
 
-        async function addTask() {
+        function addTask() {
             const ro = document.getElementById('new_ro').value;
             const hat = document.getElementById('new_hat').value || null;
             const vehicle = document.getElementById('new_vehicle').value;
@@ -865,24 +852,26 @@
 
             const safeIntakeDB = intake ? new Date(intake).toISOString() : null;
 
-            const { error } = await _supabase
-                .from('servicetracker')
-                .insert([{ 
-                    ro_number: ro, 
-                    hat: hat,
-                    vehicle_desc: vehicle, 
-                    customer_name: customer,
-                    phone_number: phone, 
-                    issue_description: issue, 
-                    intake_date: safeIntakeDB, 
-                    tech: tech, 
-                    status: 'Pending', 
-                    is_waiting: waitingType, 
-                    assigned_user: currentUser
-                }]);
+            const newTask = { 
+                id: Date.now(),
+                ro_number: ro, 
+                hat: hat,
+                vehicle_desc: vehicle, 
+                customer_name: customer,
+                phone_number: phone, 
+                issue_description: issue, 
+                intake_date: safeIntakeDB, 
+                tech: tech, 
+                status: 'Pending', 
+                is_waiting: waitingType, 
+                assigned_user: currentUser,
+                completed_date: null
+            };
 
-            if (error) alert('Database Error: ' + error.message);
-            else { getTasks(); closeModal(); }
+            fullData.push(newTask);
+            getTasks();
+            if(isReportsView) generateReports();
+            closeModal();
         }
 
         function openReportDetails(type, id) {
@@ -927,33 +916,8 @@
             document.getElementById('reportDetailsModal').classList.add('hidden');
         }
 
-        async function generateReports() {
-            let allTasks = [];
-            let fetchMore = true;
-            let startRow = 0;
-            const limit = 1000;
-
-            while (fetchMore) {
-                const { data, error } = await _supabase
-                    .from('servicetracker')
-                    .select('*')
-                    .range(startRow, startRow + limit - 1);
-
-                if (error) { 
-                    console.error('Report Error:', error); 
-                    return; 
-                }
-
-                allTasks = allTasks.concat(data);
-
-                if (data.length < limit) {
-                    fetchMore = false;
-                } else {
-                    startRow += limit;
-                }
-            }
-            
-            cachedReportTasks = allTasks;
+        function generateReports() {
+            cachedReportTasks = [...fullData];
 
             const techs = ['1166', '1197', '1915', '1956', '2107', '2116'];
             const advisors = ['Frank LaRoche', 'Matt Cannoy'];
@@ -964,7 +928,7 @@
             let globalActive = 0;
             let globalCompleted = 0;
 
-            allTasks.forEach(task => {
+            cachedReportTasks.forEach(task => {
                 const cleanStatus = task.status ? task.status.trim().toLowerCase() : '';
                 const isCompleted = cleanStatus === 'completed';
                 const tNum = task.tech ? String(task.tech).trim() : null;
@@ -1082,8 +1046,6 @@
                 `;
             });
         }
-
-        setInterval(getTasks, 60000);
     </script>
 </body>
 </html>
